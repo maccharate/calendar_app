@@ -1,26 +1,175 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ==============================
+   🌙 全体テーマ設定
+============================== */
+body {
+  color: #f3f4f6;
+  font-family: 'Inter', 'Noto Sans JP', sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ==============================
+   📅 FullCalendar ダークテーマ（シンプル版）
+============================== */
+
+/* カレンダー全体 */
+.fc {
+  background-color: transparent !important;
+  color: #f3f4f6 !important;
+  font-weight: 400;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* タイトル */
+.fc-toolbar-title {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 1.5rem;
+}
+
+/* ナビゲーションボタン */
+.fc .fc-button {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #e2e8f0 !important;
+  font-weight: 500;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  transition: all 0.2s ease;
+}
+.fc .fc-button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 曜日ヘッダー */
+.fc .fc-col-header-cell {
+  background-color: transparent !important;
+  color: #94a3b8 !important;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 0;
+  border: none !important;
+}
+
+/* 日曜と土曜の色分け */
+.fc .fc-col-header-cell:first-child {
+  color: #f87171 !important;
+}
+.fc .fc-col-header-cell:last-child {
+  color: #60a5fa !important;
+}
+
+/* 日付数字 */
+.fc .fc-daygrid-day-number {
+  color: #cbd5e1 !important;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 8px;
+}
+
+/* グリッド線 */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* 今日 */
+.fc .fc-day-today {
+  background: rgba(59, 130, 246, 0.08) !important;
+  position: relative;
+}
+.fc .fc-day-today .fc-daygrid-day-number {
+  color: #60a5fa !important;
+  font-weight: 600;
+}
+
+/* 日付ホバー */
+.fc-daygrid-day:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  transition: background-color 0.2s ease;
+}
+
+/* イベントカード */
+.fc-event {
+  border: none !important;
+  border-radius: 6px !important;
+  transition: opacity 0.2s ease;
+}
+.fc-event:hover {
+  opacity: 0.85;
+}
+/* ================================
+   📅 リストビュー（listWeek）のダークテーマ化
+================================ */
+
+/* 各日のタイトル行（日付部分） */
+.fc-list-day {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #e2e8f0 !important;
+  border: none !important;
+}
+
+/* 日付タイトルのテキスト部分 */
+.fc-list-day-cushion {
+  background-color: transparent !important;
+  color: #94a3b8 !important;
+  font-weight: 600;
+}
+
+/* 各イベント行 */
+.fc-list-event {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  margin-bottom: 4px;
+}
+
+/* イベントホバー */
+.fc-list-event:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  transition: background-color 0.2s ease;
+}
+
+/* 日付タイトルとイベントの仕切り線を消す */
+.fc-list-table td,
+.fc-list-table th {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+/* タッチデバイス用のホバー無効化 */
+@media (hover: none) {
+  .hover\:opacity-80:hover {
+    opacity: 1;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* スムーズスクロール */
+html {
+  scroll-behavior: smooth;
+}
+
+/* モバイルでのタップハイライト削除 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* カスタムスクロールバー */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
