@@ -242,6 +242,49 @@ export default function CalendarPage() {
     });
   };
 
+  // 締切までの残り時間を判定
+  const getDeadlineStatus = (event: EventType): 'urgent' | 'soon' | 'normal' => {
+    const now = new Date();
+    const endDate = new Date(event.end || event.start);
+    const hoursLeft = (endDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    // 既に応募済みの場合は通常表示
+    if (event.extendedProps?.applied) {
+      return 'normal';
+    }
+
+    // 24時間以内
+    if (hoursLeft > 0 && hoursLeft <= 24) {
+      return 'urgent';
+    }
+
+    // 3日（72時間）以内
+    if (hoursLeft > 24 && hoursLeft <= 72) {
+      return 'soon';
+    }
+
+    return 'normal';
+  };
+
+  // 締切バッジを取得
+  const getDeadlineBadge = (status: 'urgent' | 'soon' | 'normal') => {
+    if (status === 'urgent') {
+      return (
+        <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded animate-pulse">
+          🔥 緊急
+        </span>
+      );
+    }
+    if (status === 'soon') {
+      return (
+        <span className="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">
+          ⏰ 締切間近
+        </span>
+      );
+    }
+    return null;
+  };
+
   // コメントモーダルから応募
   const handleApplyWithComment = async () => {
     try {
@@ -625,11 +668,21 @@ export default function CalendarPage() {
                   今日のイベントはありません
                 </div>
               ) : (
-                todayEvents.map((event: EventType) => (
+                todayEvents.map((event: EventType) => {
+                  const deadlineStatus = getDeadlineStatus(event);
+                  const borderColor = deadlineStatus === 'urgent'
+                    ? 'border-red-500'
+                    : deadlineStatus === 'soon'
+                    ? 'border-orange-500'
+                    : 'border-gray-800';
+
+                  return (
                   <div
                     key={event.id}
                     onClick={() => setSelectedEvent(event)}
-                    className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4 hover:border-blue-500/50 transition-all cursor-pointer"
+                    className={`bg-gray-900/50 backdrop-blur-sm border ${borderColor} rounded-xl p-4 hover:border-blue-500/50 transition-all cursor-pointer ${
+                      deadlineStatus === 'urgent' ? 'ring-2 ring-red-500/50' : ''
+                    }`}
                   >
                     <div className="flex gap-4">
                       {event.extendedProps?.img && (
@@ -640,7 +693,10 @@ export default function CalendarPage() {
                         />
                       )}
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold mb-1 truncate">{event.title}</h3>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-bold truncate">{event.title}</h3>
+                          {getDeadlineBadge(deadlineStatus)}
+                        </div>
                         {event.extendedProps?.site && (
                           <p className="text-sm text-gray-400 mb-2 truncate">
                             {event.extendedProps.site}
@@ -726,7 +782,8 @@ export default function CalendarPage() {
                       </div>
                     </div>
                   </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}
@@ -737,11 +794,21 @@ export default function CalendarPage() {
               <h2 className="text-xl font-bold mb-4">
                 すべてのイベント ({filteredEvents.length}件)
               </h2>
-              {filteredEvents.map((event: EventType) => (
+              {filteredEvents.map((event: EventType) => {
+                const deadlineStatus = getDeadlineStatus(event);
+                const borderColor = deadlineStatus === 'urgent'
+                  ? 'border-red-500'
+                  : deadlineStatus === 'soon'
+                  ? 'border-orange-500'
+                  : 'border-gray-800';
+
+                return (
                 <div
                   key={event.id}
                   onClick={() => setSelectedEvent(event)}
-                  className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4 hover:border-blue-500/50 transition-all cursor-pointer"
+                  className={`bg-gray-900/50 backdrop-blur-sm border ${borderColor} rounded-xl p-4 hover:border-blue-500/50 transition-all cursor-pointer ${
+                    deadlineStatus === 'urgent' ? 'ring-2 ring-red-500/50' : ''
+                  }`}
                 >
                   <div className="flex gap-4">
                     {event.extendedProps?.img && (
@@ -752,7 +819,10 @@ export default function CalendarPage() {
                       />
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold mb-1 truncate">{event.title}</h3>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold truncate">{event.title}</h3>
+                        {getDeadlineBadge(deadlineStatus)}
+                      </div>
                       {event.extendedProps?.site && (
                         <p className="text-sm text-gray-400 mb-2 truncate">
                           {event.extendedProps.site}
@@ -830,7 +900,8 @@ export default function CalendarPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
@@ -989,10 +1060,19 @@ export default function CalendarPage() {
                     })}`;
                   };
                   
+                  const deadlineStatus = getDeadlineStatus(event);
+                  const borderColor = deadlineStatus === 'urgent'
+                    ? 'border-red-500'
+                    : deadlineStatus === 'soon'
+                    ? 'border-orange-500'
+                    : 'border-transparent';
+
                   return (
                   <div
                     key={event.id}
-                    className="bg-gray-800/70 rounded-lg p-4 flex gap-3 cursor-pointer hover:bg-gray-700/70 transition-colors"
+                    className={`bg-gray-800/70 rounded-lg p-4 flex gap-3 cursor-pointer hover:bg-gray-700/70 transition-colors border ${borderColor} ${
+                      deadlineStatus === 'urgent' ? 'ring-1 ring-red-500/50' : ''
+                    }`}
                     onClick={() => {
                       setSelectedEvent(event);
                       setSelectedDate(null);
@@ -1006,7 +1086,10 @@ export default function CalendarPage() {
                       />
                     )}
                     <div className="flex-1">
-                      <p className="font-semibold mb-1">{event.title}</p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-semibold">{event.title}</p>
+                        {getDeadlineBadge(deadlineStatus)}
+                      </div>
                       {event.extendedProps?.site && (
                         <p className="text-sm text-gray-400 mb-1">
                           {event.extendedProps.site}
