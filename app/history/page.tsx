@@ -50,6 +50,16 @@ interface ProductTemplate {
   img_url: string;
 }
 
+// プラットフォームごとの手数料率（%）
+const PLATFORM_FEE_RATES: Record<string, number> = {
+  'Mercari': 10,        // メルカリ 10%
+  'SNKRDUNK': 9.5,      // スニダン 9.5%
+  'StockX': 12,         // StockX 約12%（為替・配送により変動）
+  'YahooAuctions': 10,  // ヤフオク 10%
+  'Rakuma': 6.6,        // ラクマ 6.6%
+  'Other': 0,           // その他（手動入力）
+};
+
 export default function HistoryPage() {
   const [events, setEvents] = useState<HistoryEvent[]>([]);
   const [stats, setStats] = useState<HistoryStats | null>(null);
@@ -163,6 +173,24 @@ export default function HistoryPage() {
       }));
     }
   };
+
+  // プラットフォームと売却価格から手数料を自動計算
+  useEffect(() => {
+    const platform = editForm.platform;
+    const salePrice = Number(editForm.sale_price);
+
+    // プラットフォームが選択されていて、売却価格が入力されている場合
+    if (platform && salePrice > 0) {
+      const feeRate = PLATFORM_FEE_RATES[platform];
+      if (feeRate !== undefined && feeRate > 0) {
+        const calculatedFee = Math.floor(salePrice * (feeRate / 100));
+        setEditForm(prev => ({
+          ...prev,
+          fees: calculatedFee.toString(),
+        }));
+      }
+    }
+  }, [editForm.platform, editForm.sale_price]);
 
   // 結果入力モーダルを開く
   const handleResultClick = (event: HistoryEvent) => {
@@ -535,13 +563,16 @@ export default function HistoryPage() {
                             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
                           >
                             <option value="">選択してください</option>
-                            <option value="Mercari">メルカリ</option>
-                            <option value="SNKRDUNK">スニダン</option>
-                            <option value="StockX">StockX</option>
-                            <option value="YahooAuctions">ヤフオク</option>
-                            <option value="Rakuma">ラクマ</option>
-                            <option value="Other">その他</option>
+                            <option value="Mercari">メルカリ（手数料 10%）</option>
+                            <option value="SNKRDUNK">スニダン（手数料 9.5%）</option>
+                            <option value="StockX">StockX（手数料 12%）</option>
+                            <option value="YahooAuctions">ヤフオク（手数料 10%）</option>
+                            <option value="Rakuma">ラクマ（手数料 6.6%）</option>
+                            <option value="Other">その他（手動入力）</option>
                           </select>
+                          <p className="text-xs text-gray-500 mt-1">
+                            ※ プラットフォーム選択時に手数料が自動計算されます
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -559,6 +590,11 @@ export default function HistoryPage() {
                             onChange={(e) => setEditForm({ ...editForm, fees: e.target.value })}
                             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
                           />
+                          {editForm.platform && PLATFORM_FEE_RATES[editForm.platform] > 0 && (
+                            <p className="text-xs text-blue-400 mt-1">
+                              {editForm.platform}: {PLATFORM_FEE_RATES[editForm.platform]}% で自動計算済み
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-xs text-gray-500 mb-1">発送送料</label>
