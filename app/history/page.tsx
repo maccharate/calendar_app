@@ -378,57 +378,78 @@ export default function HistoryPage() {
               filteredEvents.map((event) => (
                 <div
                   key={event.record_id || event.id}
-                  className="bg-gray-800/40 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50 flex flex-col md:flex-row gap-4 items-start md:items-center"
+                  className="bg-gray-800/40 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50"
                 >
-                  {/* 画像 */}
-                  <div className="w-full md:w-24 h-24 relative rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={event.img}
-                      alt={event.title}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
+                  <div className="flex gap-4">
+                    {/* 画像 - 正方形に統一 */}
+                    <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-900/50">
+                      <img
+                        src={event.img}
+                        alt={event.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
-                  {/* 詳細 */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      {getStatusBadge(event.result_status)}
-                      <span className="text-xs text-gray-400">
-                        {formatAppliedDate(event.applied_at)}
-                      </span>
-                      {/* 応募数表示（グループ化されている場合） */}
-                      {!event.is_individual && event.application_count && event.application_count > 1 && (
-                        <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-bold">
-                          {event.application_count}口応募
-                        </span>
+                    {/* 詳細 */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-2 mb-2">
+                        {getStatusBadge(event.result_status)}
+                        {!event.is_individual && event.application_count && event.application_count > 1 && (
+                          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-bold">
+                            {event.application_count}口
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="font-bold text-base mb-1 line-clamp-2">{event.title}</h3>
+                      <p className="text-sm text-gray-400 mb-2">{event.site}</p>
+
+                      {formatAppliedDate(event.applied_at) && (
+                        <p className="text-xs text-gray-500 mb-2">
+                          {formatAppliedDate(event.applied_at)}
+                        </p>
+                      )}
+
+                      {/* 利益情報（当選のみ）- 見やすく表示 */}
+                      {(event.result_status === 'won' || event.result_status === 'partial') && (
+                        <div className="mt-3 grid grid-cols-3 gap-2 text-sm">
+                          <div className="bg-gray-900/50 rounded-lg p-2">
+                            <div className="text-xs text-gray-500 mb-1">購入額</div>
+                            <div className="font-bold">
+                              ¥{event.purchase_price ? Math.floor(event.purchase_price).toLocaleString() : '-'}
+                            </div>
+                          </div>
+                          <div className="bg-gray-900/50 rounded-lg p-2">
+                            <div className="text-xs text-gray-500 mb-1">売却額</div>
+                            <div className="font-bold">
+                              ¥{event.sale_price ? Math.floor(event.sale_price).toLocaleString() : '-'}
+                            </div>
+                          </div>
+                          <div className={`rounded-lg p-2 ${
+                            event.profit && event.profit > 0
+                              ? 'bg-green-500/20 border border-green-500/30'
+                              : 'bg-gray-900/50'
+                          }`}>
+                            <div className="text-xs text-gray-500 mb-1">利益</div>
+                            <div className={`font-bold ${
+                              event.profit && event.profit > 0 ? 'text-green-400' : ''
+                            }`}>
+                              {event.profit && event.profit > 0 ? '+' : ''}
+                              ¥{event.profit ? Math.floor(event.profit).toLocaleString() : '-'}
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
-                    <h3 className="font-bold text-lg truncate">{event.title}</h3>
-                    <p className="text-sm text-gray-400">{event.site}</p>
-
-                    {/* 利益情報（当選のみ） */}
-                    {(event.result_status === 'won' || event.result_status === 'partial') && (
-                      <div className="mt-2 flex gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-500">購入額:</span> ¥{event.purchase_price ? Math.floor(event.purchase_price).toLocaleString() : '-'}
-                        </div>
-                        <div>
-                          <span className="text-gray-500">売却額:</span> ¥{event.sale_price ? Math.floor(event.sale_price).toLocaleString() : '-'}
-                        </div>
-                        <div className={event.profit && event.profit > 0 ? "text-green-400" : "text-gray-400"}>
-                          <span className="text-gray-500">利益:</span> ¥{event.profit ? Math.floor(event.profit).toLocaleString() : '-'}
-                        </div>
-                      </div>
-                    )}
                   </div>
 
-                  {/* アクション（モバイルでは縦並びにしてはみ出し防止） */}
-                  <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                  {/* アクションボタン */}
+                  <div className="flex gap-2 mt-4">
                     <a
                       href={event.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full sm:w-auto px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors text-center"
+                      className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors text-center"
                     >
                       商品ページ
                     </a>
@@ -437,7 +458,7 @@ export default function HistoryPage() {
                     {event.result_status === 'pending' && (
                       <button
                         onClick={() => handleResultClick(event)}
-                        className="w-full sm:w-auto px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-medium transition-colors"
+                        className="flex-1 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-medium transition-colors"
                       >
                         結果を入力
                       </button>
@@ -447,7 +468,7 @@ export default function HistoryPage() {
                     {(event.result_status === 'won' || event.result_status === 'partial') && (
                       <button
                         onClick={() => handleEditClick(event)}
-                        className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
+                        className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
                       >
                         詳細を編集
                       </button>
