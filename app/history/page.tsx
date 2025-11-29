@@ -13,6 +13,7 @@ interface HistoryEvent {
   start: string;
   end: string;
   url: string;
+  advance: boolean;
   applied_at: string;
   status: string;
   result_status: string;
@@ -70,6 +71,7 @@ export default function HistoryPage() {
   // モーダル状態
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
 
   // フィルター状態
   const [filter, setFilter] = useState<'all' | 'won' | 'lost' | 'pending'>('all');
@@ -130,8 +132,8 @@ export default function HistoryPage() {
   // フィルタリングロジック
   const filteredEvents = events.filter(event => {
     if (filter === 'all') return true;
-    if (filter === 'won') return event.result_status === 'won' || event.result_status === 'partial';
-    if (filter === 'lost') return event.result_status === 'lost';
+    if (filter === 'won') return event.result_status === 'won' || event.result_status === 'partial' || event.result_status === 'purchased';
+    if (filter === 'lost') return event.result_status === 'lost' || event.result_status === 'not_purchased';
     if (filter === 'pending') return event.result_status === 'pending';
     return true;
   });
@@ -199,6 +201,45 @@ export default function HistoryPage() {
     setIsResultModalOpen(true);
   };
 
+  // 購入記録モーダルを開く（先着イベント用）
+  const handlePurchaseClick = (event: HistoryEvent) => {
+    setSelectedEvent(event);
+    setIsPurchaseModalOpen(true);
+  };
+
+  // 先着イベントの購入記録を保存
+  const handleSavePurchaseRecord = async (purchased: boolean) => {
+    if (!selectedEvent) return;
+
+    try {
+      const res = await fetch("/api/raffle/purchase-record", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          record_id: selectedEvent.record_id,
+          raffle_id: selectedEvent.id,
+          result_status: purchased ? "purchased" : "not_purchased",
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to save purchase record");
+
+      setIsPurchaseModalOpen(false);
+
+      // 購入した場合は詳細編集モーダルを開く
+      if (purchased) {
+        handleEditClick(selectedEvent);
+      } else {
+        fetchHistory(); // リロード
+      }
+    } catch (error) {
+      console.error("Error saving purchase record:", error);
+      alert("保存に失敗しました");
+    }
+  };
+
   // 詳細保存
   const handleSaveDetails = async () => {
     if (!selectedEvent) return;
@@ -264,14 +305,21 @@ export default function HistoryPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, isAdvance: boolean) => {
     switch (status) {
       case "won":
         return <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-bold">当選</span>;
       case "lost":
         return <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs font-bold">落選</span>;
       case "pending":
+        if (isAdvance) {
+          return <span className="px-2 py-1 bg-gray-500/20 text-gray-400 rounded text-xs font-bold">未記録</span>;
+        }
         return <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs font-bold">結果待ち</span>;
+      case "purchased":
+        return <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-bold">購入済み</span>;
+      case "not_purchased":
+        return <span className="px-2 py-1 bg-gray-500/20 text-gray-400 rounded text-xs font-bold">購入せず</span>;
       default:
         return <span className="px-2 py-1 bg-gray-500/20 text-gray-400 rounded text-xs font-bold">{status}</span>;
     }
@@ -393,7 +441,7 @@ export default function HistoryPage() {
                   <div className="flex-1 min-w-0 flex flex-col gap-3">
                     {/* ステータスと応募日 */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      {getStatusBadge(event.result_status)}
+                      {getStatusBadge(event.result_status, event.advance)}
                       <span className="text-xs text-gray-500">
                         {formatAppliedDate(event.applied_at)}
                       </span>
@@ -414,8 +462,8 @@ export default function HistoryPage() {
                       </p>
                     </div>
 
-                    {/* 利益情報（当選のみ） */}
-                    {(event.result_status === 'won' || event.result_status === 'partial') && (
+                    {/* 利益情報（当選・購入済みのみ） */}
+                    {(event.result_status === 'won' || event.result_status === 'partial' || event.result_status === 'purchased') && (
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-gray-900/50 rounded-lg border border-gray-700/30">
                         <div className="flex flex-col">
                           <span className="text-xs text-gray-500 mb-1">購入額</span>
@@ -454,8 +502,18 @@ export default function HistoryPage() {
                       商品ページ
                     </a>
 
-                    {/* 結果入力ボタン（結果待ちの場合） */}
-                    {event.result_status === 'pending' && (
+                    {/* 先着イベントの購入記録ボタン */}
+                    {event.advance && event.result_status === 'pending' && (
+                      <button
+                        onClick={() => handlePurchaseClick(event)}
+                        className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-all border border-blue-500/50"
+                      >
+                        購入記録
+                      </button>
+                    )}
+
+                    {/* 抽選イベントの結果入力ボタン（結果待ちの場合） */}
+                    {!event.advance && event.result_status === 'pending' && (
                       <button
                         onClick={() => handleResultClick(event)}
                         className="w-full px-4 py-2.5 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-medium transition-all border border-yellow-500/50"
@@ -464,8 +522,8 @@ export default function HistoryPage() {
                       </button>
                     )}
 
-                    {/* 詳細編集ボタン（当選の場合） */}
-                    {(event.result_status === 'won' || event.result_status === 'partial') && (
+                    {/* 詳細編集ボタン（当選・購入済みの場合） */}
+                    {(event.result_status === 'won' || event.result_status === 'partial' || event.result_status === 'purchased') && (
                       <button
                         onClick={() => handleEditClick(event)}
                         className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-all border border-blue-500/50"
@@ -704,6 +762,54 @@ export default function HistoryPage() {
                       className="w-full sm:w-auto px-6 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg font-bold transition-colors"
                     >
                       結果を保存
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          }
+
+          {/* 購入記録モーダル（先着イベント用） */}
+          {
+            isPurchaseModalOpen && selectedEvent && (
+              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="bg-gray-900 rounded-2xl w-full max-w-md border border-gray-800">
+                  <div className="p-6 border-b border-gray-800">
+                    <h2 className="text-xl font-bold">購入記録を入力</h2>
+                    <p className="text-sm text-gray-400 mt-1">{selectedEvent.title}</p>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <p className="text-sm text-gray-300">
+                      この先着イベントの商品を購入しましたか？
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => handleSavePurchaseRecord(true)}
+                        className="px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition-colors"
+                      >
+                        購入した
+                      </button>
+                      <button
+                        onClick={() => handleSavePurchaseRecord(false)}
+                        className="px-6 py-4 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold transition-colors"
+                      >
+                        購入せず
+                      </button>
+                    </div>
+
+                    <p className="text-xs text-gray-500 mt-2">
+                      ※「購入した」を選択すると、購入価格や販売価格を入力できます
+                    </p>
+                  </div>
+
+                  <div className="p-6 border-t border-gray-800 flex justify-end">
+                    <button
+                      onClick={() => setIsPurchaseModalOpen(false)}
+                      className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                    >
+                      キャンセル
                     </button>
                   </div>
                 </div>

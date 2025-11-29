@@ -17,15 +17,16 @@ export async function GET() {
     // - 当選: 個別レコードを返す
     const [appliedEvents] = await pool.query(
       `
-      SELECT 
+      SELECT
         rs.id as record_id,
-        ce.id, 
-        ce.title, 
-        ce.site, 
-        ce.img, 
+        ce.id,
+        ce.title,
+        ce.site,
+        ce.img,
         ce.starttime as start,
         ce.endtime as end,
         ce.link as url,
+        ce.advance,
         rs.applied_at,
         rs.status,
         rs.result_status,
@@ -87,16 +88,16 @@ export async function GET() {
     );
 
     const [wonCount] = await pool.query(
-      `SELECT COUNT(*) as won 
-       FROM raffle_status 
-       WHERE user_id = ? AND result_status IN ('won', 'partial')`,
+      `SELECT COUNT(*) as won
+       FROM raffle_status
+       WHERE user_id = ? AND result_status IN ('won', 'partial', 'purchased')`,
       [userId]
     );
 
     const [lostCount] = await pool.query(
-      `SELECT COUNT(*) as lost 
-       FROM raffle_status 
-       WHERE user_id = ? AND result_status = 'lost'`,
+      `SELECT COUNT(*) as lost
+       FROM raffle_status
+       WHERE user_id = ? AND result_status IN ('lost', 'not_purchased')`,
       [userId]
     );
 
