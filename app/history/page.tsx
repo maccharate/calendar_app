@@ -468,19 +468,19 @@ export default function HistoryPage() {
                         <div className="flex flex-col">
                           <span className="text-xs text-gray-500 mb-1">購入額</span>
                           <span className="text-base font-semibold text-white">
-                            ¥{event.purchase_price ? Math.floor(event.purchase_price).toLocaleString() : '-'}
+                            {(event.purchase_price !== null && event.purchase_price !== undefined && event.purchase_price > 0) ? `¥${Math.floor(event.purchase_price).toLocaleString()}` : '-'}
                           </span>
                         </div>
                         <div className="flex flex-col">
                           <span className="text-xs text-gray-500 mb-1">売却額</span>
                           <span className="text-base font-semibold text-white">
-                            ¥{event.sale_price ? Math.floor(event.sale_price).toLocaleString() : '-'}
+                            {(event.sale_price !== null && event.sale_price !== undefined && event.sale_price > 0) ? `¥${Math.floor(event.sale_price).toLocaleString()}` : '-'}
                           </span>
                         </div>
                         <div className="flex flex-col">
                           <span className="text-xs text-gray-500 mb-1">利益</span>
                           <span className={`text-base font-bold ${event.profit && event.profit > 0 ? "text-green-400" : event.profit && event.profit < 0 ? "text-red-400" : "text-gray-400"}`}>
-                            {event.profit !== null && event.profit !== undefined ? (
+                            {(event.profit !== null && event.profit !== undefined && event.profit !== 0) ? (
                               <>
                                 {event.profit > 0 ? '+' : ''}¥{Math.floor(event.profit).toLocaleString()}
                               </>
