@@ -12,8 +12,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = parseInt(session.user.id as string, 10);
     const subscription = await request.json();
+
+    console.log('Push subscription - userId:', userId, 'type:', typeof userId);
 
     // サブスクリプション情報を保存
     await pool.execute(
