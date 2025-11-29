@@ -287,19 +287,56 @@ export default function CalendarPage() {
   const getDeadlineBadge = (status: 'urgent' | 'soon' | 'normal') => {
     if (status === 'urgent') {
       return (
-        <span className="inline-block px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded animate-pulse whitespace-nowrap mr-2">
-          締切間近
+        <span className="inline-block px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded animate-pulse whitespace-nowrap">
+          緊急
         </span>
       );
     }
     if (status === 'soon') {
       return (
-        <span className="inline-block px-2 py-0.5 bg-orange-500 text-white text-xs font-bold rounded whitespace-nowrap mr-2">
+        <span className="inline-block px-2 py-0.5 bg-orange-500 text-white text-xs font-bold rounded whitespace-nowrap">
           締切間近
         </span>
       );
     }
     return null;
+  };
+
+  // イベントの時間表示を取得（リストビュー用）
+  const getEventTimeDisplay = (event: EventType) => {
+    const startDate = new Date(event.start);
+    const endDate = new Date(event.end || event.start);
+
+    // 日付のみ比較用（時間を0にリセット）
+    const startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const endDay = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+    // 複数日にまたがるイベントかどうか
+    const isMultiDay = startDay.getTime() !== endDay.getTime();
+
+    if (isMultiDay) {
+      return "終日";
+    }
+
+    // 先着イベントの場合 → 開始時間のみ（販売開始）
+    if (event.extendedProps?.advance) {
+      return `${startDate.toLocaleTimeString("ja-JP", {
+        timeZone: "Asia/Tokyo",
+        hour: "2-digit",
+        minute: "2-digit",
+      })}販売開始`;
+    }
+
+    // 同日内のイベント → 開始〜終了
+    return `${startDate.toLocaleTimeString("ja-JP", {
+      timeZone: "Asia/Tokyo",
+      hour: "2-digit",
+      minute: "2-digit",
+    })} 〜 ${endDate.toLocaleTimeString("ja-JP", {
+      timeZone: "Asia/Tokyo",
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
   };
 
   // コメントモーダルから応募
@@ -690,21 +727,21 @@ export default function CalendarPage() {
                   >
                     <div className="flex gap-3">
                       {event.extendedProps?.img && (
-                        <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded">
+                        <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded">
                           <img
                             src={event.extendedProps.img}
                             alt={event.title}
                             className="w-full h-full object-cover bg-gray-800/50"
                           />
+                          {/* 締切バッジを画像の上に */}
+                          {deadlineStatus !== 'normal' && (
+                            <div className="absolute top-0 left-0">
+                              {getDeadlineBadge(deadlineStatus)}
+                            </div>
+                          )}
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        {/* 締切バッジ */}
-                        {deadlineStatus !== 'normal' && (
-                          <div className="mb-1">
-                            {getDeadlineBadge(deadlineStatus)}
-                          </div>
-                        )}
                         {/* タイトル */}
                         <h3 className="font-bold text-base mb-1">
                           {event.title}
@@ -824,21 +861,21 @@ export default function CalendarPage() {
                 >
                   <div className="flex gap-3">
                     {event.extendedProps?.img && (
-                      <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded">
+                      <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded">
                         <img
                           src={event.extendedProps.img}
                           alt={event.title}
                           className="w-full h-full object-cover bg-gray-800/50"
                         />
+                        {/* 締切バッジを画像の上に */}
+                        {deadlineStatus !== 'normal' && (
+                          <div className="absolute top-0 left-0">
+                            {getDeadlineBadge(deadlineStatus)}
+                          </div>
+                        )}
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      {/* 締切バッジ */}
-                      {deadlineStatus !== 'normal' && (
-                        <div className="mb-1">
-                          {getDeadlineBadge(deadlineStatus)}
-                        </div>
-                      )}
                       {/* タイトル */}
                       <h3 className="font-bold text-base mb-1">
                         {event.title}
@@ -849,13 +886,7 @@ export default function CalendarPage() {
                         </p>
                       )}
                       <p className="text-xs text-gray-500 mb-2">
-                        {new Date(event.start).toLocaleDateString("ja-JP", {
-                          timeZone: "Asia/Tokyo",
-                          month: "numeric",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {getEventTimeDisplay(event)}
                       </p>
 
                       {/* 統計情報 */}
@@ -1099,21 +1130,21 @@ export default function CalendarPage() {
                     }}
                   >
                     {event.extendedProps?.img && (
-                      <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded">
+                      <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded">
                         <img
                           src={event.extendedProps.img}
                           alt={event.title}
                           className="w-full h-full object-contain bg-gray-900/50 p-1"
                         />
+                        {/* 締切バッジを画像の上に */}
+                        {deadlineStatus !== 'normal' && (
+                          <div className="absolute top-0 left-0">
+                            {getDeadlineBadge(deadlineStatus)}
+                          </div>
+                        )}
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      {/* 締切バッジ */}
-                      {deadlineStatus !== 'normal' && (
-                        <div className="mb-1">
-                          {getDeadlineBadge(deadlineStatus)}
-                        </div>
-                      )}
                       {/* タイトル */}
                       <p className="font-semibold text-base mb-1">
                         {event.title}
