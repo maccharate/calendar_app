@@ -287,15 +287,15 @@ export default function CalendarPage() {
   const getDeadlineBadge = (status: 'urgent' | 'soon' | 'normal') => {
     if (status === 'urgent') {
       return (
-        <span className="inline-block px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded animate-pulse whitespace-nowrap">
-          🔥 緊急
+        <span className="inline-block px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded animate-pulse whitespace-nowrap mr-2">
+          締切間近
         </span>
       );
     }
     if (status === 'soon') {
       return (
-        <span className="inline-block px-1.5 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded whitespace-nowrap">
-          ⏰ 間近
+        <span className="inline-block px-2 py-0.5 bg-orange-500 text-white text-xs font-bold rounded whitespace-nowrap mr-2">
+          締切間近
         </span>
       );
     }
@@ -690,23 +690,20 @@ export default function CalendarPage() {
                   >
                     <div className="flex gap-3">
                       {event.extendedProps?.img && (
-                        <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded">
+                        <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded">
                           <img
                             src={event.extendedProps.img}
                             alt={event.title}
                             className="w-full h-full object-cover bg-gray-800/50"
                           />
-                          {/* 締切バッジを画像の上に */}
-                          {deadlineStatus !== 'normal' && (
-                            <div className="absolute top-0 left-0">
-                              {getDeadlineBadge(deadlineStatus)}
-                            </div>
-                          )}
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
                         {/* タイトル */}
-                        <h3 className="font-bold text-base mb-1">{event.title}</h3>
+                        <h3 className="font-bold text-base mb-1 flex items-center">
+                          {deadlineStatus !== 'normal' && getDeadlineBadge(deadlineStatus)}
+                          {event.title}
+                        </h3>
                         {event.extendedProps?.site && (
                           <p className="text-sm text-gray-400 mb-2 truncate">
                             {event.extendedProps.site}
@@ -822,23 +819,20 @@ export default function CalendarPage() {
                 >
                   <div className="flex gap-3">
                     {event.extendedProps?.img && (
-                      <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded">
+                      <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded">
                         <img
                           src={event.extendedProps.img}
                           alt={event.title}
                           className="w-full h-full object-cover bg-gray-800/50"
                         />
-                        {/* 締切バッジを画像の上に */}
-                        {deadlineStatus !== 'normal' && (
-                          <div className="absolute top-0 left-0">
-                            {getDeadlineBadge(deadlineStatus)}
-                          </div>
-                        )}
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
                       {/* タイトル */}
-                      <h3 className="font-bold text-base mb-1">{event.title}</h3>
+                      <h3 className="font-bold text-base mb-1 flex items-center">
+                        {deadlineStatus !== 'normal' && getDeadlineBadge(deadlineStatus)}
+                        {event.title}
+                      </h3>
                       {event.extendedProps?.site && (
                         <p className="text-sm text-gray-400 mb-2 truncate">
                           {event.extendedProps.site}
@@ -1095,23 +1089,20 @@ export default function CalendarPage() {
                     }}
                   >
                     {event.extendedProps?.img && (
-                      <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded">
+                      <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded">
                         <img
                           src={event.extendedProps.img}
                           alt={event.title}
                           className="w-full h-full object-contain bg-gray-900/50 p-1"
                         />
-                        {/* 締切バッジを画像の上に */}
-                        {deadlineStatus !== 'normal' && (
-                          <div className="absolute top-0 left-0">
-                            {getDeadlineBadge(deadlineStatus)}
-                          </div>
-                        )}
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
                       {/* タイトル */}
-                      <p className="font-semibold text-base mb-1">{event.title}</p>
+                      <p className="font-semibold text-base mb-1 flex items-center">
+                        {deadlineStatus !== 'normal' && getDeadlineBadge(deadlineStatus)}
+                        {event.title}
+                      </p>
                       {event.extendedProps?.site && (
                         <p className="text-sm text-gray-400 mb-1">
                           {event.extendedProps.site}
@@ -1125,10 +1116,10 @@ export default function CalendarPage() {
                       {eventStats[event.id] && (
                         <div className="mt-2 flex items-center gap-2 text-xs">
                           <span className="text-blue-400">
-                            👥 {eventStats[event.id].unique_users}
+                            {eventStats[event.id].unique_users}人応募
                           </span>
                           <span className="text-gray-500">
-                            📝 {eventStats[event.id].total_applications}
+                            {eventStats[event.id].total_applications}件
                           </span>
                         </div>
                       )}
