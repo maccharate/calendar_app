@@ -642,6 +642,7 @@ export default function HistoryPage() {
 
                     {/* 売却情報 */}
                     {editForm.is_sold && (
+                    <>
                     <div>
                       <h3 className="text-sm font-bold text-gray-400 mb-3">売却情報</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -717,6 +718,7 @@ export default function HistoryPage() {
                         </div>
                       </div>
                     </div>
+                    </>
                     )}
 
                     {/* メモ（常に表示） */}
