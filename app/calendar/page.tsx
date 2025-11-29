@@ -699,9 +699,14 @@ export default function CalendarPage() {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
+                        {/* 締切バッジ */}
+                        {deadlineStatus !== 'normal' && (
+                          <div className="mb-1">
+                            {getDeadlineBadge(deadlineStatus)}
+                          </div>
+                        )}
                         {/* タイトル */}
-                        <h3 className="font-bold text-base mb-1 flex items-center">
-                          {deadlineStatus !== 'normal' && getDeadlineBadge(deadlineStatus)}
+                        <h3 className="font-bold text-base mb-1">
                           {event.title}
                         </h3>
                         {event.extendedProps?.site && (
@@ -828,9 +833,14 @@ export default function CalendarPage() {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
+                      {/* 締切バッジ */}
+                      {deadlineStatus !== 'normal' && (
+                        <div className="mb-1">
+                          {getDeadlineBadge(deadlineStatus)}
+                        </div>
+                      )}
                       {/* タイトル */}
-                      <h3 className="font-bold text-base mb-1 flex items-center">
-                        {deadlineStatus !== 'normal' && getDeadlineBadge(deadlineStatus)}
+                      <h3 className="font-bold text-base mb-1">
                         {event.title}
                       </h3>
                       {event.extendedProps?.site && (
@@ -1098,9 +1108,14 @@ export default function CalendarPage() {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
+                      {/* 締切バッジ */}
+                      {deadlineStatus !== 'normal' && (
+                        <div className="mb-1">
+                          {getDeadlineBadge(deadlineStatus)}
+                        </div>
+                      )}
                       {/* タイトル */}
-                      <p className="font-semibold text-base mb-1 flex items-center">
-                        {deadlineStatus !== 'normal' && getDeadlineBadge(deadlineStatus)}
+                      <p className="font-semibold text-base mb-1">
                         {event.title}
                       </p>
                       {event.extendedProps?.site && (
