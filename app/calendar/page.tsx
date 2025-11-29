@@ -1399,7 +1399,7 @@ export default function CalendarPage() {
                       onClick={() => handleApplyClick(selectedEvent)}
                       className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition-all"
                     >
-                      {selectedEvent.extendedProps?.event_type === 'advance' ? '商品を狙う' : '応募する'}
+                      {selectedEvent.extendedProps?.event_type === 'advance' ? '商品を狙う' : '応募済みにする'}
                     </button>
                   ) : (
                     <button
@@ -1521,7 +1521,7 @@ export default function CalendarPage() {
                   onClick={handleApplyWithComment}
                   className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg font-semibold transition-colors"
                 >
-                  {commentData.event_type === 'advance' ? '商品を狙う' : '応募する'}
+                  {commentData.event_type === 'advance' ? '商品を狙う' : '応募済みにする'}
                 </button>
               </div>
             </div>
