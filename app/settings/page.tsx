@@ -317,11 +317,11 @@ export default function SettingsPage() {
               <div className="mb-6 p-4 rounded-lg bg-gray-900/50 border border-gray-700/30">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold mb-1">プッシュ通知の状態</h3>
+                    <h3 className="font-semibold mb-1">このデバイスの通知登録</h3>
                     <p className="text-sm text-gray-400">
                       {pushPermission === 'granted' ? (
                         pushSubscribed ? (
-                          <span className="text-green-400">✓ 有効</span>
+                          <span className="text-green-400">✓ 登録済み</span>
                         ) : (
                           <span className="text-yellow-400">許可済み（登録が必要）</span>
                         )
@@ -354,11 +354,22 @@ export default function SettingsPage() {
                     ブラウザの設定から通知を許可してください
                   </p>
                 )}
+                {pushSubscribed && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    ℹ️ 通知はデバイスごとに登録が必要です。パソコンとスマホの両方で通知を受け取る場合は、それぞれで許可してください。
+                  </p>
+                )}
               </div>
 
               {/* 通知設定（プッシュが有効な場合のみ） */}
               {pushSubscribed && (
                 <div className="space-y-6">
+                  <div className="p-3 rounded-lg bg-blue-900/20 border border-blue-700/30">
+                    <p className="text-xs text-blue-300">
+                      💡 通知設定を変更した後は、ページ下部の「保存する」ボタンを押してください
+                    </p>
+                  </div>
+
                   {/* 通知全体のオンオフ */}
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
