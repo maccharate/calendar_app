@@ -104,3 +104,63 @@ async function syncEvents() {
     console.error('Sync failed:', error);
   }
 }
+
+// プッシュ通知を受信
+self.addEventListener('push', (event) => {
+  if (!event.data) {
+    console.log('Push event but no data');
+    return;
+  }
+
+  const data = event.data.json();
+  const options = {
+    body: data.body || '',
+    icon: data.icon || '/icon-192x192.png',
+    badge: '/icon-96x96.png',
+    vibrate: [200, 100, 200],
+    data: {
+      url: data.url || '/',
+      eventId: data.eventId,
+    },
+    actions: [
+      {
+        action: 'open',
+        title: '開く',
+      },
+      {
+        action: 'close',
+        title: '閉じる',
+      },
+    ],
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || '通知', options)
+  );
+});
+
+// 通知クリック時の処理
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'close') {
+    return;
+  }
+
+  const urlToOpen = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // 既に開いているタブがあればそれをフォーカス
+      for (const client of clientList) {
+        if (client.url === urlToOpen && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // なければ新しいタブで開く
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
+  );
+});

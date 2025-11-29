@@ -690,18 +690,23 @@ export default function CalendarPage() {
                   >
                     <div className="flex gap-3">
                       {event.extendedProps?.img && (
-                        <img
-                          src={event.extendedProps.img}
-                          alt={event.title}
-                          className="w-20 h-20 object-cover rounded bg-gray-800/50 flex-shrink-0"
-                        />
+                        <div className="relative w-20 h-20 flex-shrink-0">
+                          <img
+                            src={event.extendedProps.img}
+                            alt={event.title}
+                            className="w-full h-full object-cover rounded bg-gray-800/50"
+                          />
+                          {/* 締切バッジを画像の上に */}
+                          {deadlineStatus !== 'normal' && (
+                            <div className="absolute top-0 left-0 right-0">
+                              {getDeadlineBadge(deadlineStatus)}
+                            </div>
+                          )}
+                        </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        {/* 締切バッジを一番上に */}
-                        {getDeadlineBadge(deadlineStatus)}
-
                         {/* タイトル */}
-                        <h3 className="font-bold text-base mt-1 mb-1">{event.title}</h3>
+                        <h3 className="font-bold text-base mb-1">{event.title}</h3>
                         {event.extendedProps?.site && (
                           <p className="text-sm text-gray-400 mb-2 truncate">
                             {event.extendedProps.site}
@@ -817,18 +822,23 @@ export default function CalendarPage() {
                 >
                   <div className="flex gap-3">
                     {event.extendedProps?.img && (
-                      <img
-                        src={event.extendedProps.img}
-                        alt={event.title}
-                        className="w-20 h-20 object-cover rounded bg-gray-800/50 flex-shrink-0"
-                      />
+                      <div className="relative w-20 h-20 flex-shrink-0">
+                        <img
+                          src={event.extendedProps.img}
+                          alt={event.title}
+                          className="w-full h-full object-cover rounded bg-gray-800/50"
+                        />
+                        {/* 締切バッジを画像の上に */}
+                        {deadlineStatus !== 'normal' && (
+                          <div className="absolute top-0 left-0 right-0">
+                            {getDeadlineBadge(deadlineStatus)}
+                          </div>
+                        )}
+                      </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      {/* 締切バッジを一番上に */}
-                      {getDeadlineBadge(deadlineStatus)}
-
                       {/* タイトル */}
-                      <h3 className="font-bold text-base mt-1 mb-1">{event.title}</h3>
+                      <h3 className="font-bold text-base mb-1">{event.title}</h3>
                       {event.extendedProps?.site && (
                         <p className="text-sm text-gray-400 mb-2 truncate">
                           {event.extendedProps.site}
@@ -1085,18 +1095,23 @@ export default function CalendarPage() {
                     }}
                   >
                     {event.extendedProps?.img && (
-                      <img
-                        src={event.extendedProps.img}
-                        alt={event.title}
-                        className="w-20 h-20 object-contain rounded bg-gray-900/50 p-1 flex-shrink-0"
-                      />
+                      <div className="relative w-20 h-20 flex-shrink-0">
+                        <img
+                          src={event.extendedProps.img}
+                          alt={event.title}
+                          className="w-full h-full object-contain rounded bg-gray-900/50 p-1"
+                        />
+                        {/* 締切バッジを画像の上に */}
+                        {deadlineStatus !== 'normal' && (
+                          <div className="absolute top-0 left-0 right-0">
+                            {getDeadlineBadge(deadlineStatus)}
+                          </div>
+                        )}
+                      </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      {/* 締切バッジを一番上に */}
-                      {getDeadlineBadge(deadlineStatus)}
-
                       {/* タイトル */}
-                      <p className="font-semibold text-base mt-1 mb-1">{event.title}</p>
+                      <p className="font-semibold text-base mb-1">{event.title}</p>
                       {event.extendedProps?.site && (
                         <p className="text-sm text-gray-400 mb-1">
                           {event.extendedProps.site}

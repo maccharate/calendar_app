@@ -381,7 +381,7 @@ export default function HistoryPage() {
                   className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-2xl p-5 border border-gray-700/50 hover:border-gray-600/50 transition-all shadow-lg hover:shadow-xl flex flex-col md:flex-row gap-5 items-start"
                 >
                   {/* 画像 */}
-                  <div className="w-full md:w-32 h-32 relative rounded-xl overflow-hidden flex-shrink-0 bg-gray-900/50 border border-gray-700/30">
+                  <div className="w-28 h-28 md:w-32 md:h-32 relative rounded-xl overflow-hidden flex-shrink-0 bg-gray-900/50 border border-gray-700/30">
                     <img
                       src={event.img}
                       alt={event.title}
