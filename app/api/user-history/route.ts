@@ -26,7 +26,7 @@ export async function GET() {
         ce.starttime as start,
         ce.endtime as end,
         ce.link as url,
-        ce.advance,
+        CASE WHEN ce.event_type = 'advance' THEN 1 ELSE 0 END as advance,
         rs.applied_at,
         rs.status,
         rs.result_status,
