@@ -90,6 +90,7 @@ export default function HistoryPage() {
     shipping_cost: "",
     notes: "",
     product_template_id: "",
+    is_sold: false,
   });
 
   // 結果入力用フォームの状態
@@ -152,6 +153,7 @@ export default function HistoryPage() {
       shipping_cost: event.shipping_cost ? Math.floor(event.shipping_cost).toString() : "",
       notes: event.notes || "",
       product_template_id: event.product_template_id?.toString() || "",
+      is_sold: !!(event.sale_price || event.sale_date || event.platform),
     });
     setIsEditModalOpen(true);
   };
@@ -245,12 +247,22 @@ export default function HistoryPage() {
     if (!selectedEvent) return;
 
     try {
+      // 売却済みでない場合は売却関連フィールドをクリア
+      const formData = editForm.is_sold ? editForm : {
+        ...editForm,
+        sale_price: "",
+        sale_date: "",
+        platform: "",
+        fees: "",
+        shipping_cost: "",
+      };
+
       // 利益計算
-      const purchase = Number(editForm.purchase_price) || 0;
-      const pShipping = Number(editForm.purchase_shipping) || 0;
-      const sale = Number(editForm.sale_price) || 0;
-      const fees = Number(editForm.fees) || 0;
-      const sShipping = Number(editForm.shipping_cost) || 0;
+      const purchase = Number(formData.purchase_price) || 0;
+      const pShipping = Number(formData.purchase_shipping) || 0;
+      const sale = Number(formData.sale_price) || 0;
+      const fees = Number(formData.fees) || 0;
+      const sShipping = Number(formData.shipping_cost) || 0;
       const profit = sale - (purchase + pShipping + fees + sShipping);
 
       const res = await fetch("/api/raffle/details", {
@@ -261,7 +273,7 @@ export default function HistoryPage() {
         body: JSON.stringify({
           record_id: selectedEvent.record_id,
           raffle_id: selectedEvent.id,
-          ...editForm,
+          ...formData,
           profit,
         }),
       });
@@ -611,7 +623,25 @@ export default function HistoryPage() {
                       </div>
                     </div>
 
+                    {/* 売却済みチェックボックス */}
+                    <div className="flex items-center gap-2 p-3 bg-gray-900/50 rounded-lg border border-gray-700/30">
+                      <input
+                        type="checkbox"
+                        id="is_sold"
+                        checked={editForm.is_sold}
+                        onChange={(e) => setEditForm({ ...editForm, is_sold: e.target.checked })}
+                        className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900"
+                      />
+                      <label htmlFor="is_sold" className="text-sm font-medium text-gray-300 cursor-pointer">
+                        売却済み
+                      </label>
+                      <span className="text-xs text-gray-500 ml-2">
+                        （チェックを外すと購入情報のみ保存できます）
+                      </span>
+                    </div>
+
                     {/* 売却情報 */}
+                    {editForm.is_sold && (
                     <div>
                       <h3 className="text-sm font-bold text-gray-400 mb-3">売却情報</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -685,15 +715,18 @@ export default function HistoryPage() {
                             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
                           />
                         </div>
-                        <div className="md:col-span-2">
-                          <label className="block text-xs text-gray-500 mb-1">メモ</label>
-                          <textarea
-                            value={editForm.notes}
-                            onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 h-20"
-                          />
-                        </div>
                       </div>
+                    </div>
+                    )}
+
+                    {/* メモ（常に表示） */}
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">メモ</label>
+                      <textarea
+                        value={editForm.notes}
+                        onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 h-20"
+                      />
                     </div>
                   </div>
 
