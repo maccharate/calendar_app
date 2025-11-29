@@ -378,57 +378,78 @@ export default function HistoryPage() {
               filteredEvents.map((event) => (
                 <div
                   key={event.record_id || event.id}
-                  className="bg-gray-800/40 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50 flex flex-col md:flex-row gap-4 items-start md:items-center"
+                  className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-2xl p-5 border border-gray-700/50 hover:border-gray-600/50 transition-all shadow-lg hover:shadow-xl flex flex-col md:flex-row gap-5 items-start"
                 >
                   {/* 画像 */}
-                  <div className="w-full md:w-24 h-24 relative rounded-lg overflow-hidden flex-shrink-0">
+                  <div className="w-full md:w-32 h-32 relative rounded-xl overflow-hidden flex-shrink-0 bg-gray-900/50 border border-gray-700/30">
                     <img
                       src={event.img}
                       alt={event.title}
-                      className="object-cover w-full h-full"
+                      className="object-contain w-full h-full p-2"
                     />
                   </div>
 
                   {/* 詳細 */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="flex-1 min-w-0 flex flex-col gap-3">
+                    {/* ステータスと応募日 */}
+                    <div className="flex items-center gap-2 flex-wrap">
                       {getStatusBadge(event.result_status)}
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-500">
                         {formatAppliedDate(event.applied_at)}
                       </span>
                       {/* 応募数表示（グループ化されている場合） */}
                       {!event.is_individual && event.application_count && event.application_count > 1 && (
-                        <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-bold">
+                        <span className="px-2.5 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-xs font-bold border border-blue-500/30">
                           {event.application_count}口応募
                         </span>
                       )}
                     </div>
-                    <h3 className="font-bold text-lg truncate">{event.title}</h3>
-                    <p className="text-sm text-gray-400">{event.site}</p>
+
+                    {/* タイトルとサイト */}
+                    <div>
+                      <h3 className="font-bold text-xl mb-1 text-white">{event.title}</h3>
+                      <p className="text-sm text-gray-400 flex items-center gap-1">
+                        <span className="text-gray-500">📍</span>
+                        {event.site}
+                      </p>
+                    </div>
 
                     {/* 利益情報（当選のみ） */}
                     {(event.result_status === 'won' || event.result_status === 'partial') && (
-                      <div className="mt-2 flex gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-500">購入額:</span> ¥{event.purchase_price ? Math.floor(event.purchase_price).toLocaleString() : '-'}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-gray-900/50 rounded-lg border border-gray-700/30">
+                        <div className="flex flex-col">
+                          <span className="text-xs text-gray-500 mb-1">購入額</span>
+                          <span className="text-base font-semibold text-white">
+                            ¥{event.purchase_price ? Math.floor(event.purchase_price).toLocaleString() : '-'}
+                          </span>
                         </div>
-                        <div>
-                          <span className="text-gray-500">売却額:</span> ¥{event.sale_price ? Math.floor(event.sale_price).toLocaleString() : '-'}
+                        <div className="flex flex-col">
+                          <span className="text-xs text-gray-500 mb-1">売却額</span>
+                          <span className="text-base font-semibold text-white">
+                            ¥{event.sale_price ? Math.floor(event.sale_price).toLocaleString() : '-'}
+                          </span>
                         </div>
-                        <div className={event.profit && event.profit > 0 ? "text-green-400" : "text-gray-400"}>
-                          <span className="text-gray-500">利益:</span> ¥{event.profit ? Math.floor(event.profit).toLocaleString() : '-'}
+                        <div className="flex flex-col">
+                          <span className="text-xs text-gray-500 mb-1">利益</span>
+                          <span className={`text-base font-bold ${event.profit && event.profit > 0 ? "text-green-400" : event.profit && event.profit < 0 ? "text-red-400" : "text-gray-400"}`}>
+                            {event.profit !== null && event.profit !== undefined ? (
+                              <>
+                                {event.profit > 0 ? '+' : ''}¥{Math.floor(event.profit).toLocaleString()}
+                              </>
+                            ) : '-'}
+                          </span>
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* アクション（モバイルでは縦並びにしてはみ出し防止） */}
-                  <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                  {/* アクション */}
+                  <div className="flex flex-col gap-2 w-full md:w-auto md:min-w-[140px]">
                     <a
                       href={event.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full sm:w-auto px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors text-center"
+                      className="w-full px-4 py-2.5 bg-gray-700/80 hover:bg-gray-600 rounded-lg text-sm font-medium transition-all text-center border border-gray-600/50 hover:border-gray-500"
                     >
                       商品ページ
                     </a>
@@ -437,7 +458,7 @@ export default function HistoryPage() {
                     {event.result_status === 'pending' && (
                       <button
                         onClick={() => handleResultClick(event)}
-                        className="w-full sm:w-auto px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-medium transition-colors"
+                        className="w-full px-4 py-2.5 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-medium transition-all border border-yellow-500/50"
                       >
                         結果を入力
                       </button>
@@ -447,7 +468,7 @@ export default function HistoryPage() {
                     {(event.result_status === 'won' || event.result_status === 'partial') && (
                       <button
                         onClick={() => handleEditClick(event)}
-                        className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
+                        className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-all border border-blue-500/50"
                       >
                         詳細を編集
                       </button>
