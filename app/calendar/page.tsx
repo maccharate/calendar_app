@@ -37,11 +37,34 @@ interface EventStats {
   unique_users: number;
 }
 
+interface ApiEventResponse {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  url?: string;
+  status?: string;
+  event_type?: string;
+  extendedProps?: {
+    site?: string;
+    img?: string;
+    applied?: boolean;
+    advance?: boolean;
+    remind?: boolean;
+    application_comment?: string;
+    lottery_number?: string;
+    announcement_date?: string;
+    application_count?: number;
+    isPersonal?: boolean;
+    isPublic?: boolean;
+  };
+}
+
 type ViewMode = "calendar" | "today" | "list";
 
 export default function CalendarPage() {
   const router = useRouter();
-  const calendarRef = useRef<any>(null);
+  const calendarRef = useRef<FullCalendar>(null);
 
   const [events, setEvents] = useState<EventType[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<EventType[]>([]);
@@ -106,15 +129,10 @@ export default function CalendarPage() {
       if (response.ok) {
         const data = await response.json();
         // API が { events: [...] } を返す場合と配列を直接返す場合の両対応
-        const eventsArray = Array.isArray(data) ? data : data.events || [];
-        console.log("Fetched events:", eventsArray.length, "events", Array.isArray(data) ? "(array)" : "(object)");
-
-        // 応募済みイベントをログ出力
-        const appliedInFrontend = eventsArray.filter((e: EventType) => e.extendedProps?.applied);
-        console.log("[Frontend] Applied events count:", appliedInFrontend.length);
+        const eventsArray: ApiEventResponse[] = Array.isArray(data) ? data : data.events || [];
 
         // 色分けプロパティを付与してからセット
-        const colored = eventsArray.map((e: any) => {
+        const colored = eventsArray.map((e: ApiEventResponse) => {
           let backgroundColor = "#6B7280"; // デフォルト: 未応募(グレー)
           let borderColor = "#4b5563";
           let textColor = "#ffffff";
@@ -142,7 +160,6 @@ export default function CalendarPage() {
 
         setEvents(colored);
         setFilteredEvents(colored);
-        console.log('[Debug] fetched events ids:', colored.map((e: any) => e.id));
       } else {
         console.error("Failed to fetch events");
       }
@@ -288,8 +305,6 @@ export default function CalendarPage() {
   // コメントモーダルから応募
   const handleApplyWithComment = async () => {
     try {
-      console.log("Applying with data:", commentData);
-
       const res = await fetch("/api/raffle/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -297,7 +312,6 @@ export default function CalendarPage() {
       });
 
       const result = await res.json();
-      console.log("Apply response:", result);
 
       if (res.ok) {
         // 成功通知
@@ -311,10 +325,8 @@ export default function CalendarPage() {
         setShowCommentModal(false);
         setSelectedEvent(null);
 
-        console.log("Refreshing events...");
         await fetchEvents();
         await fetchEventStats();
-        console.log("Events refreshed");
       } else {
         alert("❌ 応募に失敗しました");
       }
@@ -326,9 +338,6 @@ export default function CalendarPage() {
 
   // 応募ボタンクリック
   const handleApplyClick = (event: EventType) => {
-    console.log("Opening comment modal for event:", event);
-    console.log("Extended props:", event.extendedProps);
-
     // モーダル非表示設定の場合、即座に1口応募
     if (!userSettings.show_application_modal) {
       handleQuickApply(event.id);
@@ -439,10 +448,6 @@ export default function CalendarPage() {
       return start <= clickedDate && clickedDate <= end;
     });
 
-    // デバッグ: クリックした日付と対象イベントIDを出力
-    console.log('[Debug] handleDateClick clicked date:', info.dateStr);
-    console.log('[Debug] handleDateClick matched event ids:', dayEvents.map((d) => d.id));
-
     setSelectedDate(info.dateStr);
     setSelectedDateEvents(dayEvents);
     setSelectedEvent(null);
@@ -484,7 +489,6 @@ export default function CalendarPage() {
   }
 
   const todayEvents = getTodayEvents();
-  console.log('[Debug] todayEvents count:', todayEvents.length, 'ids:', todayEvents.map((e) => e.id));
 
   return (
     <>
