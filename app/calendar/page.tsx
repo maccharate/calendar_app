@@ -105,7 +105,7 @@ export default function CalendarPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // ソート用
-  const [sortBy, setSortBy] = useState<"date" | "popularity">("date");
+  const [sortBy, setSortBy] = useState<"date" | "popularity" | "deadline">("date");
 
   // ビューモード
   const [viewMode, setViewMode] = useState<ViewMode>("today");
@@ -230,6 +230,12 @@ export default function CalendarPage() {
         const bStats = eventStats[b.id]?.total_applications || 0;
         return bStats - aStats;
       });
+    } else if (sortBy === "deadline") {
+      filtered.sort((a, b) => {
+        const aEnd = new Date(a.end || a.start).getTime();
+        const bEnd = new Date(b.end || b.start).getTime();
+        return aEnd - bEnd; // 締め切り早い順
+      });
     } else {
       filtered.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
     }
@@ -306,15 +312,34 @@ export default function CalendarPage() {
   const getEventTimeDisplay = (event: EventType) => {
     const startDate = new Date(event.start);
     const endDate = new Date(event.end || event.start);
+    const today = new Date();
 
     // 日付のみ比較用（時間を0にリセット）
     const startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
     const endDay = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     // 複数日にまたがるイベントかどうか
     const isMultiDay = startDay.getTime() !== endDay.getTime();
 
     if (isMultiDay) {
+      // 今日が開始日の場合
+      if (todayDay.getTime() === startDay.getTime()) {
+        return `${startDate.toLocaleTimeString("ja-JP", {
+          timeZone: "Asia/Tokyo",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}〜`;
+      }
+      // 今日が終了日の場合
+      if (todayDay.getTime() === endDay.getTime()) {
+        return `〜${endDate.toLocaleTimeString("ja-JP", {
+          timeZone: "Asia/Tokyo",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`;
+      }
+      // 今日が中間日の場合
       return "終日";
     }
 
@@ -594,8 +619,8 @@ export default function CalendarPage() {
           <div className="mb-6">
             <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4">
               <div className="flex items-center justify-between mb-4 md:mb-0">
-                <h2 className="font-bold flex items-center gap-2">
-                  <span className="text-blue-400">🔍</span> 絞り込み・並び替え
+                <h2 className="font-bold text-blue-400">
+                  絞り込み・並び替え
                 </h2>
                 <button
                   onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -652,7 +677,7 @@ export default function CalendarPage() {
                 {/* ソート */}
                 <div className="mb-4">
                   <h3 className="text-sm font-semibold text-gray-400 mb-2">並び替え</h3>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button
                       onClick={() => setSortBy("date")}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === "date"
@@ -661,6 +686,15 @@ export default function CalendarPage() {
                         }`}
                     >
                       日付順
+                    </button>
+                    <button
+                      onClick={() => setSortBy("deadline")}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === "deadline"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                        }`}
+                    >
+                      締切順
                     </button>
                     <button
                       onClick={() => setSortBy("popularity")}
