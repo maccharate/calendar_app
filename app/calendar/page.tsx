@@ -86,6 +86,7 @@ export default function CalendarPage() {
     lottery_number: "",
     announcement_date: "",
     application_count: 1,
+    event_type: "",
   });
 
   // ユーザー設定
@@ -413,6 +414,7 @@ export default function CalendarPage() {
       lottery_number: event.extendedProps?.lottery_number || "",
       announcement_date: event.extendedProps?.announcement_date || "",
       application_count: event.extendedProps?.application_count || userSettings.default_application_count,
+      event_type: event.extendedProps?.event_type || "",
     });
     setShowCommentModal(true);
   };
@@ -1344,6 +1346,7 @@ export default function CalendarPage() {
                             announcement_date:
                               formatDate(selectedEvent.extendedProps?.announcement_date || ""),
                             application_count: 1,
+                            event_type: selectedEvent.extendedProps?.event_type || "",
                           });
                           setShowCommentModal(true);
                         }}
@@ -1396,7 +1399,7 @@ export default function CalendarPage() {
                       onClick={() => handleApplyClick(selectedEvent)}
                       className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition-all"
                     >
-                      応募する
+                      {selectedEvent.extendedProps?.event_type === 'advance' ? '商品を狙う' : '応募する'}
                     </button>
                   ) : (
                     <button
@@ -1518,7 +1521,7 @@ export default function CalendarPage() {
                   onClick={handleApplyWithComment}
                   className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg font-semibold transition-colors"
                 >
-                  応募する
+                  {commentData.event_type === 'advance' ? '商品を狙う' : '応募する'}
                 </button>
               </div>
             </div>
