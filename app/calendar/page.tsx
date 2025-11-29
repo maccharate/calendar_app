@@ -287,15 +287,15 @@ export default function CalendarPage() {
   const getDeadlineBadge = (status: 'urgent' | 'soon' | 'normal') => {
     if (status === 'urgent') {
       return (
-        <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded animate-pulse">
+        <span className="inline-block px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded animate-pulse whitespace-nowrap">
           🔥 緊急
         </span>
       );
     }
     if (status === 'soon') {
       return (
-        <span className="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">
-          ⏰ 締切間近
+        <span className="inline-block px-1.5 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded whitespace-nowrap">
+          ⏰ 間近
         </span>
       );
     }
@@ -690,15 +690,15 @@ export default function CalendarPage() {
                   >
                     <div className="flex gap-3">
                       {event.extendedProps?.img && (
-                        <div className="relative w-20 h-20 flex-shrink-0">
+                        <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded">
                           <img
                             src={event.extendedProps.img}
                             alt={event.title}
-                            className="w-full h-full object-cover rounded bg-gray-800/50"
+                            className="w-full h-full object-cover bg-gray-800/50"
                           />
                           {/* 締切バッジを画像の上に */}
                           {deadlineStatus !== 'normal' && (
-                            <div className="absolute top-0 left-0 right-0">
+                            <div className="absolute top-0 left-0">
                               {getDeadlineBadge(deadlineStatus)}
                             </div>
                           )}
@@ -822,15 +822,15 @@ export default function CalendarPage() {
                 >
                   <div className="flex gap-3">
                     {event.extendedProps?.img && (
-                      <div className="relative w-20 h-20 flex-shrink-0">
+                      <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded">
                         <img
                           src={event.extendedProps.img}
                           alt={event.title}
-                          className="w-full h-full object-cover rounded bg-gray-800/50"
+                          className="w-full h-full object-cover bg-gray-800/50"
                         />
                         {/* 締切バッジを画像の上に */}
                         {deadlineStatus !== 'normal' && (
-                          <div className="absolute top-0 left-0 right-0">
+                          <div className="absolute top-0 left-0">
                             {getDeadlineBadge(deadlineStatus)}
                           </div>
                         )}
@@ -1095,15 +1095,15 @@ export default function CalendarPage() {
                     }}
                   >
                     {event.extendedProps?.img && (
-                      <div className="relative w-20 h-20 flex-shrink-0">
+                      <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded">
                         <img
                           src={event.extendedProps.img}
                           alt={event.title}
-                          className="w-full h-full object-contain rounded bg-gray-900/50 p-1"
+                          className="w-full h-full object-contain bg-gray-900/50 p-1"
                         />
                         {/* 締切バッジを画像の上に */}
                         {deadlineStatus !== 'normal' && (
-                          <div className="absolute top-0 left-0 right-0">
+                          <div className="absolute top-0 left-0">
                             {getDeadlineBadge(deadlineStatus)}
                           </div>
                         )}
