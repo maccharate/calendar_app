@@ -24,17 +24,23 @@ VAPID_MAILTO=mailto:your-email@example.com
 
 ## 3. データベースのセットアップ
 
+### 新規セットアップの場合
+
 MySQLデータベースに以下のテーブルを作成します:
 
 ```bash
 mysql -u root -p raffle_db < sql/create_push_notifications.sql
 ```
 
-または、手動でSQLを実行:
+### 既存のテーブルがある場合（マイグレーション）
 
-```sql
--- sql/create_push_notifications.sql の内容を実行
+既にテーブルを作成していて、user_id型の問題が発生している場合は、マイグレーションスクリプトを実行してください:
+
+```bash
+mysql -u root -p raffle_db < sql/migrate_user_id_to_bigint.sql
 ```
+
+このスクリプトは、`user_id` カラムの型を `INT` から `BIGINT` に変更します。NextAuthが生成する大きなユーザーIDに対応するために必要です。
 
 ## 4. アプリケーションの再起動
 
