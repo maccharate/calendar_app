@@ -642,7 +642,7 @@ export default function HistoryPage() {
                     )}
 
                     {/* 先着イベントの購入記録ボタン */}
-                    {event.advance && event.result_status === 'pending' && (
+                    {event.advance === 1 && event.result_status === 'pending' && (
                       <button
                         onClick={() => handlePurchaseClick(event)}
                         className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-all border border-blue-500/50"
@@ -652,7 +652,7 @@ export default function HistoryPage() {
                     )}
 
                     {/* 抽選イベントの結果入力ボタン（結果待ちの場合） */}
-                    {!event.advance && event.result_status === 'pending' && (
+                    {event.advance === 0 && event.result_status === 'pending' && (
                       <button
                         onClick={() => handleResultClick(event)}
                         className="w-full px-4 py-2.5 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-medium transition-all border border-yellow-500/50"
