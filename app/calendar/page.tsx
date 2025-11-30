@@ -393,11 +393,11 @@ export default function CalendarPage() {
         await fetchEvents();
         await fetchEventStats();
       } else {
-        alert("❌ 応募に失敗しました");
+        alert("応募に失敗しました");
       }
     } catch (error) {
       console.error(error);
-      alert("❌ エラーが発生しました");
+      alert("エラーが発生しました");
     }
   };
 
@@ -446,11 +446,11 @@ export default function CalendarPage() {
         await fetchEvents();
         await fetchEventStats();
       } else {
-        alert("❌ 応募に失敗しました");
+        alert("応募に失敗しました");
       }
     } catch (error) {
       console.error(error);
-      alert("❌ エラーが発生しました");
+      alert("エラーが発生しました");
     }
   };
 
@@ -486,7 +486,7 @@ export default function CalendarPage() {
         }
       } catch (error) {
         console.error("Error canceling application:", error);
-        alert("❌ 取り消しに失敗しました");
+        alert("取り消しに失敗しました");
       }
     }
   };

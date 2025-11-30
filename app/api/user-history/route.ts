@@ -23,7 +23,7 @@ export async function GET() {
         ce.id,
         COALESCE(rs.product_name, ce.title) as title,
         COALESCE(rs.brand, ce.site) as site,
-        ce.img,
+        COALESCE(rs.img, ce.img) as img,
         ce.starttime as start,
         ce.endtime as end,
         ce.link as url,
