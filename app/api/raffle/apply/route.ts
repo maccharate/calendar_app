@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { pool } from "../../../../lib/db";
+import { logActivity } from "../../../../lib/activityLogger";
 
 export async function POST(request: Request) {
   try {
@@ -84,6 +85,22 @@ export async function POST(request: Request) {
        SET applied = 1, applied_at = IFNULL(applied_at, NOW())
        WHERE user_id = ? AND raffle_id = ?`,
       [userId, raffle_id]
+    );
+
+    // アクティビティログを記録
+    await logActivity(
+      userId,
+      session.user.name,
+      "apply_raffle",
+      {
+        targetType: "event",
+        targetId: raffle_id,
+        metadata: {
+          application_count,
+          lottery_number,
+        },
+        request,
+      }
     );
 
     return NextResponse.json({

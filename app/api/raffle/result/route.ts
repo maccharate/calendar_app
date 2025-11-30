@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { pool } from "../../../../lib/db";
+import { logActivity } from "../../../../lib/activityLogger";
 
 export async function POST(request: Request) {
     try {
@@ -58,6 +59,22 @@ export async function POST(request: Request) {
                 [lostIds]
             );
         }
+
+        // アクティビティログを記録
+        await logActivity(
+            userId,
+            session.user.name,
+            "update_result",
+            {
+                targetType: "event",
+                targetId: raffle_id,
+                metadata: {
+                    won_count: wonIds.length,
+                    lost_count: lostIds.length,
+                },
+                request,
+            }
+        );
 
         return NextResponse.json({
             success: true,
