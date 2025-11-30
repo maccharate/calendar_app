@@ -29,8 +29,10 @@ interface EventType {
     application_count?: number;
     isPersonal?: boolean;
     isPublic?: boolean;
+    event_type?: string;  // ← これを追加
   };
 }
+
 
 interface EventStats {
   total_applications: number;

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
 // 管理者のDiscord ID（route.tsと同じ）
-const ADMIN_USER_IDS = ["547775428526473217", "549913811172196362", "501024205916078083"];
+const ADMIN_USER_IDS = ["547775428526473217", "549913811172196362", "501024205916078083","642197951216746528"];
 
 export async function GET() {
   try {

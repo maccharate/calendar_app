@@ -1,3 +1,5 @@
+"use client";  // ⭐ これを一番上に追加
+
 export default function OfflinePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white flex flex-col items-center justify-center p-4">
