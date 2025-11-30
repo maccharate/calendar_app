@@ -59,10 +59,9 @@ export async function POST(request: Request) {
         profit,
         notes,
         product_template_id,
-        application_count,
-        won_count,
-        created_at
-      ) VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, NOW())`,
+        applied,
+        applied_at
+      ) VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW())`,
       [
         userId,
         product_name.trim(),
