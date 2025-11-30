@@ -423,7 +423,12 @@ export default function HistoryPage() {
     }
   };
 
-  const getStatusBadge = (status: string, isAdvance: boolean) => {
+  const getStatusBadge = (status: string, isAdvance: boolean, isManual: boolean = false) => {
+    // 手動追加レコードの場合
+    if (isManual) {
+      return <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-xs font-bold">📝 手動追加</span>;
+    }
+
     switch (status) {
       case "won":
         return <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-bold">当選</span>;
@@ -572,7 +577,7 @@ export default function HistoryPage() {
                   <div className="flex-1 min-w-0 flex flex-col gap-3">
                     {/* ステータスと応募日 */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      {getStatusBadge(event.result_status, event.advance)}
+                      {getStatusBadge(event.result_status, event.advance, event.is_manual)}
                       <span className="text-xs text-gray-500">
                         {formatAppliedDate(event.applied_at)}
                       </span>
@@ -753,22 +758,43 @@ export default function HistoryPage() {
                       </div>
                     </div>
 
-                    {/* 売却済みチェックボックス */}
-                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl border-2 border-gray-700/50 hover:border-blue-500/30 transition-all">
-                      <input
-                        type="checkbox"
-                        id="is_sold"
-                        checked={editForm.is_sold}
-                        onChange={(e) => setEditForm({ ...editForm, is_sold: e.target.checked })}
-                        className="w-5 h-5 rounded-lg border-2 border-gray-600 bg-gray-800 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all cursor-pointer"
-                      />
-                      <label htmlFor="is_sold" className="text-sm font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent cursor-pointer flex items-center gap-2">
-                        <span>📦</span>
-                        売却済み
+                    {/* 売却状態の選択 */}
+                    <div className="space-y-3">
+                      <label className="block text-sm font-semibold text-white">
+                        売却状態
                       </label>
-                      <span className="text-xs text-gray-500 ml-auto bg-gray-800/50 px-3 py-1 rounded-full border border-gray-700/30">
-                        購入情報のみ保存も可能
-                      </span>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setEditForm({ ...editForm, is_sold: false })}
+                          className={`p-4 rounded-lg border-2 transition-all text-left ${
+                            !editForm.is_sold
+                              ? 'border-blue-500 bg-blue-500/10 text-white'
+                              : 'border-gray-700 bg-gray-800/30 text-gray-400 hover:border-gray-600'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">📦</span>
+                            <span className="font-bold text-sm">在庫中</span>
+                          </div>
+                          <p className="text-xs text-gray-500">売却情報は後で入力</p>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditForm({ ...editForm, is_sold: true })}
+                          className={`p-4 rounded-lg border-2 transition-all text-left ${
+                            editForm.is_sold
+                              ? 'border-green-500 bg-green-500/10 text-white'
+                              : 'border-gray-700 bg-gray-800/30 text-gray-400 hover:border-gray-600'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">💰</span>
+                            <span className="font-bold text-sm">売却済み</span>
+                          </div>
+                          <p className="text-xs text-gray-500">売却情報を入力する</p>
+                        </button>
+                      </div>
                     </div>
 
                     {/* 売却情報 */}
@@ -876,19 +902,34 @@ export default function HistoryPage() {
                     </div>
                   </div>
 
-                  <div className="sticky bottom-0 p-6 border-t border-gray-700/50 flex flex-col sm:flex-row justify-end gap-3 bg-gradient-to-r from-transparent to-gray-800/30 backdrop-blur-sm">
-                    <button
-                      onClick={() => setIsEditModalOpen(false)}
-                      className="w-full sm:w-auto px-5 py-2.5 text-gray-400 hover:text-white transition-all text-center rounded-xl hover:bg-gray-800/50 font-medium"
-                    >
-                      キャンセル
-                    </button>
-                    <button
-                      onClick={handleSaveDetails}
-                      className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/40 hover:scale-105"
-                    >
-                      💾 保存する
-                    </button>
+                  <div className="sticky bottom-0 p-6 border-t border-gray-700/50 bg-gray-900/95 backdrop-blur-sm">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                      {/* 左側：在庫中の場合のヒント */}
+                      {!editForm.is_sold && (
+                        <p className="text-sm text-gray-400 hidden sm:block">
+                          💡 売却情報は後から追加できます
+                        </p>
+                      )}
+                      <div className="flex-1"></div>
+
+                      {/* 右側：ボタン */}
+                      <div className="flex flex-col-reverse sm:flex-row gap-3 w-full sm:w-auto">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditModalOpen(false)}
+                          className="w-full sm:w-auto px-6 py-3 border-2 border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 rounded-lg font-medium transition-colors"
+                        >
+                          キャンセル
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveDetails}
+                          className="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-colors shadow-lg focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                        >
+                          保存する
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1118,22 +1159,43 @@ export default function HistoryPage() {
                     </div>
                   </div>
 
-                  {/* 売却済みチェックボックス */}
-                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl border-2 border-gray-700/50 hover:border-blue-500/30 transition-all">
-                    <input
-                      type="checkbox"
-                      id="manual_is_sold"
-                      checked={manualAddForm.is_sold}
-                      onChange={(e) => setManualAddForm({ ...manualAddForm, is_sold: e.target.checked })}
-                      className="w-5 h-5 rounded-lg border-2 border-gray-600 bg-gray-800 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all cursor-pointer"
-                    />
-                    <label htmlFor="manual_is_sold" className="text-sm font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent cursor-pointer flex items-center gap-2">
-                      <span>📦</span>
-                      売却済み
+                  {/* 売却状態の選択 */}
+                  <div className="space-y-3">
+                    <label className="block text-sm font-semibold text-white">
+                      売却状態
                     </label>
-                    <span className="text-xs text-gray-500 ml-auto bg-gray-800/50 px-3 py-1 rounded-full border border-gray-700/30">
-                      購入情報のみ保存も可能
-                    </span>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setManualAddForm({ ...manualAddForm, is_sold: false })}
+                        className={`p-4 rounded-lg border-2 transition-all text-left ${
+                          !manualAddForm.is_sold
+                            ? 'border-blue-500 bg-blue-500/10 text-white'
+                            : 'border-gray-700 bg-gray-800/30 text-gray-400 hover:border-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg">📦</span>
+                          <span className="font-bold text-sm">在庫中</span>
+                        </div>
+                        <p className="text-xs text-gray-500">売却情報は後で入力</p>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setManualAddForm({ ...manualAddForm, is_sold: true })}
+                        className={`p-4 rounded-lg border-2 transition-all text-left ${
+                          manualAddForm.is_sold
+                            ? 'border-green-500 bg-green-500/10 text-white'
+                            : 'border-gray-700 bg-gray-800/30 text-gray-400 hover:border-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg">💰</span>
+                          <span className="font-bold text-sm">売却済み</span>
+                        </div>
+                        <p className="text-xs text-gray-500">売却情報を入力する</p>
+                      </button>
+                    </div>
                   </div>
 
                   {/* 売却情報 */}
@@ -1241,19 +1303,34 @@ export default function HistoryPage() {
                   </div>
                 </div>
 
-                <div className="sticky bottom-0 p-6 border-t border-gray-700/50 flex flex-col sm:flex-row justify-end gap-3 bg-gradient-to-r from-transparent to-gray-800/30 backdrop-blur-sm">
-                  <button
-                    onClick={() => setIsManualAddModalOpen(false)}
-                    className="w-full sm:w-auto px-5 py-2.5 text-gray-400 hover:text-white transition-all text-center rounded-xl hover:bg-gray-800/50 font-medium"
-                  >
-                    キャンセル
-                  </button>
-                  <button
-                    onClick={handleSaveManualAdd}
-                    className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/40 hover:scale-105"
-                  >
-                    💾 追加する
-                  </button>
+                <div className="sticky bottom-0 p-6 border-t border-gray-700/50 bg-gray-900/95 backdrop-blur-sm">
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    {/* 左側：在庫中の場合のヒント */}
+                    {!manualAddForm.is_sold && (
+                      <p className="text-sm text-gray-400 hidden sm:block">
+                        💡 売却情報は後から追加できます
+                      </p>
+                    )}
+                    <div className="flex-1"></div>
+
+                    {/* 右側：ボタン */}
+                    <div className="flex flex-col-reverse sm:flex-row gap-3 w-full sm:w-auto">
+                      <button
+                        type="button"
+                        onClick={() => setIsManualAddModalOpen(false)}
+                        className="w-full sm:w-auto px-6 py-3 border-2 border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 rounded-lg font-medium transition-colors"
+                      >
+                        キャンセル
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveManualAdd}
+                        className="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-colors shadow-lg focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                      >
+                        追加する
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
