@@ -17,6 +17,7 @@ export async function POST(request: Request) {
     const {
       product_name,
       brand,
+      img,
       purchase_price,
       purchase_date,
       purchase_shipping,
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
         raffle_id,
         product_name,
         brand,
+        img,
         result_status,
         purchase_price,
         purchase_date,
@@ -61,11 +63,12 @@ export async function POST(request: Request) {
         product_template_id,
         applied,
         applied_at
-      ) VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW())`,
+      ) VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW())`,
       [
         userId,
         product_name.trim(),
         brand?.trim() || null,
+        img || null,
         result_status,
         purchase_price || null,
         purchase_date || null,

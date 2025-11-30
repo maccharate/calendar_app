@@ -32,11 +32,11 @@ export default function MyEventsNewPage() {
         router.push("/");
       } else {
         const error = await res.json();
-        alert(`❌ エラー: ${error.details || error.error}`);
+        alert(`エラー: ${error.details || error.error}`);
       }
     } catch (error) {
       console.error(error);
-      alert("❌ エラーが発生しました");
+      alert("エラーが発生しました");
     } finally {
       setLoading(false);
     }
@@ -161,7 +161,7 @@ export default function MyEventsNewPage() {
 
             {/* 注意事項 */}
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-400 mb-2">📝 マイイベントについて</h3>
+              <h3 className="font-semibold text-blue-400 mb-2">マイイベントについて</h3>
               <ul className="text-sm text-gray-300 space-y-1">
                 <li>• このイベントはあなただけに表示されます</li>
                 <li>• 他のユーザーには見えません</li>

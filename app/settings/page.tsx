@@ -181,11 +181,11 @@ export default function SettingsPage() {
         setTimeout(() => notification.remove(), 3000);
       } else {
         const error = await res.json();
-        alert(`❌ エラー: ${error.error}`);
+        alert(`エラー: ${error.error}`);
       }
     } catch (error) {
       console.error("Error saving settings:", error);
-      alert("❌ エラーが発生しました");
+      alert("エラーが発生しました");
     } finally {
       setSaving(false);
     }
@@ -395,7 +395,7 @@ export default function SettingsPage() {
                 <div className="space-y-6">
                   <div className="p-3 rounded-lg bg-blue-900/20 border border-blue-700/30">
                     <p className="text-xs text-blue-300">
-                      💡 通知設定を変更した後は、ページ下部の「保存する」ボタンを押してください
+                      通知設定を変更した後は、ページ下部の「保存する」ボタンを押してください
                     </p>
                   </div>
 

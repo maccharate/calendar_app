@@ -52,6 +52,12 @@ interface ProductTemplate {
   img_url: string;
 }
 
+interface StorageImage {
+  fileName: string;
+  url: string;
+  uploadedAt: string;
+}
+
 // プラットフォームごとの手数料率（%）
 const PLATFORM_FEE_RATES: Record<string, number> = {
   'Mercari': 10,        // メルカリ 10%
@@ -68,6 +74,10 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<HistoryEvent | null>(null);
   const [templates, setTemplates] = useState<ProductTemplate[]>([]);
+  const [images, setImages] = useState<StorageImage[]>([]);
+  const [loadingImages, setLoadingImages] = useState(false);
+  const [imageSearchQuery, setImageSearchQuery] = useState("");
+  const [imageInputMode, setImageInputMode] = useState<'storage' | 'url'>('storage');
 
   // モーダル状態
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -99,6 +109,7 @@ export default function HistoryPage() {
   const [manualAddForm, setManualAddForm] = useState({
     product_name: "",
     brand: "",
+    img: "",
     purchase_price: "",
     purchase_date: "",
     purchase_shipping: "",
@@ -146,6 +157,21 @@ export default function HistoryPage() {
       }
     } catch (error) {
       console.error("Error fetching templates:", error);
+    }
+  };
+
+  const fetchImages = async () => {
+    setLoadingImages(true);
+    try {
+      const res = await fetch("/api/upload/image");
+      if (res.ok) {
+        const data = await res.json();
+        setImages(data.images);
+      }
+    } catch (error) {
+      console.error("Error fetching images:", error);
+    } finally {
+      setLoadingImages(false);
     }
   };
 
@@ -347,24 +373,8 @@ export default function HistoryPage() {
 
       if (!res.ok) throw new Error("Failed to add manual record");
 
-      // フォームをリセット
-      setManualAddForm({
-        product_name: "",
-        brand: "",
-        purchase_price: "",
-        purchase_date: "",
-        purchase_shipping: "",
-        sale_price: "",
-        sale_date: "",
-        platform: "",
-        fees: "",
-        shipping_cost: "",
-        notes: "",
-        product_template_id: "",
-        is_sold: false,
-      });
-
-      setIsManualAddModalOpen(false);
+      // モーダルを閉じてフォームをリセット
+      handleCloseManualAddModal();
       fetchHistory(); // リロードして最新情報を取得
     } catch (error) {
       console.error("Error saving manual record:", error);
@@ -383,6 +393,7 @@ export default function HistoryPage() {
         product_template_id: templateId,
         product_name: template.name,
         brand: template.brand,
+        img: template.img_url || prev.img,
         purchase_price: template.default_retail_price ? Math.floor(template.default_retail_price).toString() : prev.purchase_price,
         sale_price: template.avg_resale_price ? Math.floor(template.avg_resale_price).toString() : prev.sale_price,
       }));
@@ -392,6 +403,29 @@ export default function HistoryPage() {
         product_template_id: "",
       }));
     }
+  };
+
+  // 手動追加モーダルを閉じる
+  const handleCloseManualAddModal = () => {
+    setIsManualAddModalOpen(false);
+    setImageSearchQuery("");
+    setImageInputMode('storage');
+    setManualAddForm({
+      product_name: "",
+      brand: "",
+      img: "",
+      purchase_price: "",
+      purchase_date: "",
+      purchase_shipping: "",
+      sale_price: "",
+      sale_date: "",
+      platform: "",
+      fees: "",
+      shipping_cost: "",
+      notes: "",
+      product_template_id: "",
+      is_sold: false,
+    });
   };
 
   // 結果保存
@@ -426,7 +460,7 @@ export default function HistoryPage() {
   const getStatusBadge = (status: string, isAdvance: boolean, isManual: boolean = false) => {
     // 手動追加レコードの場合
     if (isManual) {
-      return <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-xs font-bold">📝 手動追加</span>;
+      return <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-xs font-bold">手動追加</span>;
     }
 
     switch (status) {
@@ -478,7 +512,11 @@ export default function HistoryPage() {
               応募履歴
             </h1>
             <button
-              onClick={() => setIsManualAddModalOpen(true)}
+              onClick={() => {
+                fetchTemplates();
+                fetchImages();
+                setIsManualAddModalOpen(true);
+              }}
               className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/40 hover:scale-105 flex items-center gap-2"
             >
               <span className="text-xl">➕</span>
@@ -563,7 +601,7 @@ export default function HistoryPage() {
                   {/* 画像 */}
                   <div className="w-28 h-28 md:w-32 md:h-32 relative rounded-xl overflow-hidden flex-shrink-0 bg-gray-900/50 border border-gray-700/30 flex items-center justify-center">
                     {event.is_manual || !event.img ? (
-                      <div className="text-4xl">📦</div>
+                      <div className="text-sm text-gray-500">画像なし</div>
                     ) : (
                       <img
                         src={event.img}
@@ -696,8 +734,7 @@ export default function HistoryPage() {
                   <div className="p-6 space-y-6">
                     {/* 商品テンプレート選択 */}
                     <div className="bg-gradient-to-br from-gray-800/70 to-gray-800/50 p-5 rounded-xl border border-gray-700/50 shadow-lg">
-                      <label className="block text-sm font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3 flex items-center gap-2">
-                        <span className="text-lg">🎯</span>
+                      <label className="block text-sm font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3">
                         商品テンプレートから自動入力
                       </label>
                       <select
@@ -713,14 +750,13 @@ export default function HistoryPage() {
                         ))}
                       </select>
                       <p className="text-xs text-gray-500 mt-2 bg-blue-500/5 p-2 rounded-lg border border-blue-500/20">
-                        💡 選択すると購入価格と売却価格が自動で入力されます
+                        選択すると購入価格と売却価格が自動で入力されます
                       </p>
                     </div>
 
                     {/* 購入情報 */}
                     <div>
-                      <h3 className="text-sm font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-green-500/20">
-                        <span className="text-lg">💰</span>
+                      <h3 className="text-sm font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-4 pb-2 border-b border-green-500/20">
                         購入情報
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -773,9 +809,8 @@ export default function HistoryPage() {
                               : 'border-gray-700 bg-gray-800/30 text-gray-400 hover:border-gray-600'
                           }`}
                         >
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-lg">📦</span>
-                            <span className="font-bold text-sm">在庫中</span>
+                          <div className="flex items-center mb-1">
+                            <span className="font-bold text-sm">未売却</span>
                           </div>
                           <p className="text-xs text-gray-500">売却情報は後で入力</p>
                         </button>
@@ -788,8 +823,7 @@ export default function HistoryPage() {
                               : 'border-gray-700 bg-gray-800/30 text-gray-400 hover:border-gray-600'
                           }`}
                         >
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-lg">💰</span>
+                          <div className="flex items-center mb-1">
                             <span className="font-bold text-sm">売却済み</span>
                           </div>
                           <p className="text-xs text-gray-500">売却情報を入力する</p>
@@ -801,8 +835,7 @@ export default function HistoryPage() {
                     {editForm.is_sold && (
                     <>
                     <div>
-                      <h3 className="text-sm font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-purple-500/20">
-                        <span className="text-lg">💎</span>
+                      <h3 className="text-sm font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 pb-2 border-b border-purple-500/20">
                         売却情報
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -842,7 +875,7 @@ export default function HistoryPage() {
                             <option value="Other">その他（手動入力）</option>
                           </select>
                           <p className="text-xs text-gray-500 mt-2 bg-purple-500/5 p-2 rounded-lg border border-purple-500/20">
-                            💡 プラットフォーム選択時に手数料が自動計算されます
+                            プラットフォーム選択時に手数料が自動計算されます
                           </p>
                         </div>
                       </div>
@@ -850,8 +883,7 @@ export default function HistoryPage() {
 
                     {/* 経費・その他 */}
                     <div>
-                      <h3 className="text-sm font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-orange-500/20">
-                        <span className="text-lg">📊</span>
+                      <h3 className="text-sm font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-4 pb-2 border-b border-orange-500/20">
                         経費・その他
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -889,8 +921,7 @@ export default function HistoryPage() {
 
                     {/* メモ（常に表示） */}
                     <div>
-                      <label className="block text-xs font-semibold bg-gradient-to-r from-gray-400 to-gray-500 bg-clip-text text-transparent mb-2 flex items-center gap-2">
-                        <span className="text-lg">📝</span>
+                      <label className="block text-xs font-semibold bg-gradient-to-r from-gray-400 to-gray-500 bg-clip-text text-transparent mb-2">
                         メモ
                       </label>
                       <textarea
@@ -907,7 +938,7 @@ export default function HistoryPage() {
                       {/* 左側：在庫中の場合のヒント */}
                       {!editForm.is_sold && (
                         <p className="text-sm text-gray-400 hidden sm:block">
-                          💡 売却情報は後から追加できます
+                          売却情報は後から追加できます
                         </p>
                       )}
                       <div className="flex-1"></div>
@@ -970,7 +1001,7 @@ export default function HistoryPage() {
                         className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-4 text-white text-lg focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all shadow-inner"
                       />
                       <p className="text-xs text-gray-500 mt-3 bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
-                        💡 残りの {Math.max(0, (selectedEvent.application_count || 1) - resultForm.won_count)}口 は「落選」として記録されます
+                        残りの {Math.max(0, (selectedEvent.application_count || 1) - resultForm.won_count)}口 は「落選」として記録されます
                       </p>
                     </div>
                   </div>
@@ -1029,7 +1060,7 @@ export default function HistoryPage() {
                     </div>
 
                     <p className="text-xs text-gray-500 bg-blue-500/5 p-3 rounded-lg border border-blue-500/20">
-                      💡 「購入した」を選択すると、購入価格や販売価格を入力できます
+                      「購入した」を選択すると、購入価格や販売価格を入力できます
                     </p>
                   </div>
 
@@ -1055,7 +1086,7 @@ export default function HistoryPage() {
                     購入記録を手動で追加
                   </h2>
                   <button
-                    onClick={() => setIsManualAddModalOpen(false)}
+                    onClick={handleCloseManualAddModal}
                     className="text-gray-400 hover:text-white transition-all hover:rotate-90 duration-300 text-2xl"
                   >
                     ✕
@@ -1065,8 +1096,7 @@ export default function HistoryPage() {
                 <div className="p-6 space-y-6">
                   {/* 商品テンプレート選択 */}
                   <div className="bg-gradient-to-br from-gray-800/70 to-gray-800/50 p-5 rounded-xl border border-gray-700/50 shadow-lg">
-                    <label className="block text-sm font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3 flex items-center gap-2">
-                      <span className="text-lg">🎯</span>
+                    <label className="block text-sm font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3">
                       商品テンプレートから自動入力
                     </label>
                     <select
@@ -1082,14 +1112,13 @@ export default function HistoryPage() {
                       ))}
                     </select>
                     <p className="text-xs text-gray-500 mt-2 bg-blue-500/5 p-2 rounded-lg border border-blue-500/20">
-                      💡 選択すると商品名、ブランド、価格が自動で入力されます
+                      選択すると商品名、ブランド、価格が自動で入力されます
                     </p>
                   </div>
 
                   {/* 商品情報 */}
                   <div>
-                    <h3 className="text-sm font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-cyan-500/20">
-                      <span className="text-lg">📦</span>
+                    <h3 className="text-sm font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-4 pb-2 border-b border-cyan-500/20">
                       商品情報
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1116,12 +1145,110 @@ export default function HistoryPage() {
                         />
                       </div>
                     </div>
+
+                    {/* 画像選択 */}
+                    <div className="mt-4">
+                      <label className="block text-xs font-semibold text-gray-400 mb-3">商品画像（任意）</label>
+
+                      {/* 画像入力モード選択 */}
+                      <div className="flex gap-2 mb-3">
+                        <button
+                          type="button"
+                          onClick={() => setImageInputMode('storage')}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            imageInputMode === 'storage'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                          }`}
+                        >
+                          ストレージから選択
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setImageInputMode('url')}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            imageInputMode === 'url'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                          }`}
+                        >
+                          URLを入力
+                        </button>
+                      </div>
+
+                      {/* ストレージモード */}
+                      {imageInputMode === 'storage' && (
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="画像を検索..."
+                            value={imageSearchQuery}
+                            onChange={(e) => setImageSearchQuery(e.target.value)}
+                            className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner mb-3 text-sm"
+                          />
+                          <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto bg-gray-900/50 rounded-lg p-2">
+                            {loadingImages ? (
+                              <div className="col-span-3 text-center py-8 text-gray-400">読み込み中...</div>
+                            ) : images.filter(img => img.fileName.toLowerCase().includes(imageSearchQuery.toLowerCase())).length === 0 ? (
+                              <div className="col-span-3 text-center py-8 text-gray-400">画像がありません</div>
+                            ) : (
+                              images
+                                .filter(img => img.fileName.toLowerCase().includes(imageSearchQuery.toLowerCase()))
+                                .map((image) => (
+                                  <div
+                                    key={image.url}
+                                    onClick={() => setManualAddForm({ ...manualAddForm, img: image.url })}
+                                    className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
+                                      manualAddForm.img === image.url
+                                        ? 'border-blue-500 ring-2 ring-blue-500/50'
+                                        : 'border-gray-700 hover:border-gray-500'
+                                    }`}
+                                  >
+                                    <img
+                                      src={image.url}
+                                      alt={image.fileName}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* URLモード */}
+                      {imageInputMode === 'url' && (
+                        <div>
+                          <input
+                            type="url"
+                            value={manualAddForm.img}
+                            onChange={(e) => setManualAddForm({ ...manualAddForm, img: e.target.value })}
+                            placeholder="https://example.com/image.jpg"
+                            className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner"
+                          />
+                          {manualAddForm.img && (
+                            <div className="mt-3">
+                              <p className="text-xs text-gray-500 mb-2">プレビュー:</p>
+                              <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-900/50 border border-gray-700">
+                                <img
+                                  src={manualAddForm.img}
+                                  alt="プレビュー"
+                                  className="w-full h-full object-contain"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* 購入情報 */}
                   <div>
-                    <h3 className="text-sm font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-green-500/20">
-                      <span className="text-lg">💰</span>
+                    <h3 className="text-sm font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-4 pb-2 border-b border-green-500/20">
                       購入情報
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1174,9 +1301,8 @@ export default function HistoryPage() {
                             : 'border-gray-700 bg-gray-800/30 text-gray-400 hover:border-gray-600'
                         }`}
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-lg">📦</span>
-                          <span className="font-bold text-sm">在庫中</span>
+                        <div className="flex items-center mb-1">
+                          <span className="font-bold text-sm">未売却</span>
                         </div>
                         <p className="text-xs text-gray-500">売却情報は後で入力</p>
                       </button>
@@ -1189,8 +1315,7 @@ export default function HistoryPage() {
                             : 'border-gray-700 bg-gray-800/30 text-gray-400 hover:border-gray-600'
                         }`}
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-lg">💰</span>
+                        <div className="flex items-center mb-1">
                           <span className="font-bold text-sm">売却済み</span>
                         </div>
                         <p className="text-xs text-gray-500">売却情報を入力する</p>
@@ -1202,8 +1327,7 @@ export default function HistoryPage() {
                   {manualAddForm.is_sold && (
                   <>
                   <div>
-                    <h3 className="text-sm font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-purple-500/20">
-                      <span className="text-lg">💎</span>
+                    <h3 className="text-sm font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 pb-2 border-b border-purple-500/20">
                       売却情報
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1243,7 +1367,7 @@ export default function HistoryPage() {
                           <option value="Other">その他（手動入力）</option>
                         </select>
                         <p className="text-xs text-gray-500 mt-2 bg-purple-500/5 p-2 rounded-lg border border-purple-500/20">
-                          💡 プラットフォーム選択時に手数料が自動計算されます
+                          プラットフォーム選択時に手数料が自動計算されます
                         </p>
                       </div>
                     </div>
@@ -1251,8 +1375,7 @@ export default function HistoryPage() {
 
                   {/* 経費・その他 */}
                   <div>
-                    <h3 className="text-sm font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-orange-500/20">
-                      <span className="text-lg">📊</span>
+                    <h3 className="text-sm font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-4 pb-2 border-b border-orange-500/20">
                       経費・その他
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1290,8 +1413,7 @@ export default function HistoryPage() {
 
                   {/* メモ（常に表示） */}
                   <div>
-                    <label className="block text-xs font-semibold bg-gradient-to-r from-gray-400 to-gray-500 bg-clip-text text-transparent mb-2 flex items-center gap-2">
-                      <span className="text-lg">📝</span>
+                    <label className="block text-xs font-semibold bg-gradient-to-r from-gray-400 to-gray-500 bg-clip-text text-transparent mb-2">
                       メモ
                     </label>
                     <textarea
@@ -1308,7 +1430,7 @@ export default function HistoryPage() {
                     {/* 左側：在庫中の場合のヒント */}
                     {!manualAddForm.is_sold && (
                       <p className="text-sm text-gray-400 hidden sm:block">
-                        💡 売却情報は後から追加できます
+                        売却情報は後から追加できます
                       </p>
                     )}
                     <div className="flex-1"></div>
@@ -1317,7 +1439,7 @@ export default function HistoryPage() {
                     <div className="flex flex-col-reverse sm:flex-row gap-3 w-full sm:w-auto">
                       <button
                         type="button"
-                        onClick={() => setIsManualAddModalOpen(false)}
+                        onClick={handleCloseManualAddModal}
                         className="w-full sm:w-auto px-6 py-3 border-2 border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 rounded-lg font-medium transition-colors"
                       >
                         キャンセル

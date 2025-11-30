@@ -181,7 +181,6 @@ export default function TemplatesPage() {
             </div>
           ) : (
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-12 border border-gray-700/50 text-center">
-              <div className="text-6xl mb-4">📦</div>
               <h2 className="text-2xl font-bold mb-2">テンプレートがありません</h2>
               <p className="text-gray-400 mb-6">新しいテンプレートを追加してください</p>
               <button

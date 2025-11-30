@@ -71,11 +71,11 @@ export default function AdminEventsPage() {
         alert("✅ イベントを削除しました");
         fetchEvents();
       } else {
-        alert("❌ 削除に失敗しました");
+        alert("削除に失敗しました");
       }
     } catch (error) {
       console.error(error);
-      alert("❌ エラーが発生しました");
+      alert("エラーが発生しました");
     }
   };
 

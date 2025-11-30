@@ -88,11 +88,11 @@ export default function NewEventPage() {
         setTimeout(() => notification.remove(), 3000);
       } else {
         const error = await res.json();
-        alert(`❌ ${error.error}`);
+        alert(`${error.error}`);
       }
     } catch (error) {
       console.error(error);
-      alert("❌ アップロードに失敗しました");
+      alert("アップロードに失敗しました");
     } finally {
       setUploading(false);
     }
@@ -128,11 +128,11 @@ export default function NewEventPage() {
         router.push("/admin/events");
       } else {
         const error = await res.json();
-        alert(`❌ エラー: ${error.details || error.error}`);
+        alert(`エラー: ${error.details || error.error}`);
       }
     } catch (error) {
       console.error(error);
-      alert("❌ エラーが発生しました");
+      alert("エラーが発生しました");
     } finally {
       setLoading(false);
     }

@@ -53,11 +53,11 @@ export default function SettingsPage() {
         setTimeout(() => notification.remove(), 3000);
       } else {
         const error = await res.json();
-        alert(`❌ エラー: ${error.error}`);
+        alert(`エラー: ${error.error}`);
       }
     } catch (error) {
       console.error("Error saving settings:", error);
-      alert("❌ エラーが発生しました");
+      alert("エラーが発生しました");
     } finally {
       setSaving(false);
     }

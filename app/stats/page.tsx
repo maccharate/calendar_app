@@ -233,7 +233,7 @@ export default function StatsPage() {
           {dataScope === "all" && (
             <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4 mb-6">
               <p className="text-purple-300">
-                🎯 コミュニティ全体: <span className="font-bold text-xl">{globalStats.totalUsers}</span> 人のデータを集計
+                コミュニティ全体: <span className="font-bold text-xl">{globalStats.totalUsers}</span> 人のデータを集計
               </p>
             </div>
           )}
@@ -293,7 +293,7 @@ export default function StatsPage() {
           {dataScope === "me" && userStats.pendingEvents > 0 && (
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-8">
               <p className="text-yellow-400 text-sm">
-                ⏳ 結果未入力: {userStats.pendingEvents}件（{userStats.pendingCount}口）
+                結果未入力: {userStats.pendingEvents}件（{userStats.pendingCount}口）
                 <button 
                   onClick={() => router.push("/history?filter=pending")}
                   className="ml-2 underline hover:no-underline"
