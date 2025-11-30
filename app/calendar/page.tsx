@@ -1543,6 +1543,259 @@ export default function CalendarPage() {
         .animate-fade-in {
           animation: fade-in 0.3s ease-out;
         }
+
+        /* FullCalendar モダンスタイル */
+        .fc {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        /* カレンダー全体の背景 */
+        .fc-theme-standard {
+          background: transparent;
+        }
+
+        /* ヘッダーツールバー */
+        .fc-header-toolbar {
+          margin-bottom: 1.5rem !important;
+          padding: 1rem;
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+          border-radius: 12px;
+          border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .fc-toolbar-title {
+          font-size: 1.5rem !important;
+          font-weight: 700 !important;
+          background: linear-gradient(135deg, #60a5fa, #a78bfa);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        /* ボタン */
+        .fc-button {
+          background: rgba(59, 130, 246, 0.2) !important;
+          border: 1px solid rgba(59, 130, 246, 0.4) !important;
+          color: #93c5fd !important;
+          border-radius: 8px !important;
+          padding: 0.5rem 1rem !important;
+          font-weight: 600 !important;
+          text-transform: none !important;
+          transition: all 0.2s ease !important;
+          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1) !important;
+        }
+
+        .fc-button:hover {
+          background: rgba(59, 130, 246, 0.3) !important;
+          border-color: rgba(59, 130, 246, 0.6) !important;
+          color: #dbeafe !important;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+        }
+
+        .fc-button-active {
+          background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+          border-color: #6366f1 !important;
+          color: white !important;
+          box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4) !important;
+        }
+
+        .fc-button:disabled {
+          opacity: 0.4 !important;
+          cursor: not-allowed !important;
+        }
+
+        /* テーブル */
+        .fc-scrollgrid {
+          border: none !important;
+          border-radius: 12px;
+          overflow: hidden;
+        }
+
+        .fc-theme-standard td,
+        .fc-theme-standard th {
+          border-color: rgba(55, 65, 81, 0.5) !important;
+        }
+
+        /* ヘッダー（曜日） */
+        .fc-col-header-cell {
+          background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.9)) !important;
+          padding: 1rem 0.5rem !important;
+          font-weight: 700 !important;
+          font-size: 0.875rem !important;
+          color: #9ca3af !important;
+          border: none !important;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .fc-col-header-cell:first-child {
+          color: #fca5a5 !important; /* 日曜日 */
+        }
+
+        .fc-col-header-cell:last-child {
+          color: #93c5fd !important; /* 土曜日 */
+        }
+
+        /* 日付セル */
+        .fc-daygrid-day {
+          background: rgba(17, 24, 39, 0.4) !important;
+          transition: all 0.2s ease !important;
+          cursor: pointer;
+        }
+
+        .fc-daygrid-day:hover {
+          background: rgba(31, 41, 55, 0.6) !important;
+          transform: scale(1.02);
+        }
+
+        .fc-daygrid-day-frame {
+          padding: 0.5rem !important;
+          min-height: 100px;
+        }
+
+        /* 日付番号 */
+        .fc-daygrid-day-number {
+          padding: 0.5rem !important;
+          font-weight: 600 !important;
+          font-size: 1rem !important;
+          color: #d1d5db !important;
+        }
+
+        /* 今日 */
+        .fc-day-today {
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15)) !important;
+          border: 2px solid rgba(99, 102, 241, 0.4) !important;
+          box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.1);
+        }
+
+        .fc-day-today .fc-daygrid-day-number {
+          background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+          color: white !important;
+          border-radius: 8px;
+          padding: 0.375rem 0.75rem !important;
+          font-weight: 700 !important;
+          box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        /* 他の月の日付 */
+        .fc-day-other {
+          opacity: 0.3 !important;
+        }
+
+        /* イベント */
+        .fc-event {
+          border: none !important;
+          border-radius: 6px !important;
+          padding: 0.25rem 0.5rem !important;
+          margin: 0.125rem 0 !important;
+          font-size: 0.75rem !important;
+          font-weight: 600 !important;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+          transition: all 0.2s ease !important;
+          cursor: pointer;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .fc-event:before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+
+        .fc-event:hover {
+          transform: scale(1.05) translateY(-1px) !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+          z-index: 10 !important;
+        }
+
+        .fc-event:hover:before {
+          opacity: 1;
+        }
+
+        .fc-event-title {
+          font-weight: 600 !important;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 応募済みイベントの強調 */
+        .fc-event[style*="rgb(34, 197, 94)"],
+        .fc-event[style*="rgb(16, 185, 129)"] {
+          background: linear-gradient(135deg, #10b981, #059669) !important;
+          box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4) !important;
+        }
+
+        .fc-event[style*="rgb(34, 197, 94)"]:hover,
+        .fc-event[style*="rgb(16, 185, 129)"]:hover {
+          box-shadow: 0 4px 16px rgba(16, 185, 129, 0.5) !important;
+        }
+
+        /* モア（more）リンク */
+        .fc-daygrid-more-link {
+          color: #60a5fa !important;
+          font-weight: 600 !important;
+          padding: 0.25rem 0.5rem !important;
+          border-radius: 4px !important;
+          background: rgba(59, 130, 246, 0.1) !important;
+          transition: all 0.2s ease !important;
+        }
+
+        .fc-daygrid-more-link:hover {
+          background: rgba(59, 130, 246, 0.2) !important;
+          color: #93c5fd !important;
+        }
+
+        /* ポップオーバー */
+        .fc-popover {
+          background: #1f2937 !important;
+          border: 1px solid #374151 !important;
+          border-radius: 12px !important;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .fc-popover-header {
+          background: linear-gradient(135deg, #1f2937, #111827) !important;
+          color: #f3f4f6 !important;
+          padding: 0.75rem 1rem !important;
+          border-radius: 12px 12px 0 0 !important;
+          font-weight: 700 !important;
+        }
+
+        .fc-popover-close {
+          color: #9ca3af !important;
+          font-size: 1.25rem !important;
+        }
+
+        .fc-popover-close:hover {
+          color: #f3f4f6 !important;
+        }
+
+        /* レスポンシブ調整 */
+        @media (max-width: 768px) {
+          .fc-toolbar-title {
+            font-size: 1.25rem !important;
+          }
+
+          .fc-button {
+            padding: 0.375rem 0.75rem !important;
+            font-size: 0.875rem !important;
+          }
+
+          .fc-daygrid-day-number {
+            font-size: 0.875rem !important;
+          }
+
+          .fc-event {
+            font-size: 0.6875rem !important;
+          }
+        }
       `}</style>
     </>
   );

@@ -552,13 +552,15 @@ export default function HistoryPage() {
           {/* 詳細編集モーダル */}
           {
             isEditModalOpen && (
-              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                <div className="bg-gray-900 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-800">
-                  <div className="p-6 border-b border-gray-800 flex justify-between items-center">
-                    <h2 className="text-xl font-bold">取引詳細を編集</h2>
+              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-700 shadow-2xl">
+                  <div className="sticky top-0 p-6 border-b border-gray-700/50 flex justify-between items-center bg-gradient-to-r from-purple-500/10 to-pink-500/10 backdrop-blur-sm z-10">
+                    <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                      取引詳細を編集
+                    </h2>
                     <button
                       onClick={() => setIsEditModalOpen(false)}
-                      className="text-gray-400 hover:text-white"
+                      className="text-gray-400 hover:text-white transition-all hover:rotate-90 duration-300 text-2xl"
                     >
                       ✕
                     </button>
@@ -566,14 +568,15 @@ export default function HistoryPage() {
 
                   <div className="p-6 space-y-6">
                     {/* 商品テンプレート選択 */}
-                    <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                      <label className="block text-sm font-bold text-blue-400 mb-2">
+                    <div className="bg-gradient-to-br from-gray-800/70 to-gray-800/50 p-5 rounded-xl border border-gray-700/50 shadow-lg">
+                      <label className="block text-sm font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3 flex items-center gap-2">
+                        <span className="text-lg">🎯</span>
                         商品テンプレートから自動入力
                       </label>
                       <select
                         value={editForm.product_template_id}
                         onChange={handleTemplateChange}
-                        className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-gray-900/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner"
                       >
                         <option value="">テンプレートを選択...</option>
                         {templates.map((template) => (
@@ -582,61 +585,67 @@ export default function HistoryPage() {
                           </option>
                         ))}
                       </select>
-                      <p className="text-xs text-gray-500 mt-1">
-                        ※ 選択すると購入価格と売却価格が自動で入力されます
+                      <p className="text-xs text-gray-500 mt-2 bg-blue-500/5 p-2 rounded-lg border border-blue-500/20">
+                        💡 選択すると購入価格と売却価格が自動で入力されます
                       </p>
                     </div>
 
                     {/* 購入情報 */}
                     <div>
-                      <h3 className="text-sm font-bold text-gray-400 mb-3">購入情報</h3>
+                      <h3 className="text-sm font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-green-500/20">
+                        <span className="text-lg">💰</span>
+                        購入情報
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">購入価格</label>
+                          <label className="block text-xs font-semibold text-gray-400 mb-2">購入価格</label>
                           <input
                             type="number"
                             step="1"
                             value={editForm.purchase_price}
                             onChange={(e) => setEditForm({ ...editForm, purchase_price: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all shadow-inner"
+                            placeholder="0"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">購入日</label>
+                          <label className="block text-xs font-semibold text-gray-400 mb-2">購入日</label>
                           <input
                             type="date"
                             value={editForm.purchase_date}
                             onChange={(e) => setEditForm({ ...editForm, purchase_date: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all shadow-inner"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">購入時送料</label>
+                          <label className="block text-xs font-semibold text-gray-400 mb-2">購入時送料</label>
                           <input
                             type="number"
                             step="1"
                             value={editForm.purchase_shipping}
                             onChange={(e) => setEditForm({ ...editForm, purchase_shipping: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all shadow-inner"
+                            placeholder="0"
                           />
                         </div>
                       </div>
                     </div>
 
                     {/* 売却済みチェックボックス */}
-                    <div className="flex items-center gap-2 p-3 bg-gray-900/50 rounded-lg border border-gray-700/30">
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl border-2 border-gray-700/50 hover:border-blue-500/30 transition-all">
                       <input
                         type="checkbox"
                         id="is_sold"
                         checked={editForm.is_sold}
                         onChange={(e) => setEditForm({ ...editForm, is_sold: e.target.checked })}
-                        className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900"
+                        className="w-5 h-5 rounded-lg border-2 border-gray-600 bg-gray-800 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all cursor-pointer"
                       />
-                      <label htmlFor="is_sold" className="text-sm font-medium text-gray-300 cursor-pointer">
+                      <label htmlFor="is_sold" className="text-sm font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent cursor-pointer flex items-center gap-2">
+                        <span>📦</span>
                         売却済み
                       </label>
-                      <span className="text-xs text-gray-500 ml-2">
-                        （チェックを外すと購入情報のみ保存できます）
+                      <span className="text-xs text-gray-500 ml-auto bg-gray-800/50 px-3 py-1 rounded-full border border-gray-700/30">
+                        購入情報のみ保存も可能
                       </span>
                     </div>
 
@@ -644,33 +653,37 @@ export default function HistoryPage() {
                     {editForm.is_sold && (
                     <>
                     <div>
-                      <h3 className="text-sm font-bold text-gray-400 mb-3">売却情報</h3>
+                      <h3 className="text-sm font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-purple-500/20">
+                        <span className="text-lg">💎</span>
+                        売却情報
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">売却価格</label>
+                          <label className="block text-xs font-semibold text-gray-400 mb-2">売却価格</label>
                           <input
                             type="number"
                             step="1"
                             value={editForm.sale_price}
                             onChange={(e) => setEditForm({ ...editForm, sale_price: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all shadow-inner"
+                            placeholder="0"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">売却日</label>
+                          <label className="block text-xs font-semibold text-gray-400 mb-2">売却日</label>
                           <input
                             type="date"
                             value={editForm.sale_date}
                             onChange={(e) => setEditForm({ ...editForm, sale_date: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all shadow-inner"
                           />
                         </div>
-                        <div>
-                          <label className="block text-xs text-gray-500 mb-1">プラットフォーム</label>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-semibold text-gray-400 mb-2">プラットフォーム</label>
                           <select
                             value={editForm.platform}
                             onChange={(e) => setEditForm({ ...editForm, platform: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all shadow-inner"
                           >
                             <option value="">選択してください</option>
                             <option value="Mercari">メルカリ（手数料 10%）</option>
@@ -680,8 +693,8 @@ export default function HistoryPage() {
                             <option value="Rakuma">ラクマ（手数料 6.6%）</option>
                             <option value="Other">その他（手動入力）</option>
                           </select>
-                          <p className="text-xs text-gray-500 mt-1">
-                            ※ プラットフォーム選択時に手数料が自動計算されます
+                          <p className="text-xs text-gray-500 mt-2 bg-purple-500/5 p-2 rounded-lg border border-purple-500/20">
+                            💡 プラットフォーム選択時に手数料が自動計算されます
                           </p>
                         </div>
                       </div>
@@ -689,31 +702,36 @@ export default function HistoryPage() {
 
                     {/* 経費・その他 */}
                     <div>
-                      <h3 className="text-sm font-bold text-gray-400 mb-3">経費・その他</h3>
+                      <h3 className="text-sm font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-orange-500/20">
+                        <span className="text-lg">📊</span>
+                        経費・その他
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">販売手数料</label>
+                          <label className="block text-xs font-semibold text-gray-400 mb-2">販売手数料</label>
                           <input
                             type="number"
                             step="1"
                             value={editForm.fees}
                             onChange={(e) => setEditForm({ ...editForm, fees: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-inner"
+                            placeholder="0"
                           />
                           {editForm.platform && PLATFORM_FEE_RATES[editForm.platform] > 0 && (
-                            <p className="text-xs text-blue-400 mt-1">
-                              {editForm.platform}: {PLATFORM_FEE_RATES[editForm.platform]}% で自動計算済み
+                            <p className="text-xs bg-gradient-to-r from-blue-500/10 to-cyan-500/10 text-blue-400 mt-2 p-2 rounded-lg border border-blue-500/20">
+                              ✓ {editForm.platform}: {PLATFORM_FEE_RATES[editForm.platform]}% で自動計算済み
                             </p>
                           )}
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-500 mb-1">発送送料</label>
+                          <label className="block text-xs font-semibold text-gray-400 mb-2">発送送料</label>
                           <input
                             type="number"
                             step="1"
                             value={editForm.shipping_cost}
                             onChange={(e) => setEditForm({ ...editForm, shipping_cost: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-inner"
+                            placeholder="0"
                           />
                         </div>
                       </div>
@@ -723,27 +741,31 @@ export default function HistoryPage() {
 
                     {/* メモ（常に表示） */}
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">メモ</label>
+                      <label className="block text-xs font-semibold bg-gradient-to-r from-gray-400 to-gray-500 bg-clip-text text-transparent mb-2 flex items-center gap-2">
+                        <span className="text-lg">📝</span>
+                        メモ
+                      </label>
                       <textarea
                         value={editForm.notes}
                         onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 h-20"
+                        className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner h-24 resize-none"
+                        placeholder="メモを入力..."
                       />
                     </div>
                   </div>
 
-                  <div className="p-6 border-t border-gray-800 flex flex-col sm:flex-row justify-end gap-3">
+                  <div className="sticky bottom-0 p-6 border-t border-gray-700/50 flex flex-col sm:flex-row justify-end gap-3 bg-gradient-to-r from-transparent to-gray-800/30 backdrop-blur-sm">
                     <button
                       onClick={() => setIsEditModalOpen(false)}
-                      className="w-full sm:w-auto px-4 py-2 text-gray-400 hover:text-white transition-colors text-center"
+                      className="w-full sm:w-auto px-5 py-2.5 text-gray-400 hover:text-white transition-all text-center rounded-xl hover:bg-gray-800/50 font-medium"
                     >
                       キャンセル
                     </button>
                     <button
                       onClick={handleSaveDetails}
-                      className="w-full sm:w-auto px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition-colors"
+                      className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/40 hover:scale-105"
                     >
-                      保存する
+                      💾 保存する
                     </button>
                   </div>
                 </div>
@@ -754,21 +776,26 @@ export default function HistoryPage() {
           {/* 結果入力モーダル */}
           {
             isResultModalOpen && selectedEvent && (
-              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                <div className="bg-gray-900 rounded-2xl w-full max-w-md border border-gray-800">
-                  <div className="p-6 border-b border-gray-800">
-                    <h2 className="text-xl font-bold">抽選結果を入力</h2>
+              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-2xl w-full max-w-md border border-gray-700 shadow-2xl">
+                  <div className="p-6 border-b border-gray-700/50 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
+                    <h2 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                      抽選結果を入力
+                    </h2>
                     <p className="text-sm text-gray-400 mt-1">{selectedEvent.title}</p>
                   </div>
 
                   <div className="p-6 space-y-6">
-                    <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                      <p className="text-sm text-gray-400 mb-1">応募口数</p>
-                      <p className="text-2xl font-bold">{selectedEvent.application_count || 1}口</p>
+                    <div className="bg-gradient-to-br from-gray-800/70 to-gray-800/50 p-5 rounded-xl border border-gray-700/50 shadow-lg">
+                      <p className="text-sm text-gray-400 mb-2 font-medium">応募口数</p>
+                      <p className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        {selectedEvent.application_count || 1}口
+                      </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-300 mb-2">
+                      <label className="block text-sm font-bold text-gray-300 mb-3 flex items-center gap-2">
+                        <span className="text-yellow-400">✓</span>
                         当選数
                       </label>
                       <input
@@ -777,24 +804,24 @@ export default function HistoryPage() {
                         max={selectedEvent.application_count || 1}
                         value={resultForm.won_count}
                         onChange={(e) => setResultForm({ won_count: parseInt(e.target.value) || 0 })}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white text-lg focus:outline-none focus:border-blue-500"
+                        className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-4 text-white text-lg focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all shadow-inner"
                       />
-                      <p className="text-xs text-gray-500 mt-2">
-                        ※ 残りの {Math.max(0, (selectedEvent.application_count || 1) - resultForm.won_count)}口 は「落選」として記録されます
+                      <p className="text-xs text-gray-500 mt-3 bg-gray-800/30 p-3 rounded-lg border border-gray-700/30">
+                        💡 残りの {Math.max(0, (selectedEvent.application_count || 1) - resultForm.won_count)}口 は「落選」として記録されます
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-6 border-t border-gray-800 flex flex-col sm:flex-row justify-end gap-3">
+                  <div className="p-6 border-t border-gray-700/50 flex flex-col sm:flex-row justify-end gap-3 bg-gradient-to-r from-transparent to-gray-800/30">
                     <button
                       onClick={() => setIsResultModalOpen(false)}
-                      className="w-full sm:w-auto px-4 py-2 text-gray-400 hover:text-white transition-colors text-center"
+                      className="w-full sm:w-auto px-5 py-2.5 text-gray-400 hover:text-white transition-all text-center rounded-lg hover:bg-gray-800/50 font-medium"
                     >
                       キャンセル
                     </button>
                     <button
                       onClick={handleSaveResult}
-                      className="w-full sm:w-auto px-6 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg font-bold transition-colors"
+                      className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 rounded-xl font-bold transition-all shadow-lg hover:shadow-yellow-500/30 hover:scale-105"
                     >
                       結果を保存
                     </button>
@@ -807,42 +834,46 @@ export default function HistoryPage() {
           {/* 購入記録モーダル（先着イベント用） */}
           {
             isPurchaseModalOpen && selectedEvent && (
-              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                <div className="bg-gray-900 rounded-2xl w-full max-w-md border border-gray-800">
-                  <div className="p-6 border-b border-gray-800">
-                    <h2 className="text-xl font-bold">購入記録を入力</h2>
+              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-2xl w-full max-w-md border border-gray-700 shadow-2xl">
+                  <div className="p-6 border-b border-gray-700/50 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+                    <h2 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                      購入記録を入力
+                    </h2>
                     <p className="text-sm text-gray-400 mt-1">{selectedEvent.title}</p>
                   </div>
 
-                  <div className="p-6 space-y-4">
-                    <p className="text-sm text-gray-300">
+                  <div className="p-6 space-y-5">
+                    <p className="text-sm text-gray-300 text-center py-2 bg-gray-800/30 rounded-lg border border-gray-700/30">
                       この先着イベントの商品を購入しましたか？
                     </p>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-4">
                       <button
                         onClick={() => handleSavePurchaseRecord(true)}
-                        className="px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition-colors"
+                        className="px-6 py-5 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/40 hover:scale-105 border border-blue-500/30"
                       >
+                        <div className="text-2xl mb-1">✓</div>
                         購入した
                       </button>
                       <button
                         onClick={() => handleSavePurchaseRecord(false)}
-                        className="px-6 py-4 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold transition-colors"
+                        className="px-6 py-5 bg-gradient-to-br from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 rounded-xl font-bold transition-all shadow-lg hover:shadow-gray-500/20 hover:scale-105 border border-gray-600/30"
                       >
+                        <div className="text-2xl mb-1">✕</div>
                         購入せず
                       </button>
                     </div>
 
-                    <p className="text-xs text-gray-500 mt-2">
-                      ※「購入した」を選択すると、購入価格や販売価格を入力できます
+                    <p className="text-xs text-gray-500 bg-blue-500/5 p-3 rounded-lg border border-blue-500/20">
+                      💡 「購入した」を選択すると、購入価格や販売価格を入力できます
                     </p>
                   </div>
 
-                  <div className="p-6 border-t border-gray-800 flex justify-end">
+                  <div className="p-6 border-t border-gray-700/50 flex justify-end bg-gradient-to-r from-transparent to-gray-800/30">
                     <button
                       onClick={() => setIsPurchaseModalOpen(false)}
-                      className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                      className="px-5 py-2.5 text-gray-400 hover:text-white transition-all rounded-lg hover:bg-gray-800/50 font-medium"
                     >
                       キャンセル
                     </button>
