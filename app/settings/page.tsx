@@ -86,32 +86,61 @@ export default function SettingsPage() {
 
   const subscribeToPush = async () => {
     try {
+      // Service Workerが登録されるまで待つ
+      console.log('Service Workerの準備を確認中...');
       const registration = await navigator.serviceWorker.ready;
+      console.log('Service Worker準備完了:', registration);
 
       // VAPID公開鍵を取得
+      console.log('VAPID公開鍵を取得中...');
       const vapidResponse = await fetch('/api/push/vapid-public-key');
+      if (!vapidResponse.ok) {
+        const error = await vapidResponse.json();
+        throw new Error(`VAPID公開鍵の取得に失敗: ${error.error || 'Unknown error'}`);
+      }
       const { publicKey } = await vapidResponse.json();
+      console.log('VAPID公開鍵取得成功');
 
+      // プッシュ通知をサブスクライブ
+      console.log('プッシュマネージャーにサブスクライブ中...');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey),
       });
+      console.log('サブスクリプション成功:', subscription);
 
       // サブスクリプションをサーバーに送信
+      console.log('サーバーにサブスクリプションを送信中...');
       const response = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(subscription),
       });
 
-      if (response.ok) {
-        setPushSubscribed(true);
-        setNotificationSettings({ ...notificationSettings, notifications_enabled: true });
-        alert('プッシュ通知の登録が完了しました！');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`サーバー登録失敗: ${error.error || error.details || 'Unknown error'}`);
       }
-    } catch (error) {
+
+      console.log('プッシュ通知登録完了');
+      setPushSubscribed(true);
+      setNotificationSettings({ ...notificationSettings, notifications_enabled: true });
+      alert('✅ プッシュ通知の登録が完了しました！');
+    } catch (error: any) {
       console.error('プッシュ通知のサブスクライブに失敗:', error);
-      alert('プッシュ通知の登録に失敗しました');
+
+      // エラーメッセージを詳細に表示
+      let errorMessage = 'プッシュ通知の登録に失敗しました';
+      if (error.message) {
+        errorMessage += `\n\n詳細: ${error.message}`;
+      }
+      if (error.name === 'NotAllowedError') {
+        errorMessage += '\n\n通知の許可が拒否されています。ブラウザの設定を確認してください。';
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage += '\n\nこのブラウザはプッシュ通知をサポートしていません。';
+      }
+
+      alert(errorMessage);
     }
   };
 
