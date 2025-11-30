@@ -29,6 +29,7 @@ interface HistoryEvent {
   notes: string | null;
   product_template_id: number | null;
   is_individual: boolean;
+  is_manual?: boolean; // 手動追加レコードかどうか
   application_count?: number; // 応募数（グループ化されている場合）
 }
 
@@ -72,6 +73,7 @@ export default function HistoryPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [isManualAddModalOpen, setIsManualAddModalOpen] = useState(false);
 
   // フィルター状態
   const [filter, setFilter] = useState<'all' | 'won' | 'lost' | 'pending'>('all');
@@ -80,6 +82,23 @@ export default function HistoryPage() {
 
   // 編集用フォームの状態
   const [editForm, setEditForm] = useState({
+    purchase_price: "",
+    purchase_date: "",
+    purchase_shipping: "",
+    sale_price: "",
+    sale_date: "",
+    platform: "",
+    fees: "",
+    shipping_cost: "",
+    notes: "",
+    product_template_id: "",
+    is_sold: false,
+  });
+
+  // 手動追加用フォームの状態
+  const [manualAddForm, setManualAddForm] = useState({
+    product_name: "",
+    brand: "",
     purchase_price: "",
     purchase_date: "",
     purchase_shipping: "",
@@ -288,6 +307,93 @@ export default function HistoryPage() {
     }
   };
 
+  // 手動追加保存
+  const handleSaveManualAdd = async () => {
+    // 商品名は必須
+    if (!manualAddForm.product_name.trim()) {
+      alert("商品名を入力してください");
+      return;
+    }
+
+    try {
+      // 売却済みでない場合は売却関連フィールドをクリア
+      const formData = manualAddForm.is_sold ? manualAddForm : {
+        ...manualAddForm,
+        sale_price: "",
+        sale_date: "",
+        platform: "",
+        fees: "",
+        shipping_cost: "",
+      };
+
+      // 利益計算
+      const purchase = Number(formData.purchase_price) || 0;
+      const pShipping = Number(formData.purchase_shipping) || 0;
+      const sale = Number(formData.sale_price) || 0;
+      const fees = Number(formData.fees) || 0;
+      const sShipping = Number(formData.shipping_cost) || 0;
+      const profit = sale - (purchase + pShipping + fees + sShipping);
+
+      const res = await fetch("/api/raffle/manual-add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          profit,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to add manual record");
+
+      // フォームをリセット
+      setManualAddForm({
+        product_name: "",
+        brand: "",
+        purchase_price: "",
+        purchase_date: "",
+        purchase_shipping: "",
+        sale_price: "",
+        sale_date: "",
+        platform: "",
+        fees: "",
+        shipping_cost: "",
+        notes: "",
+        product_template_id: "",
+        is_sold: false,
+      });
+
+      setIsManualAddModalOpen(false);
+      fetchHistory(); // リロードして最新情報を取得
+    } catch (error) {
+      console.error("Error saving manual record:", error);
+      alert("保存に失敗しました");
+    }
+  };
+
+  // 手動追加用テンプレート選択時の処理
+  const handleManualTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const templateId = e.target.value;
+    const template = templates.find(t => t.id.toString() === templateId);
+
+    if (template) {
+      setManualAddForm(prev => ({
+        ...prev,
+        product_template_id: templateId,
+        product_name: template.name,
+        brand: template.brand,
+        purchase_price: template.default_retail_price ? Math.floor(template.default_retail_price).toString() : prev.purchase_price,
+        sale_price: template.avg_resale_price ? Math.floor(template.avg_resale_price).toString() : prev.sale_price,
+      }));
+    } else {
+      setManualAddForm(prev => ({
+        ...prev,
+        product_template_id: "",
+      }));
+    }
+  };
+
   // 結果保存
   const handleSaveResult = async () => {
     if (!selectedEvent) return;
@@ -362,9 +468,18 @@ export default function HistoryPage() {
       <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            応募履歴
-          </h1>
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              応募履歴
+            </h1>
+            <button
+              onClick={() => setIsManualAddModalOpen(true)}
+              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/40 hover:scale-105 flex items-center gap-2"
+            >
+              <span className="text-xl">➕</span>
+              手動で追加
+            </button>
+          </div>
 
           {/* 統計情報 */}
           {stats && (
@@ -441,12 +556,16 @@ export default function HistoryPage() {
                   className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-2xl p-5 border border-gray-700/50 hover:border-gray-600/50 transition-all shadow-lg hover:shadow-xl flex flex-col md:flex-row gap-5 items-start"
                 >
                   {/* 画像 */}
-                  <div className="w-28 h-28 md:w-32 md:h-32 relative rounded-xl overflow-hidden flex-shrink-0 bg-gray-900/50 border border-gray-700/30">
-                    <img
-                      src={event.img}
-                      alt={event.title}
-                      className="object-contain w-full h-full p-2"
-                    />
+                  <div className="w-28 h-28 md:w-32 md:h-32 relative rounded-xl overflow-hidden flex-shrink-0 bg-gray-900/50 border border-gray-700/30 flex items-center justify-center">
+                    {event.is_manual || !event.img ? (
+                      <div className="text-4xl">📦</div>
+                    ) : (
+                      <img
+                        src={event.img}
+                        alt={event.title}
+                        className="object-contain w-full h-full p-2"
+                      />
+                    )}
                   </div>
 
                   {/* 詳細 */}
@@ -505,14 +624,17 @@ export default function HistoryPage() {
 
                   {/* アクション */}
                   <div className="flex flex-col gap-2 w-full md:w-auto md:min-w-[140px]">
-                    <a
-                      href={event.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full px-4 py-2.5 bg-gray-700/80 hover:bg-gray-600 rounded-lg text-sm font-medium transition-all text-center border border-gray-600/50 hover:border-gray-500"
-                    >
-                      商品ページ
-                    </a>
+                    {/* 商品ページボタン（手動追加でない場合のみ） */}
+                    {!event.is_manual && event.url && (
+                      <a
+                        href={event.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full px-4 py-2.5 bg-gray-700/80 hover:bg-gray-600 rounded-lg text-sm font-medium transition-all text-center border border-gray-600/50 hover:border-gray-500"
+                      >
+                        商品ページ
+                      </a>
+                    )}
 
                     {/* 先着イベントの購入記録ボタン */}
                     {event.advance && event.result_status === 'pending' && (
@@ -882,6 +1004,260 @@ export default function HistoryPage() {
               </div>
             )
           }
+
+          {/* 手動追加モーダル */}
+          {isManualAddModalOpen && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+              <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-700 shadow-2xl">
+                <div className="sticky top-0 p-6 border-b border-gray-700/50 flex justify-between items-center bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm z-10">
+                  <h2 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    購入記録を手動で追加
+                  </h2>
+                  <button
+                    onClick={() => setIsManualAddModalOpen(false)}
+                    className="text-gray-400 hover:text-white transition-all hover:rotate-90 duration-300 text-2xl"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="p-6 space-y-6">
+                  {/* 商品テンプレート選択 */}
+                  <div className="bg-gradient-to-br from-gray-800/70 to-gray-800/50 p-5 rounded-xl border border-gray-700/50 shadow-lg">
+                    <label className="block text-sm font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3 flex items-center gap-2">
+                      <span className="text-lg">🎯</span>
+                      商品テンプレートから自動入力
+                    </label>
+                    <select
+                      value={manualAddForm.product_template_id}
+                      onChange={handleManualTemplateChange}
+                      className="w-full bg-gray-900/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner"
+                    >
+                      <option value="">テンプレートを選択...</option>
+                      {templates.map((template) => (
+                        <option key={template.id} value={template.id}>
+                          {template.name} ({template.brand})
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-2 bg-blue-500/5 p-2 rounded-lg border border-blue-500/20">
+                      💡 選択すると商品名、ブランド、価格が自動で入力されます
+                    </p>
+                  </div>
+
+                  {/* 商品情報 */}
+                  <div>
+                    <h3 className="text-sm font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-cyan-500/20">
+                      <span className="text-lg">📦</span>
+                      商品情報
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 mb-2">
+                          商品名 <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={manualAddForm.product_name}
+                          onChange={(e) => setManualAddForm({ ...manualAddForm, product_name: e.target.value })}
+                          className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all shadow-inner"
+                          placeholder="商品名を入力"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 mb-2">ブランド</label>
+                        <input
+                          type="text"
+                          value={manualAddForm.brand}
+                          onChange={(e) => setManualAddForm({ ...manualAddForm, brand: e.target.value })}
+                          className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all shadow-inner"
+                          placeholder="ブランド名を入力"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 購入情報 */}
+                  <div>
+                    <h3 className="text-sm font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-green-500/20">
+                      <span className="text-lg">💰</span>
+                      購入情報
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 mb-2">購入価格</label>
+                        <input
+                          type="number"
+                          step="1"
+                          value={manualAddForm.purchase_price}
+                          onChange={(e) => setManualAddForm({ ...manualAddForm, purchase_price: e.target.value })}
+                          className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all shadow-inner"
+                          placeholder="0"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 mb-2">購入日</label>
+                        <input
+                          type="date"
+                          value={manualAddForm.purchase_date}
+                          onChange={(e) => setManualAddForm({ ...manualAddForm, purchase_date: e.target.value })}
+                          className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all shadow-inner"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 mb-2">購入時送料</label>
+                        <input
+                          type="number"
+                          step="1"
+                          value={manualAddForm.purchase_shipping}
+                          onChange={(e) => setManualAddForm({ ...manualAddForm, purchase_shipping: e.target.value })}
+                          className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all shadow-inner"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 売却済みチェックボックス */}
+                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl border-2 border-gray-700/50 hover:border-blue-500/30 transition-all">
+                    <input
+                      type="checkbox"
+                      id="manual_is_sold"
+                      checked={manualAddForm.is_sold}
+                      onChange={(e) => setManualAddForm({ ...manualAddForm, is_sold: e.target.checked })}
+                      className="w-5 h-5 rounded-lg border-2 border-gray-600 bg-gray-800 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all cursor-pointer"
+                    />
+                    <label htmlFor="manual_is_sold" className="text-sm font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent cursor-pointer flex items-center gap-2">
+                      <span>📦</span>
+                      売却済み
+                    </label>
+                    <span className="text-xs text-gray-500 ml-auto bg-gray-800/50 px-3 py-1 rounded-full border border-gray-700/30">
+                      購入情報のみ保存も可能
+                    </span>
+                  </div>
+
+                  {/* 売却情報 */}
+                  {manualAddForm.is_sold && (
+                  <>
+                  <div>
+                    <h3 className="text-sm font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-purple-500/20">
+                      <span className="text-lg">💎</span>
+                      売却情報
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 mb-2">売却価格</label>
+                        <input
+                          type="number"
+                          step="1"
+                          value={manualAddForm.sale_price}
+                          onChange={(e) => setManualAddForm({ ...manualAddForm, sale_price: e.target.value })}
+                          className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all shadow-inner"
+                          placeholder="0"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 mb-2">売却日</label>
+                        <input
+                          type="date"
+                          value={manualAddForm.sale_date}
+                          onChange={(e) => setManualAddForm({ ...manualAddForm, sale_date: e.target.value })}
+                          className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all shadow-inner"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-semibold text-gray-400 mb-2">プラットフォーム</label>
+                        <select
+                          value={manualAddForm.platform}
+                          onChange={(e) => setManualAddForm({ ...manualAddForm, platform: e.target.value })}
+                          className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all shadow-inner"
+                        >
+                          <option value="">選択してください</option>
+                          <option value="Mercari">メルカリ（手数料 10%）</option>
+                          <option value="SNKRDUNK">スニダン（手数料 9.5%）</option>
+                          <option value="StockX">StockX（手数料 12%）</option>
+                          <option value="YahooAuctions">ヤフオク（手数料 10%）</option>
+                          <option value="Rakuma">ラクマ（手数料 6.6%）</option>
+                          <option value="Other">その他（手動入力）</option>
+                        </select>
+                        <p className="text-xs text-gray-500 mt-2 bg-purple-500/5 p-2 rounded-lg border border-purple-500/20">
+                          💡 プラットフォーム選択時に手数料が自動計算されます
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 経費・その他 */}
+                  <div>
+                    <h3 className="text-sm font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 pb-2 border-b border-orange-500/20">
+                      <span className="text-lg">📊</span>
+                      経費・その他
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 mb-2">販売手数料</label>
+                        <input
+                          type="number"
+                          step="1"
+                          value={manualAddForm.fees}
+                          onChange={(e) => setManualAddForm({ ...manualAddForm, fees: e.target.value })}
+                          className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-inner"
+                          placeholder="0"
+                        />
+                        {manualAddForm.platform && PLATFORM_FEE_RATES[manualAddForm.platform] > 0 && (
+                          <p className="text-xs bg-gradient-to-r from-blue-500/10 to-cyan-500/10 text-blue-400 mt-2 p-2 rounded-lg border border-blue-500/20">
+                            ✓ {manualAddForm.platform}: {PLATFORM_FEE_RATES[manualAddForm.platform]}% で自動計算済み
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 mb-2">発送送料</label>
+                        <input
+                          type="number"
+                          step="1"
+                          value={manualAddForm.shipping_cost}
+                          onChange={(e) => setManualAddForm({ ...manualAddForm, shipping_cost: e.target.value })}
+                          className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-inner"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  </>
+                  )}
+
+                  {/* メモ（常に表示） */}
+                  <div>
+                    <label className="block text-xs font-semibold bg-gradient-to-r from-gray-400 to-gray-500 bg-clip-text text-transparent mb-2 flex items-center gap-2">
+                      <span className="text-lg">📝</span>
+                      メモ
+                    </label>
+                    <textarea
+                      value={manualAddForm.notes}
+                      onChange={(e) => setManualAddForm({ ...manualAddForm, notes: e.target.value })}
+                      className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner h-24 resize-none"
+                      placeholder="メモを入力..."
+                    />
+                  </div>
+                </div>
+
+                <div className="sticky bottom-0 p-6 border-t border-gray-700/50 flex flex-col sm:flex-row justify-end gap-3 bg-gradient-to-r from-transparent to-gray-800/30 backdrop-blur-sm">
+                  <button
+                    onClick={() => setIsManualAddModalOpen(false)}
+                    className="w-full sm:w-auto px-5 py-2.5 text-gray-400 hover:text-white transition-all text-center rounded-xl hover:bg-gray-800/50 font-medium"
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    onClick={handleSaveManualAdd}
+                    className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/40 hover:scale-105"
+                  >
+                    💾 追加する
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
