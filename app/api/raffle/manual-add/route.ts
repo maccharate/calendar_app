@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { pool } from "../../../../lib/db";
+import { logActivity } from "../../../../lib/activityLogger";
 
 export async function POST(request: Request) {
   try {
@@ -82,6 +83,23 @@ export async function POST(request: Request) {
         notes || null,
         product_template_id || null,
       ]
+    );
+
+    // アクティビティログを記録
+    await logActivity(
+      userId,
+      session.user.name,
+      "add_manual",
+      {
+        targetType: "manual_record",
+        metadata: {
+          product_name: product_name.trim(),
+          brand: brand?.trim(),
+          purchase_price,
+          sale_price,
+        },
+        request,
+      }
     );
 
     return NextResponse.json({
