@@ -14,7 +14,13 @@ export type ActivityAction =
   | "create_template"
   | "update_template"
   | "delete_template"
-  | "update_settings";
+  | "update_settings"
+  | "create_giveaway"
+  | "update_giveaway"
+  | "delete_giveaway"
+  | "enter_giveaway"
+  | "cancel_entry"
+  | "draw_lottery";
 
 export interface LogActivityOptions {
   targetType?: string;

@@ -31,6 +31,7 @@ export default function Navigation() {
     { name: "ダッシュボード", path: "/dashboard" },
     { name: "統計", path: "/stats" },
     { name: "履歴", path: "/history" },
+    { name: "プレゼント", path: "/giveaway" },
     { name: "マイイベント", path: "/my-events/new" },
     { name: "設定", path: "/settings" },
   ];
@@ -53,8 +54,8 @@ export default function Navigation() {
             onClick={() => handleNavClick("/calendar")}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-              🐵
+            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+              C
             </div>
             <span className="text-xl font-bold hidden sm:block">ちんぱんコミュニティ</span>
           </button>
