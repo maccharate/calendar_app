@@ -564,7 +564,7 @@ export default function CalendarPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* ヘッダー */}
           <div className="mb-8">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                   イベントカレンダー
@@ -573,6 +573,13 @@ export default function CalendarPage() {
               </div>
               {!isMobile && (
                 <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => router.push("/my-events/new")}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-all flex items-center gap-2"
+                  >
+                    <span className="text-xl">+</span>
+                    マイイベント追加
+                  </button>
                   <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-lg px-4 py-2">
                     <p className="text-xs text-gray-400">総イベント数</p>
                     <p className="text-2xl font-bold text-blue-400">{events.length}</p>
@@ -584,6 +591,15 @@ export default function CalendarPage() {
                 </div>
               )}
             </div>
+            {isMobile && (
+              <button
+                onClick={() => router.push("/my-events/new")}
+                className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
+              >
+                <span className="text-xl">+</span>
+                マイイベント追加
+              </button>
+            )}
           </div>
 
           {/* ビュー切り替え（モバイル） */}

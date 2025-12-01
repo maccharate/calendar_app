@@ -32,7 +32,6 @@ export default function Navigation() {
     { name: "統計", path: "/stats" },
     { name: "履歴", path: "/history" },
     { name: "プレゼント", path: "/giveaway" },
-    { name: "マイイベント", path: "/my-events/new" },
     { name: "設定", path: "/settings" },
   ];
 
