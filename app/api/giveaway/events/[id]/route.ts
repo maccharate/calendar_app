@@ -5,11 +5,11 @@ import { pool } from "../../../../../lib/db";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
-    const eventId = params.id;
+    const { id: eventId } = await params;
 
     // イベント情報取得
     const [events] = await pool.query(

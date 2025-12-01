@@ -668,7 +668,7 @@ export default function HistoryPage() {
                   {/* アクション */}
                   <div className="flex flex-col gap-2 w-full md:w-auto md:min-w-[140px]">
                     {/* 商品ページボタン（手動追加でない場合のみ） */}
-                    {!event.is_manual && event.url && (
+                    {!event.is_manual && event.url ? (
                       <a
                         href={event.url}
                         target="_blank"
@@ -677,27 +677,27 @@ export default function HistoryPage() {
                       >
                         商品ページ
                       </a>
-                    )}
+                    ) : null}
 
                     {/* 先着イベントの購入記録ボタン */}
-                    {event.advance === 1 && event.result_status === 'pending' && (
+                    {event.advance === 1 && event.result_status === 'pending' ? (
                       <button
                         onClick={() => handlePurchaseClick(event)}
                         className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-all border border-blue-500/50"
                       >
                         購入記録
                       </button>
-                    )}
+                    ) : null}
 
                     {/* 抽選イベントの結果入力ボタン（結果待ちの場合） */}
-                    {event.advance === 0 && event.result_status === 'pending' && (
+                    {event.advance === 0 && event.result_status === 'pending' ? (
                       <button
                         onClick={() => handleResultClick(event)}
                         className="w-full px-4 py-2.5 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-medium transition-all border border-yellow-500/50"
                       >
                         結果を入力
                       </button>
-                    )}
+                    ) : null}
 
                     {/* 詳細編集ボタン（当選・購入済みの場合） */}
                     {(event.result_status === 'won' || event.result_status === 'partial' || event.result_status === 'purchased') && (
