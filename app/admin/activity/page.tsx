@@ -111,6 +111,12 @@ export default function ActivityLogsPage() {
       update_template: "テンプレート更新",
       delete_template: "テンプレート削除",
       update_settings: "設定変更",
+      create_giveaway: "プレゼント企画作成",
+      update_giveaway: "プレゼント企画更新",
+      delete_giveaway: "プレゼント企画削除",
+      enter_giveaway: "プレゼント企画応募",
+      cancel_entry: "応募キャンセル",
+      draw_lottery: "抽選実行",
     };
     return labels[action] || action;
   };
