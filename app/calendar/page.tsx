@@ -104,6 +104,7 @@ export default function CalendarPage() {
     notApplied: false,
     advance: false,
     personal: false,
+    showEnded: false, // 終了したイベントを表示
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -214,6 +215,15 @@ export default function CalendarPage() {
     }
 
     let filtered = [...events];
+
+    // 終了したイベントを除外（showEndedがfalseの場合）
+    if (!filters.showEnded) {
+      const now = new Date();
+      filtered = filtered.filter((event) => {
+        const endDate = new Date(event.end || event.start);
+        return endDate >= now; // 終了時間が現在時刻より後
+      });
+    }
 
     // フィルター
     if (filters.applied || filters.notApplied || filters.advance || filters.personal) {
@@ -542,8 +552,9 @@ export default function CalendarPage() {
       notApplied: false,
       advance: false,
       personal: false,
+      showEnded: false,
     });
-    setSortBy("date");
+    setSortBy("deadline"); // デフォルトは締切順
   };
 
   if (loading) {
@@ -730,6 +741,25 @@ export default function CalendarPage() {
                         }`}
                     >
                       人気順
+                    </button>
+                  </div>
+                </div>
+
+                {/* 終了したイベントを表示スイッチ */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
+                    <span className="text-sm font-medium text-gray-300">終了したイベントを表示</span>
+                    <button
+                      onClick={() => setFilters({ ...filters, showEnded: !filters.showEnded })}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        filters.showEnded ? "bg-blue-600" : "bg-gray-600"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          filters.showEnded ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
                     </button>
                   </div>
                 </div>
