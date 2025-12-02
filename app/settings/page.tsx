@@ -49,8 +49,13 @@ export default function SettingsPage() {
       const notifRes = await fetch("/api/user/notification-settings");
       if (notifRes.ok) {
         const notifData = await notifRes.json();
+        console.log('通知設定取得:', notifData);
+        console.log('has_subscription:', notifData.has_subscription);
         setNotificationSettings(notifData);
         setPushSubscribed(notifData.has_subscription || false);
+        console.log('pushSubscribed設定後:', notifData.has_subscription || false);
+      } else {
+        console.error('通知設定の取得に失敗:', notifRes.status);
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
