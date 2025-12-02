@@ -9,51 +9,99 @@ export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
+      console.error('Push subscribe: Not authenticated');
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const userId = parseInt(session.user.id as string, 10);
-    const subscription = await request.json();
-
     console.log('Push subscription - userId:', userId, 'type:', typeof userId);
 
-    // サブスクリプション情報を保存
-    await pool.execute(
-      `INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth)
-       VALUES (?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE
-         p256dh = VALUES(p256dh),
-         auth = VALUES(auth),
-         updated_at = CURRENT_TIMESTAMP`,
-      [
-        userId,
-        subscription.endpoint,
-        subscription.keys.p256dh,
-        subscription.keys.auth,
-      ]
-    );
-
-    // 通知設定がない場合はデフォルトで作成
-    const [existingSettings] = await pool.query(
-      `SELECT id FROM notification_settings WHERE user_id = ?`,
-      [userId]
-    );
-
-    if ((existingSettings as any[]).length === 0) {
-      await pool.execute(
-        `INSERT INTO notification_settings
-         (user_id, notifications_enabled, advance_before_start, raffle_on_start, raffle_before_end)
-         VALUES (?, TRUE, TRUE, TRUE, TRUE)`,
-        [userId]
-      );
+    let subscription;
+    try {
+      subscription = await request.json();
+      console.log('Push subscription data received:', {
+        hasEndpoint: !!subscription.endpoint,
+        hasKeys: !!subscription.keys,
+        hasP256dh: !!subscription.keys?.p256dh,
+        hasAuth: !!subscription.keys?.auth,
+      });
+    } catch (parseError: any) {
+      console.error('Failed to parse subscription data:', parseError);
+      return NextResponse.json({
+        error: "Invalid subscription data",
+        details: parseError.message,
+      }, { status: 400 });
     }
 
+    if (!subscription.endpoint || !subscription.keys?.p256dh || !subscription.keys?.auth) {
+      console.error('Push subscribe: Missing required fields in subscription');
+      return NextResponse.json({
+        error: "Missing required subscription fields",
+        details: "endpoint, p256dh, and auth are required",
+      }, { status: 400 });
+    }
+
+    // サブスクリプション情報を保存
+    try {
+      console.log('Saving subscription to database...');
+      await pool.execute(
+        `INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth)
+         VALUES (?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+           p256dh = VALUES(p256dh),
+           auth = VALUES(auth),
+           updated_at = CURRENT_TIMESTAMP`,
+        [
+          userId,
+          subscription.endpoint,
+          subscription.keys.p256dh,
+          subscription.keys.auth,
+        ]
+      );
+      console.log('Subscription saved successfully');
+    } catch (dbError: any) {
+      console.error('Database error saving subscription:', dbError);
+      return NextResponse.json({
+        error: "Database error saving subscription",
+        details: dbError.message,
+        code: dbError.code,
+      }, { status: 500 });
+    }
+
+    // 通知設定がない場合はデフォルトで作成
+    try {
+      console.log('Checking notification settings...');
+      const [existingSettings] = await pool.query(
+        `SELECT id FROM notification_settings WHERE user_id = ?`,
+        [userId]
+      );
+
+      if ((existingSettings as any[]).length === 0) {
+        console.log('Creating default notification settings...');
+        await pool.execute(
+          `INSERT INTO notification_settings
+           (user_id, notifications_enabled, advance_before_start, raffle_on_start, raffle_before_end)
+           VALUES (?, TRUE, TRUE, TRUE, TRUE)`,
+          [userId]
+        );
+        console.log('Default notification settings created');
+      } else {
+        console.log('Notification settings already exist');
+      }
+    } catch (dbError: any) {
+      console.error('Database error with notification settings:', dbError);
+      // 通知設定のエラーは致命的ではないので続行
+    }
+
+    console.log('Push subscription completed successfully');
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("Error subscribing to push:", error);
+    console.error("Error stack:", error.stack);
     return NextResponse.json({
       error: "Failed to subscribe to push notifications",
       details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     }, { status: 500 });
   }
 }
