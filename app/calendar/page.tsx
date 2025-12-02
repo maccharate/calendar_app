@@ -268,47 +268,53 @@ export default function CalendarPage() {
     });
   };
 
-  // 締切までの残り時間を判定
-  const getDeadlineStatus = (event: EventType): 'urgent' | 'soon' | 'normal' => {
+  // 残り時間を計算（時間と分を返す）
+  const getTimeRemaining = (event: EventType): { hours: number; minutes: number; isValid: boolean } => {
     const now = new Date();
-    const endDate = new Date(event.end || event.start);
-    const hoursLeft = (endDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+    let targetDate: Date;
 
-    // 既に応募済みの場合は通常表示
-    if (event.extendedProps?.applied) {
-      return 'normal';
+    // 先着イベントの場合は開始時間まで
+    if (event.extendedProps?.advance) {
+      targetDate = new Date(event.start);
+    } else {
+      // 抽選イベントの場合は終了時間まで
+      targetDate = new Date(event.end || event.start);
     }
 
-    // 24時間以内
-    if (hoursLeft > 0 && hoursLeft <= 24) {
-      return 'urgent';
+    const diffMs = targetDate.getTime() - now.getTime();
+
+    // 24時間以内かつ未来の時間の場合のみ有効
+    if (diffMs <= 0 || diffMs > 24 * 60 * 60 * 1000) {
+      return { hours: 0, minutes: 0, isValid: false };
     }
 
-    // 3日（72時間）以内
-    if (hoursLeft > 24 && hoursLeft <= 72) {
-      return 'soon';
-    }
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
-    return 'normal';
+    return { hours, minutes, isValid: true };
   };
 
-  // 締切バッジを取得
-  const getDeadlineBadge = (status: 'urgent' | 'soon' | 'normal') => {
-    if (status === 'urgent') {
-      return (
-        <span className="inline-block px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded animate-pulse whitespace-nowrap">
-          緊急
-        </span>
-      );
+  // 残り時間の表示を取得
+  const getRemainingTimeDisplay = (event: EventType) => {
+    // 既に応募済みの場合は表示しない
+    if (event.extendedProps?.applied) {
+      return null;
     }
-    if (status === 'soon') {
-      return (
-        <span className="inline-block px-2 py-0.5 bg-orange-500 text-white text-xs font-bold rounded whitespace-nowrap">
-          締切間近
-        </span>
-      );
+
+    const timeRemaining = getTimeRemaining(event);
+
+    if (!timeRemaining.isValid) {
+      return null;
     }
-    return null;
+
+    const { hours, minutes } = timeRemaining;
+    const isAdvance = event.extendedProps?.advance;
+
+    return (
+      <span className="inline-block px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded whitespace-nowrap">
+        {isAdvance ? '販売まで' : ''}残り{hours}時間{minutes}分
+      </span>
+    );
   };
 
   // イベントの時間表示を取得（リストビュー用）
@@ -764,20 +770,11 @@ export default function CalendarPage() {
                 </div>
               ) : (
                 todayEvents.map((event: EventType) => {
-                  const deadlineStatus = getDeadlineStatus(event);
-                  const borderColor = deadlineStatus === 'urgent'
-                    ? 'border-red-500'
-                    : deadlineStatus === 'soon'
-                    ? 'border-orange-500'
-                    : 'border-gray-800';
-
                   return (
                   <div
                     key={event.id}
                     onClick={() => setSelectedEvent(event)}
-                    className={`bg-gray-900/50 backdrop-blur-sm border ${borderColor} rounded-xl p-4 hover:border-blue-500/50 transition-all cursor-pointer ${
-                      deadlineStatus === 'urgent' ? 'ring-2 ring-red-500/50' : ''
-                    }`}
+                    className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4 hover:border-blue-500/50 transition-all cursor-pointer"
                   >
                     <div className="flex gap-3">
                       {event.extendedProps?.img && (
@@ -787,12 +784,6 @@ export default function CalendarPage() {
                             alt={event.title}
                             className="w-full h-full object-cover bg-gray-800/50"
                           />
-                          {/* 締切バッジを画像の上に */}
-                          {deadlineStatus !== 'normal' && (
-                            <div className="absolute top-0 left-0">
-                              {getDeadlineBadge(deadlineStatus)}
-                            </div>
-                          )}
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
@@ -870,6 +861,7 @@ export default function CalendarPage() {
                         {/* バッジ（応募済み以外） */}
                         {!event.extendedProps?.applied && (
                           <div className="flex gap-2 flex-wrap">
+                            {getRemainingTimeDisplay(event)}
                             {event.extendedProps?.advance && (
                               <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-xs rounded border border-amber-500/50">
                                 先着
@@ -898,20 +890,11 @@ export default function CalendarPage() {
                 すべてのイベント ({filteredEvents.length}件)
               </h2>
               {filteredEvents.map((event: EventType) => {
-                const deadlineStatus = getDeadlineStatus(event);
-                const borderColor = deadlineStatus === 'urgent'
-                  ? 'border-red-500'
-                  : deadlineStatus === 'soon'
-                  ? 'border-orange-500'
-                  : 'border-gray-800';
-
                 return (
                 <div
                   key={event.id}
                   onClick={() => setSelectedEvent(event)}
-                  className={`bg-gray-900/50 backdrop-blur-sm border ${borderColor} rounded-xl p-4 hover:border-blue-500/50 transition-all cursor-pointer ${
-                    deadlineStatus === 'urgent' ? 'ring-2 ring-red-500/50' : ''
-                  }`}
+                  className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4 hover:border-blue-500/50 transition-all cursor-pointer"
                 >
                   <div className="flex gap-3">
                     {event.extendedProps?.img && (
@@ -921,12 +904,6 @@ export default function CalendarPage() {
                           alt={event.title}
                           className="w-full h-full object-cover bg-gray-800/50"
                         />
-                        {/* 締切バッジを画像の上に */}
-                        {deadlineStatus !== 'normal' && (
-                          <div className="absolute top-0 left-0">
-                            {getDeadlineBadge(deadlineStatus)}
-                          </div>
-                        )}
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
@@ -990,6 +967,7 @@ export default function CalendarPage() {
                       {/* バッジ（応募済み以外） */}
                       {!event.extendedProps?.applied && (
                         <div className="flex gap-2 flex-wrap">
+                          {getRemainingTimeDisplay(event)}
                           {event.extendedProps?.advance && (
                             <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-xs rounded border border-amber-500/50">
                               先着
@@ -1164,20 +1142,11 @@ export default function CalendarPage() {
                       minute: "2-digit",
                     })}`;
                   };
-                  
-                  const deadlineStatus = getDeadlineStatus(event);
-                  const borderColor = deadlineStatus === 'urgent'
-                    ? 'border-red-500'
-                    : deadlineStatus === 'soon'
-                    ? 'border-orange-500'
-                    : 'border-transparent';
 
                   return (
                   <div
                     key={event.id}
-                    className={`bg-gray-800/70 rounded-lg p-4 flex gap-3 cursor-pointer hover:bg-gray-700/70 transition-colors border ${borderColor} ${
-                      deadlineStatus === 'urgent' ? 'ring-1 ring-red-500/50' : ''
-                    }`}
+                    className="bg-gray-800/70 rounded-lg p-4 flex gap-3 cursor-pointer hover:bg-gray-700/70 transition-colors border border-transparent"
                     onClick={() => {
                       setSelectedEvent(event);
                       setSelectedDate(null);
@@ -1190,12 +1159,6 @@ export default function CalendarPage() {
                           alt={event.title}
                           className="w-full h-full object-contain bg-gray-900/50 p-1"
                         />
-                        {/* 締切バッジを画像の上に */}
-                        {deadlineStatus !== 'normal' && (
-                          <div className="absolute top-0 left-0">
-                            {getDeadlineBadge(deadlineStatus)}
-                          </div>
-                        )}
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
@@ -1208,9 +1171,16 @@ export default function CalendarPage() {
                           {event.extendedProps.site}
                         </p>
                       )}
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 mb-2">
                         {getTimeDisplay()}
                       </p>
+
+                      {/* 残り時間表示 */}
+                      {!event.extendedProps?.applied && getRemainingTimeDisplay(event) && (
+                        <div className="mb-2">
+                          {getRemainingTimeDisplay(event)}
+                        </div>
+                      )}
 
                       {/* 統計 */}
                       {eventStats[event.id] && (
