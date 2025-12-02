@@ -192,7 +192,7 @@ export default function GiveawayDetailPage() {
     };
     const badge = badges[status] || { label: status, color: "bg-gray-600" };
     return (
-      <span className={`${badge.color} text-white px-4 py-2 rounded-full text-base font-medium`}>
+      <span className={`${badge.color} text-white px-4 py-2 rounded-full text-base font-medium whitespace-nowrap`}>
         {badge.label}
       </span>
     );
