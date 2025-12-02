@@ -68,26 +68,18 @@ export async function POST(request: Request) {
       }, { status: 500 });
     }
 
-    // 通知設定がない場合はデフォルトで作成
+    // 通知設定を作成または更新（重複時は何もしない）
     try {
-      console.log('Checking notification settings...');
-      const [existingSettings] = await pool.query(
-        `SELECT id FROM notification_settings WHERE user_id = ?`,
+      console.log('Creating or updating notification settings...');
+      await pool.execute(
+        `INSERT INTO notification_settings
+         (user_id, notifications_enabled, advance_before_start, raffle_on_start, raffle_before_end)
+         VALUES (?, TRUE, TRUE, TRUE, TRUE)
+         ON DUPLICATE KEY UPDATE
+           user_id = user_id`,
         [userId]
       );
-
-      if ((existingSettings as any[]).length === 0) {
-        console.log('Creating default notification settings...');
-        await pool.execute(
-          `INSERT INTO notification_settings
-           (user_id, notifications_enabled, advance_before_start, raffle_on_start, raffle_before_end)
-           VALUES (?, TRUE, TRUE, TRUE, TRUE)`,
-          [userId]
-        );
-        console.log('Default notification settings created');
-      } else {
-        console.log('Notification settings already exist');
-      }
+      console.log('Notification settings ensured');
     } catch (dbError: any) {
       console.error('Database error with notification settings:', dbError);
       // 通知設定のエラーは致命的ではないので続行
