@@ -243,7 +243,7 @@ export default function GiveawayPage() {
                     {/* アクティブ表示 */}
                     {isEventActive(event) && (
                       <div className="mt-3 bg-green-600/20 border border-green-600/50 rounded-lg px-3 py-2 text-center">
-                        <p className="text-green-400 text-sm font-medium">
+                        <p className="text-green-400 text-sm font-medium whitespace-nowrap">
                           応募受付中
                         </p>
                       </div>

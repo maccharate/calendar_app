@@ -108,7 +108,7 @@ export default function CalendarPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // ソート用
-  const [sortBy, setSortBy] = useState<"date" | "popularity" | "deadline">("date");
+  const [sortBy, setSortBy] = useState<"date" | "popularity" | "deadline">("deadline");
 
   // ビューモード
   const [viewMode, setViewMode] = useState<ViewMode>("today");
