@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     // イベント存在確認
     const [events] = await pool.query(
-      `SELECT id, status, start_date, end_date FROM giveaway_events WHERE id = ?`,
+      `SELECT id, status, start_date, end_date, created_by FROM giveaway_events WHERE id = ?`,
       [event_id]
     ) as any;
 
@@ -25,6 +25,13 @@ export async function POST(request: Request) {
     }
 
     const event = events[0];
+
+    // 自分が作成したイベントには応募できない
+    if (event.created_by === session.user.id) {
+      return NextResponse.json({
+        error: "自分が作成したイベントには応募できません"
+      }, { status: 400 });
+    }
 
     // ステータスチェック
     if (event.status !== 'active') {

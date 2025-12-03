@@ -334,33 +334,8 @@ export default function CalendarPage() {
     const today = new Date();
 
     // 日付のみ比較用（時間を0にリセット）
-    const startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
     const endDay = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
     const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-    // 複数日にまたがるイベントかどうか
-    const isMultiDay = startDay.getTime() !== endDay.getTime();
-
-    if (isMultiDay) {
-      // 今日が開始日の場合
-      if (todayDay.getTime() === startDay.getTime()) {
-        return `${startDate.toLocaleTimeString("ja-JP", {
-          timeZone: "Asia/Tokyo",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}〜`;
-      }
-      // 今日が終了日の場合
-      if (todayDay.getTime() === endDay.getTime()) {
-        return `〜${endDate.toLocaleTimeString("ja-JP", {
-          timeZone: "Asia/Tokyo",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}`;
-      }
-      // 今日が中間日の場合
-      return "終日";
-    }
 
     // 先着イベントの場合 → 開始時間のみ（販売開始）
     if (event.extendedProps?.advance) {
@@ -371,16 +346,18 @@ export default function CalendarPage() {
       })}販売開始`;
     }
 
-    // 同日内のイベント → 開始〜終了
-    return `${startDate.toLocaleTimeString("ja-JP", {
-      timeZone: "Asia/Tokyo",
-      hour: "2-digit",
-      minute: "2-digit",
-    })} 〜 ${endDate.toLocaleTimeString("ja-JP", {
-      timeZone: "Asia/Tokyo",
-      hour: "2-digit",
-      minute: "2-digit",
-    })}`;
+    // 抽選イベントの場合
+    // 期限が今日の場合 → 終了時刻のみ表示
+    if (todayDay.getTime() === endDay.getTime()) {
+      return endDate.toLocaleTimeString("ja-JP", {
+        timeZone: "Asia/Tokyo",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    // 期限が今日じゃない場合 → 終日と表示
+    return "終日";
   };
 
   // コメントモーダルから応募
