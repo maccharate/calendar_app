@@ -25,8 +25,12 @@ export default function AdminEventsPage() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [showBulkEditModal, setShowBulkEditModal] = useState(false);
   const [bulkImage, setBulkImage] = useState<File | null>(null);
+  const [bulkImageUrl, setBulkImageUrl] = useState<string>("");
   const [bulkTitle, setBulkTitle] = useState("");
   const [bulkUpdating, setBulkUpdating] = useState(false);
+  const [imageMode, setImageMode] = useState<"upload" | "select">("upload");
+  const [storageImages, setStorageImages] = useState<any[]>([]);
+  const [loadingImages, setLoadingImages] = useState(false);
 
   useEffect(() => {
     checkAdmin();
@@ -98,16 +102,32 @@ export default function AdminEventsPage() {
     );
   };
 
+  const fetchStorageImages = async () => {
+    setLoadingImages(true);
+    try {
+      const res = await fetch("/api/upload/image");
+      if (res.ok) {
+        const data = await res.json();
+        setStorageImages(data.images || []);
+      }
+    } catch (error) {
+      console.error("Error fetching images:", error);
+    } finally {
+      setLoadingImages(false);
+    }
+  };
+
   const handleBulkEdit = () => {
     if (selectedIds.length === 0) {
       alert("編集するイベントを選択してください");
       return;
     }
     setShowBulkEditModal(true);
+    fetchStorageImages();
   };
 
   const handleBulkUpdate = async () => {
-    if (!bulkImage && !bulkTitle.trim()) {
+    if (!bulkImage && !bulkImageUrl.trim() && !bulkTitle.trim()) {
       alert("画像またはタイトルを入力してください");
       return;
     }
@@ -124,6 +144,8 @@ export default function AdminEventsPage() {
 
       if (bulkImage) {
         formData.append("image", bulkImage);
+      } else if (bulkImageUrl.trim()) {
+        formData.append("imageUrl", bulkImageUrl.trim());
       }
 
       if (bulkTitle.trim()) {
@@ -139,7 +161,9 @@ export default function AdminEventsPage() {
         alert("✅ イベントを更新しました");
         setShowBulkEditModal(false);
         setBulkImage(null);
+        setBulkImageUrl("");
         setBulkTitle("");
+        setImageMode("upload");
         setSelectedIds([]);
         fetchEvents();
       } else {
@@ -362,25 +386,108 @@ export default function AdminEventsPage() {
             <div className="p-6 space-y-6">
               {/* 画像更新セクション */}
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-medium mb-3">
                   画像を更新
                 </label>
-                <div className="space-y-3">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setBulkImage(e.target.files?.[0] || null)}
-                    className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 cursor-pointer"
-                  />
-                  {bulkImage && (
-                    <p className="text-xs text-green-400">
-                      ✓ {bulkImage.name} を選択中
-                    </p>
-                  )}
-                  <p className="text-xs text-gray-500">
-                    選択したすべてのイベントの画像を同じ画像に更新します
-                  </p>
+
+                {/* モード切替タブ */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => {
+                      setImageMode("upload");
+                      setBulkImageUrl("");
+                    }}
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      imageMode === "upload"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    }`}
+                  >
+                    新規アップロード
+                  </button>
+                  <button
+                    onClick={() => {
+                      setImageMode("select");
+                      setBulkImage(null);
+                    }}
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      imageMode === "select"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    }`}
+                  >
+                    ライブラリから選択
+                  </button>
                 </div>
+
+                {/* アップロードモード */}
+                {imageMode === "upload" && (
+                  <div className="space-y-3">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setBulkImage(e.target.files?.[0] || null)}
+                      className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 cursor-pointer"
+                    />
+                    {bulkImage && (
+                      <p className="text-xs text-green-400">
+                        ✓ {bulkImage.name} を選択中
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-500">
+                      選択したすべてのイベントの画像を同じ画像に更新します
+                    </p>
+                  </div>
+                )}
+
+                {/* 選択モード */}
+                {imageMode === "select" && (
+                  <div className="space-y-3">
+                    {loadingImages ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                        <p className="text-sm text-gray-400">画像を読み込み中...</p>
+                      </div>
+                    ) : storageImages.length === 0 ? (
+                      <div className="text-center py-8 bg-gray-800/50 rounded-lg">
+                        <p className="text-sm text-gray-400">画像がありません</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-3 max-h-64 overflow-y-auto p-2">
+                        {storageImages.map((image, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setBulkImageUrl(image.url)}
+                            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                              bulkImageUrl === image.url
+                                ? "border-blue-500 ring-2 ring-blue-500/50"
+                                : "border-gray-700 hover:border-gray-600"
+                            }`}
+                          >
+                            <img
+                              src={image.url}
+                              alt={image.fileName}
+                              className="w-full h-full object-cover"
+                            />
+                            {bulkImageUrl === image.url && (
+                              <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
+                                <span className="text-2xl">✓</span>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {bulkImageUrl && (
+                      <p className="text-xs text-green-400">
+                        ✓ 画像を選択中
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-500">
+                      選択したすべてのイベントの画像を同じ画像に更新します
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* タイトル更新セクション */}
@@ -415,7 +522,9 @@ export default function AdminEventsPage() {
                 onClick={() => {
                   setShowBulkEditModal(false);
                   setBulkImage(null);
+                  setBulkImageUrl("");
                   setBulkTitle("");
+                  setImageMode("upload");
                 }}
                 disabled={bulkUpdating}
                 className="px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -424,7 +533,7 @@ export default function AdminEventsPage() {
               </button>
               <button
                 onClick={handleBulkUpdate}
-                disabled={bulkUpdating || (!bulkImage && !bulkTitle.trim())}
+                disabled={bulkUpdating || (!bulkImage && !bulkImageUrl.trim() && !bulkTitle.trim())}
                 className="px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {bulkUpdating ? "更新中..." : "更新する"}
