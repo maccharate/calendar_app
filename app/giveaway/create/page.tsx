@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
@@ -28,9 +28,33 @@ export default function CreateGiveawayPage() {
     { name: "", description: "", image_url: "", winner_count: 1 }
   ]);
   const [loading, setLoading] = useState(false);
+  const [prizeImageModes, setPrizeImageModes] = useState<("url" | "upload" | "library")[]>(["url"]);
+  const [storageImages, setStorageImages] = useState<any[]>([]);
+  const [loadingImages, setLoadingImages] = useState(false);
+  const [uploadingPrizeImage, setUploadingPrizeImage] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchStorageImages();
+  }, []);
+
+  const fetchStorageImages = async () => {
+    setLoadingImages(true);
+    try {
+      const res = await fetch("/api/upload/image");
+      if (res.ok) {
+        const data = await res.json();
+        setStorageImages(data.images || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch storage images:", error);
+    } finally {
+      setLoadingImages(false);
+    }
+  };
 
   const addPrize = () => {
     setPrizes([...prizes, { name: "", description: "", image_url: "", winner_count: 1 }]);
+    setPrizeImageModes([...prizeImageModes, "url"]);
   };
 
   const removePrize = (index: number) => {
@@ -39,6 +63,7 @@ export default function CreateGiveawayPage() {
       return;
     }
     setPrizes(prizes.filter((_, i) => i !== index));
+    setPrizeImageModes(prizeImageModes.filter((_, i) => i !== index));
   };
 
   const updatePrize = (index: number, field: keyof Prize, value: string | number) => {
@@ -80,6 +105,48 @@ export default function CreateGiveawayPage() {
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const handlePrizeImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, prizeIndex: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("ファイルサイズは5MB以下にしてください");
+      return;
+    }
+
+    setUploadingPrizeImage(prizeIndex);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        updatePrize(prizeIndex, "image_url", data.url);
+        alert("画像をアップロードしました");
+        // ライブラリを再読み込み
+        fetchStorageImages();
+      } else {
+        alert("アップロードに失敗しました");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("アップロードエラーが発生しました");
+    } finally {
+      setUploadingPrizeImage(null);
+    }
+  };
+
+  const setPrizeImageMode = (index: number, mode: "url" | "upload" | "library") => {
+    const newModes = [...prizeImageModes];
+    newModes[index] = mode;
+    setPrizeImageModes(newModes);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -373,14 +440,122 @@ export default function CreateGiveawayPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm text-gray-400 mb-1">賞品画像URL</label>
-                        <input
-                          type="url"
-                          value={prize.image_url}
-                          onChange={(e) => updatePrize(index, "image_url", e.target.value)}
-                          placeholder="https://example.com/prize.jpg"
-                          className="w-full bg-gray-900/70 border-2 border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500"
-                        />
+                        <label className="block text-sm text-gray-400 mb-2">賞品画像</label>
+
+                        {/* モード切替タブ */}
+                        <div className="flex gap-2 mb-3">
+                          <button
+                            type="button"
+                            onClick={() => setPrizeImageMode(index, "url")}
+                            className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                              prizeImageModes[index] === "url"
+                                ? "bg-purple-600 text-white"
+                                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                            }`}
+                          >
+                            URL入力
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPrizeImageMode(index, "upload")}
+                            className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                              prizeImageModes[index] === "upload"
+                                ? "bg-purple-600 text-white"
+                                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                            }`}
+                          >
+                            アップロード
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPrizeImageMode(index, "library")}
+                            className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                              prizeImageModes[index] === "library"
+                                ? "bg-purple-600 text-white"
+                                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                            }`}
+                          >
+                            ライブラリ
+                          </button>
+                        </div>
+
+                        {/* URL入力モード */}
+                        {prizeImageModes[index] === "url" && (
+                          <input
+                            type="url"
+                            value={prize.image_url}
+                            onChange={(e) => updatePrize(index, "image_url", e.target.value)}
+                            placeholder="https://example.com/prize.jpg"
+                            className="w-full bg-gray-900/70 border-2 border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500"
+                          />
+                        )}
+
+                        {/* アップロードモード */}
+                        {prizeImageModes[index] === "upload" && (
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handlePrizeImageUpload(e, index)}
+                            disabled={uploadingPrizeImage === index}
+                            className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 cursor-pointer disabled:opacity-50"
+                          />
+                        )}
+
+                        {/* ライブラリモード */}
+                        {prizeImageModes[index] === "library" && (
+                          <div>
+                            {loadingImages ? (
+                              <div className="text-center py-4">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500 mx-auto mb-2"></div>
+                                <p className="text-xs text-gray-400">読み込み中...</p>
+                              </div>
+                            ) : storageImages.length === 0 ? (
+                              <div className="text-center py-4 bg-gray-800/50 rounded-lg">
+                                <p className="text-xs text-gray-400">画像がありません</p>
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 bg-gray-800/30 rounded-lg">
+                                {storageImages.map((image, imgIndex) => (
+                                  <button
+                                    key={imgIndex}
+                                    type="button"
+                                    onClick={() => updatePrize(index, "image_url", image.url)}
+                                    className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                                      prize.image_url === image.url
+                                        ? "border-purple-500 ring-2 ring-purple-500/50"
+                                        : "border-gray-700 hover:border-gray-600"
+                                    }`}
+                                  >
+                                    <img
+                                      src={image.url}
+                                      alt={image.fileName}
+                                      className="w-full h-full object-cover"
+                                    />
+                                    {prize.image_url === image.url && (
+                                      <div className="absolute inset-0 bg-purple-500/20 flex items-center justify-center">
+                                        <span className="text-xl">✓</span>
+                                      </div>
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* プレビュー */}
+                        {prize.image_url && (
+                          <div className="mt-3">
+                            <img
+                              src={prize.image_url}
+                              alt="賞品画像プレビュー"
+                              className="max-w-[200px] rounded-lg border border-gray-700"
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
 
                       <div>
