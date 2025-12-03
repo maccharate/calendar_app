@@ -36,6 +36,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const eventIdsStr = formData.get("eventIds") as string;
     const imageFile = formData.get("image") as File | null;
+    const imageUrlFromForm = formData.get("imageUrl") as string | null;
     const title = formData.get("title") as string | null;
 
     if (!eventIdsStr) {
@@ -48,14 +49,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid event IDs" }, { status: 400 });
     }
 
-    if (!imageFile && !title) {
+    if (!imageFile && !imageUrlFromForm && !title) {
       return NextResponse.json({ error: "No updates provided" }, { status: 400 });
     }
 
     let imageUrl: string | null = null;
 
-    // 画像がある場合はアップロード
-    if (imageFile) {
+    // 既存の画像URLが指定されている場合
+    if (imageUrlFromForm) {
+      imageUrl = imageUrlFromForm;
+    }
+    // 画像ファイルがある場合はアップロード
+    else if (imageFile) {
       // ファイルサイズチェック（5MB以下）
       const maxSize = 5 * 1024 * 1024;
       if (imageFile.size > maxSize) {
