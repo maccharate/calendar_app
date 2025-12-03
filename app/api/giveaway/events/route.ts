@@ -141,6 +141,53 @@ export async function POST(request: Request) {
       }
     );
 
+    // Discord Webhook送信
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    if (webhookUrl) {
+      try {
+        const webhookData = {
+          embeds: [{
+            title: "🎁 新しいプレゼント企画が作成されました",
+            description: description || "詳細は以下の通りです",
+            color: 0x9B59B6, // 紫色
+            fields: [
+              {
+                name: "企画名",
+                value: title,
+                inline: false
+              },
+              {
+                name: "作成者",
+                value: show_creator !== false ? session.user.name : "非公開",
+                inline: true
+              },
+              {
+                name: "当選者数",
+                value: `${totalWinners}名`,
+                inline: true
+              },
+              {
+                name: "応募期間",
+                value: `${new Date(start_date).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })} 〜 ${new Date(end_date).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}`,
+                inline: false
+              }
+            ],
+            thumbnail: image_url ? { url: image_url } : undefined,
+            timestamp: new Date().toISOString()
+          }]
+        };
+
+        await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(webhookData)
+        });
+      } catch (webhookError) {
+        console.error("Discord webhook error:", webhookError);
+        // Webhookエラーは無視（イベント作成自体は成功とする）
+      }
+    }
+
     return NextResponse.json({
       success: true,
       event_id: eventId,
