@@ -19,6 +19,8 @@ export default function CreateGiveawayPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [imageMode, setImageMode] = useState<"url" | "upload">("url");
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [showCreator, setShowCreator] = useState(true);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -43,6 +45,41 @@ export default function CreateGiveawayPage() {
     const newPrizes = [...prizes];
     newPrizes[index] = { ...newPrizes[index], [field]: value };
     setPrizes(newPrizes);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // ファイルサイズチェック (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("ファイルサイズは5MB以下にしてください");
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setImageUrl(data.url);
+        alert("画像をアップロードしました");
+      } else {
+        alert("アップロードに失敗しました");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("アップロードエラーが発生しました");
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -159,20 +196,68 @@ export default function CreateGiveawayPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-400 mb-2">イベント画像URL</label>
-                  <input
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full bg-gray-900/70 border-2 border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500"
-                  />
+                  <label className="block text-sm text-gray-400 mb-2">イベント画像</label>
+
+                  {/* モード切替タブ */}
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      type="button"
+                      onClick={() => setImageMode("url")}
+                      className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        imageMode === "url"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                      }`}
+                    >
+                      URL入力
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageMode("upload")}
+                      className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        imageMode === "upload"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                      }`}
+                    >
+                      ファイルアップロード
+                    </button>
+                  </div>
+
+                  {/* URL入力モード */}
+                  {imageMode === "url" && (
+                    <input
+                      type="url"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      placeholder="https://example.com/image.jpg"
+                      className="w-full bg-gray-900/70 border-2 border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500"
+                    />
+                  )}
+
+                  {/* アップロードモード */}
+                  {imageMode === "upload" && (
+                    <div className="space-y-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                        className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 cursor-pointer disabled:opacity-50"
+                      />
+                      {uploadingImage && (
+                        <p className="text-xs text-blue-400">アップロード中...</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* プレビュー */}
                   {imageUrl && (
-                    <div className="mt-2">
+                    <div className="mt-3">
                       <img
                         src={imageUrl}
                         alt="プレビュー"
-                        className="max-w-xs rounded-lg"
+                        className="max-w-xs rounded-lg border border-gray-700"
                         onError={(e) => {
                           e.currentTarget.style.display = "none";
                         }}
