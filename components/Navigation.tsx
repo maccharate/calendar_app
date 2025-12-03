@@ -9,6 +9,7 @@ export default function Navigation() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminMenu, setShowAdminMenu] = useState(false);
 
   useEffect(() => {
     checkAdmin();
@@ -35,9 +36,7 @@ export default function Navigation() {
     { name: "設定", path: "/settings" },
   ];
 
-  const navItems = isAdmin
-    ? [...baseNavItems, { name: "管理", path: "/admin/events" }]
-    : baseNavItems;
+  const navItems = baseNavItems;
 
   const handleNavClick = (path: string) => {
     router.push(path);
@@ -74,6 +73,62 @@ export default function Navigation() {
                 {item.name}
               </button>
             ))}
+
+            {/* 管理メニュー（管理者のみ） */}
+            {isAdmin && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowAdminMenu(!showAdminMenu)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-1 ${
+                    pathname?.startsWith("/admin")
+                      ? "bg-blue-600 text-white"
+                      : "text-gray-300 hover:bg-gray-800"
+                  }`}
+                >
+                  管理
+                  <svg
+                    className={`w-4 h-4 transition-transform ${showAdminMenu ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {showAdminMenu && (
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden z-50">
+                    <button
+                      onClick={() => {
+                        handleNavClick("/admin/events");
+                        setShowAdminMenu(false);
+                      }}
+                      className="w-full px-4 py-3 text-left text-gray-300 hover:bg-gray-700 transition-colors"
+                    >
+                      イベント管理
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleNavClick("/admin/templates");
+                        setShowAdminMenu(false);
+                      }}
+                      className="w-full px-4 py-3 text-left text-gray-300 hover:bg-gray-700 transition-colors"
+                    >
+                      テンプレート管理
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleNavClick("/admin/activity");
+                        setShowAdminMenu(false);
+                      }}
+                      className="w-full px-4 py-3 text-left text-gray-300 hover:bg-gray-700 transition-colors"
+                    >
+                      アクティビティ
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* ハンバーガーメニューボタン（モバイル） */}
@@ -131,6 +186,63 @@ export default function Navigation() {
                   {item.name}
                 </button>
               ))}
+
+              {/* 管理メニュー（管理者のみ・モバイル） */}
+              {isAdmin && (
+                <>
+                  <button
+                    onClick={() => setShowAdminMenu(!showAdminMenu)}
+                    className={`px-4 py-3 rounded-lg font-medium text-left transition-all flex items-center justify-between ${
+                      pathname?.startsWith("/admin")
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-300 hover:bg-gray-800"
+                    }`}
+                  >
+                    管理
+                    <svg
+                      className={`w-4 h-4 transition-transform ${showAdminMenu ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {showAdminMenu && (
+                    <div className="pl-4 flex flex-col gap-2">
+                      <button
+                        onClick={() => {
+                          handleNavClick("/admin/events");
+                          setShowAdminMenu(false);
+                        }}
+                        className="px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-800 text-left transition-colors"
+                      >
+                        イベント管理
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleNavClick("/admin/templates");
+                          setShowAdminMenu(false);
+                        }}
+                        className="px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-800 text-left transition-colors"
+                      >
+                        テンプレート管理
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleNavClick("/admin/activity");
+                          setShowAdminMenu(false);
+                        }}
+                        className="px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-800 text-left transition-colors"
+                      >
+                        アクティビティ
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+
               <button
                 onClick={() => {
                   router.push("/api/auth/signout");

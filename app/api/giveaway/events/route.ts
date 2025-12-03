@@ -145,6 +145,11 @@ export async function POST(request: Request) {
     const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
     if (webhookUrl) {
       try {
+        // プレゼントページのURL構築
+        const requestUrl = new URL(request.url);
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${requestUrl.protocol}//${requestUrl.host}`;
+        const giveawayUrl = `${baseUrl}/giveaway/${eventId}`;
+
         const webhookData = {
           embeds: [{
             title: "🎁 新しいプレゼント企画が作成されました",
@@ -169,6 +174,11 @@ export async function POST(request: Request) {
               {
                 name: "応募期間",
                 value: `${new Date(start_date).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })} 〜 ${new Date(end_date).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}`,
+                inline: false
+              },
+              {
+                name: "応募",
+                value: `[応募する](${giveawayUrl})`,
                 inline: false
               }
             ],
