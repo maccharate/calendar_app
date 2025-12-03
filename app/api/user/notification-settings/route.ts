@@ -12,7 +12,10 @@ export async function GET() {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    // user_idを文字列として保持（BIGINTの精度を保つため）
+    const userId = String(session.user.id);
+
+    console.log('Notification settings GET - userId:', userId, 'type:', typeof userId);
 
     // 通知設定を取得（存在しない場合はデフォルト値を返す）
     const [settings] = await pool.query(
@@ -33,6 +36,7 @@ export async function GET() {
     );
 
     const hasSubscription = (subscriptions as any)[0].count > 0;
+    console.log('Subscription check result - count:', (subscriptions as any)[0].count, 'hasSubscription:', hasSubscription);
 
     if ((settings as any[]).length === 0) {
       // デフォルト値を返す
@@ -67,8 +71,11 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    // user_idを文字列として保持（BIGINTの精度を保つため）
+    const userId = String(session.user.id);
     const data = await request.json();
+
+    console.log('Notification settings PUT - userId:', userId, 'type:', typeof userId);
 
     // 既存の設定を確認
     const [existing] = await pool.query(

@@ -13,7 +13,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const userId = parseInt(session.user.id as string, 10);
+    // user_idを文字列として保持（BIGINTの精度を保つため）
+    const userId = String(session.user.id);
     console.log('Push subscription - userId:', userId, 'type:', typeof userId);
 
     let subscription;
@@ -83,6 +84,18 @@ export async function POST(request: Request) {
     } catch (dbError: any) {
       console.error('Database error with notification settings:', dbError);
       // 通知設定のエラーは致命的ではないので続行
+    }
+
+    // 保存確認のためサブスクリプションを検証
+    try {
+      const [verification] = await pool.query(
+        `SELECT COUNT(*) as count FROM push_subscriptions WHERE user_id = ?`,
+        [userId]
+      );
+      const count = (verification as any)[0].count;
+      console.log('Verification: Found', count, 'subscription(s) for userId:', userId);
+    } catch (verifyError: any) {
+      console.error('Verification query failed:', verifyError);
     }
 
     console.log('Push subscription completed successfully');
