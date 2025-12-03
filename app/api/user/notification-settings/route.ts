@@ -12,7 +12,11 @@ export async function GET() {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
+    // user_idを数値に変換（DBのBIGINT型と一致させる）
     const userId = session.user.id;
+    const userIdNum = parseInt(userId as string, 10);
+
+    console.log('Notification settings GET - userId:', userId, 'userIdNum:', userIdNum);
 
     // 通知設定を取得（存在しない場合はデフォルト値を返す）
     const [settings] = await pool.query(
@@ -23,16 +27,17 @@ export async function GET() {
         raffle_before_end
        FROM notification_settings
        WHERE user_id = ?`,
-      [userId]
+      [userIdNum]
     );
 
     // サブスクリプションの存在確認
     const [subscriptions] = await pool.query(
       `SELECT COUNT(*) as count FROM push_subscriptions WHERE user_id = ?`,
-      [userId]
+      [userIdNum]
     );
 
     const hasSubscription = (subscriptions as any)[0].count > 0;
+    console.log('Subscription check result - count:', (subscriptions as any)[0].count, 'hasSubscription:', hasSubscription);
 
     if ((settings as any[]).length === 0) {
       // デフォルト値を返す
@@ -67,13 +72,17 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
+    // user_idを数値に変換（DBのBIGINT型と一致させる）
     const userId = session.user.id;
+    const userIdNum = parseInt(userId as string, 10);
     const data = await request.json();
+
+    console.log('Notification settings PUT - userId:', userId, 'userIdNum:', userIdNum);
 
     // 既存の設定を確認
     const [existing] = await pool.query(
       `SELECT id FROM notification_settings WHERE user_id = ?`,
-      [userId]
+      [userIdNum]
     );
 
     if ((existing as any[]).length === 0) {
@@ -83,7 +92,7 @@ export async function PUT(request: Request) {
          (user_id, notifications_enabled, advance_before_start, raffle_on_start, raffle_before_end)
          VALUES (?, ?, ?, ?, ?)`,
         [
-          userId,
+          userIdNum,
           data.notifications_enabled || false,
           data.advance_before_start !== undefined ? data.advance_before_start : true,
           data.raffle_on_start !== undefined ? data.raffle_on_start : true,
@@ -104,7 +113,7 @@ export async function PUT(request: Request) {
           data.advance_before_start !== undefined ? data.advance_before_start : true,
           data.raffle_on_start !== undefined ? data.raffle_on_start : true,
           data.raffle_before_end !== undefined ? data.raffle_before_end : true,
-          userId,
+          userIdNum,
         ]
       );
     }
