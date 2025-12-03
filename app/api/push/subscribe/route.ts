@@ -13,8 +13,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const userId = parseInt(session.user.id as string, 10);
-    console.log('Push subscription - Original user_id:', session.user.id, 'Parsed userId:', userId, 'type:', typeof userId);
+    // user_idを文字列として保持（BIGINTの精度を保つため）
+    const userId = String(session.user.id);
+    console.log('Push subscription - userId:', userId, 'type:', typeof userId);
 
     let subscription;
     try {

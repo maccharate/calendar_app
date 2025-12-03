@@ -12,11 +12,10 @@ export async function GET() {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // user_idを数値に変換（DBのBIGINT型と一致させる）
-    const userId = session.user.id;
-    const userIdNum = parseInt(userId as string, 10);
+    // user_idを文字列として保持（BIGINTの精度を保つため）
+    const userId = String(session.user.id);
 
-    console.log('Notification settings GET - userId:', userId, 'userIdNum:', userIdNum);
+    console.log('Notification settings GET - userId:', userId, 'type:', typeof userId);
 
     // 通知設定を取得（存在しない場合はデフォルト値を返す）
     const [settings] = await pool.query(
@@ -27,13 +26,13 @@ export async function GET() {
         raffle_before_end
        FROM notification_settings
        WHERE user_id = ?`,
-      [userIdNum]
+      [userId]
     );
 
     // サブスクリプションの存在確認
     const [subscriptions] = await pool.query(
       `SELECT COUNT(*) as count FROM push_subscriptions WHERE user_id = ?`,
-      [userIdNum]
+      [userId]
     );
 
     const hasSubscription = (subscriptions as any)[0].count > 0;
@@ -72,17 +71,16 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // user_idを数値に変換（DBのBIGINT型と一致させる）
-    const userId = session.user.id;
-    const userIdNum = parseInt(userId as string, 10);
+    // user_idを文字列として保持（BIGINTの精度を保つため）
+    const userId = String(session.user.id);
     const data = await request.json();
 
-    console.log('Notification settings PUT - userId:', userId, 'userIdNum:', userIdNum);
+    console.log('Notification settings PUT - userId:', userId, 'type:', typeof userId);
 
     // 既存の設定を確認
     const [existing] = await pool.query(
       `SELECT id FROM notification_settings WHERE user_id = ?`,
-      [userIdNum]
+      [userId]
     );
 
     if ((existing as any[]).length === 0) {
@@ -92,7 +90,7 @@ export async function PUT(request: Request) {
          (user_id, notifications_enabled, advance_before_start, raffle_on_start, raffle_before_end)
          VALUES (?, ?, ?, ?, ?)`,
         [
-          userIdNum,
+          userId,
           data.notifications_enabled || false,
           data.advance_before_start !== undefined ? data.advance_before_start : true,
           data.raffle_on_start !== undefined ? data.raffle_on_start : true,
@@ -113,7 +111,7 @@ export async function PUT(request: Request) {
           data.advance_before_start !== undefined ? data.advance_before_start : true,
           data.raffle_on_start !== undefined ? data.raffle_on_start : true,
           data.raffle_before_end !== undefined ? data.raffle_before_end : true,
-          userIdNum,
+          userId,
         ]
       );
     }
