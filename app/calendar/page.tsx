@@ -804,21 +804,7 @@ export default function CalendarPage() {
                           </p>
                         )}
                         <p className="text-xs text-gray-500 mb-2">
-                          {new Date(event.start).toLocaleTimeString("ja-JP", {
-                            timeZone: "Asia/Tokyo",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                          {!event.extendedProps?.advance && (
-                            <>
-                              {" 〜 "}
-                              {new Date(event.end || event.start).toLocaleTimeString("ja-JP", {
-                                timeZone: "Asia/Tokyo",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </>
-                          )}
+                          {getEventTimeDisplay(event)}
                         </p>
 
                         {/* 統計情報 */}
