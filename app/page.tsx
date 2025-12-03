@@ -1,6 +1,16 @@
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await getServerSession(authOptions);
+
+  // すでにログイン済みの場合はカレンダーページにリダイレクト
+  if (session) {
+    redirect("/calendar");
+  }
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-black text-white text-center">
       <h1 className="text-4xl font-bold mb-4">ちんぱんコミュニティ カレンダー</h1>

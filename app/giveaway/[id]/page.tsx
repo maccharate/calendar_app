@@ -211,6 +211,8 @@ export default function GiveawayDetailPage() {
 
   const canEnter = (event: GiveawayEvent) => {
     if (event.status !== 'active') return false;
+    // 自分が作成したイベントには応募できない
+    if (session?.user && event.created_by === session.user.id) return false;
     const now = new Date();
     const start = new Date(event.start_date);
     const end = new Date(event.end_date);
