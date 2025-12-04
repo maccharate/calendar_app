@@ -10,6 +10,7 @@ interface GiveawayEvent {
   title: string;
   description: string;
   image_url: string;
+  main_image?: string;
   created_by: string;
   creator_name: string;
   show_creator: boolean;
@@ -182,11 +183,11 @@ export default function GiveawayPage() {
                   onClick={() => router.push(`/giveaway/${event.id}`)}
                   className="bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 hover:border-gray-600/50 transition-all cursor-pointer group"
                 >
-                  {/* イベント画像 */}
-                  {event.image_url && (
+                  {/* 商品画像（メイン画像） */}
+                  {(event.main_image || event.image_url) && (
                     <div className="aspect-video bg-gray-900 overflow-hidden">
                       <img
-                        src={event.image_url}
+                        src={event.main_image || event.image_url}
                         alt={event.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
