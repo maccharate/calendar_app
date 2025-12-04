@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 
@@ -16,6 +16,64 @@ export default function NewTemplatePage() {
     img_url: "",
     popular: false,
   });
+  const [imageMode, setImageMode] = useState<"url" | "upload" | "library">("url");
+  const [storageImages, setStorageImages] = useState<any[]>([]);
+  const [loadingImages, setLoadingImages] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  useEffect(() => {
+    fetchStorageImages();
+  }, []);
+
+  const fetchStorageImages = async () => {
+    setLoadingImages(true);
+    try {
+      const res = await fetch("/api/upload/image");
+      if (res.ok) {
+        const data = await res.json();
+        setStorageImages(data.images || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch storage images:", error);
+    } finally {
+      setLoadingImages(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("ファイルサイズは5MB以下にしてください");
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append("file", file);
+
+      const res = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formDataUpload,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setFormData({ ...formData, img_url: data.url });
+        alert("画像をアップロードしました");
+        fetchStorageImages();
+      } else {
+        alert("アップロードに失敗しました");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("アップロードエラーが発生しました");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,15 +197,111 @@ export default function NewTemplatePage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                画像URL
+                商品画像
               </label>
-              <input
-                type="url"
-                value={formData.img_url}
-                onChange={(e) => setFormData({ ...formData, img_url: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-700/50 rounded-lg border border-gray-600/50 focus:border-blue-500 focus:outline-none"
-                placeholder="https://..."
-              />
+
+              {/* モード切替タブ */}
+              <div className="flex gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setImageMode("url")}
+                  className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                    imageMode === "url"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                  }`}
+                >
+                  URL入力
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImageMode("upload")}
+                  className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                    imageMode === "upload"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                  }`}
+                >
+                  アップロード
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImageMode("library")}
+                  className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                    imageMode === "library"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                  }`}
+                >
+                  ライブラリ
+                </button>
+              </div>
+
+              {/* URL入力モード */}
+              {imageMode === "url" && (
+                <input
+                  type="url"
+                  value={formData.img_url}
+                  onChange={(e) => setFormData({ ...formData, img_url: e.target.value })}
+                  className="w-full px-4 py-2 bg-gray-700/50 rounded-lg border border-gray-600/50 focus:border-blue-500 focus:outline-none"
+                  placeholder="https://..."
+                />
+              )}
+
+              {/* アップロードモード */}
+              {imageMode === "upload" && (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                  className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer disabled:opacity-50"
+                />
+              )}
+
+              {/* ライブラリモード */}
+              {imageMode === "library" && (
+                <div>
+                  {loadingImages ? (
+                    <div className="text-center py-4">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                      <p className="text-xs text-gray-400">読み込み中...</p>
+                    </div>
+                  ) : storageImages.length === 0 ? (
+                    <div className="text-center py-4 bg-gray-700/50 rounded-lg">
+                      <p className="text-xs text-gray-400">画像がありません</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-gray-700/30 rounded-lg">
+                      {storageImages.map((image, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, img_url: image.url })}
+                          className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                            formData.img_url === image.url
+                              ? "border-blue-500 ring-2 ring-blue-500/50"
+                              : "border-gray-600 hover:border-gray-500"
+                          }`}
+                        >
+                          <img
+                            src={image.url}
+                            alt={image.fileName}
+                            className="w-full h-full object-cover"
+                          />
+                          {formData.img_url === image.url && (
+                            <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
+                              <span className="text-xl">✓</span>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* プレビュー */}
               {formData.img_url && (
                 <div className="mt-4">
                   <img

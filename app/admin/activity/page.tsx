@@ -243,26 +243,27 @@ export default function ActivityLogsPage() {
                   onClick={() => setSelectedLog(log)}
                   className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50 hover:border-gray-600/50 transition-all cursor-pointer"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 flex-1">
-                      <span className={`font-bold ${getActionColor(log.action)}`}>
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div className="flex items-start md:items-center gap-2 md:gap-4 flex-1 min-w-0">
+                      <span className={`font-bold text-sm md:text-base ${getActionColor(log.action)} flex-shrink-0`}>
                         {getActionLabel(log.action)}
                       </span>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-300">
-                          {log.username || "不明"} <span className="text-gray-500">({log.user_id})</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-300 truncate">
+                          {log.username || "不明"}
+                          <span className="hidden md:inline text-gray-500"> ({log.user_id})</span>
                         </p>
                         {log.metadata && (
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-gray-500 mt-1 truncate">
                             {log.metadata.product_name || log.metadata.event_name || ""}
                           </p>
                         )}
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left md:text-right flex-shrink-0">
                       <p className="text-sm text-gray-400">{formatDate(log.created_at)}</p>
                       {log.ip_address && (
-                        <p className="text-xs text-gray-600">{log.ip_address}</p>
+                        <p className="text-xs text-gray-600 hidden md:block">{log.ip_address}</p>
                       )}
                     </div>
                   </div>
