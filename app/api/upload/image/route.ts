@@ -16,12 +16,13 @@ const bucket = storage.bucket(bucketName);
 // 管理者のDiscord ID
 const ADMIN_USER_IDS = ["547775428526473217", "549913811172196362", "501024205916078083"];
 
-// GET: 画像一覧取得
+// GET: 画像一覧取得（全ユーザーがアクセス可能）
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    
-    if (!session || !session.user || !ADMIN_USER_IDS.includes(session.user.id)) {
+
+    // ログインしていれば誰でも画像一覧を取得可能
+    if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 

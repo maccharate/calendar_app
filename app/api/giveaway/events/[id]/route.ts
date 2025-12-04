@@ -64,3 +64,117 @@ export async function GET(
     }, { status: 500 });
   }
 }
+
+// DELETE: イベント削除
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
+    const { id: eventId } = await params;
+
+    // イベントの作成者確認
+    const [events] = await pool.query(
+      `SELECT created_by FROM giveaway_events WHERE id = ?`,
+      [eventId]
+    );
+
+    if (!events || (events as any[]).length === 0) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+
+    const event = (events as any[])[0];
+
+    // 作成者のみ削除可能
+    if (event.created_by !== String(session.user.id)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    // 関連データを削除
+    await pool.execute(`DELETE FROM giveaway_winners WHERE event_id = ?`, [eventId]);
+    await pool.execute(`DELETE FROM giveaway_entries WHERE event_id = ?`, [eventId]);
+    await pool.execute(`DELETE FROM giveaway_prizes WHERE event_id = ?`, [eventId]);
+    await pool.execute(`DELETE FROM giveaway_events WHERE id = ?`, [eventId]);
+
+    return NextResponse.json({ success: true, message: "イベントを削除しました" });
+  } catch (error: any) {
+    console.error("Error deleting giveaway event:", error);
+    return NextResponse.json({
+      error: "Failed to delete event",
+      details: error.message
+    }, { status: 500 });
+  }
+}
+
+// PUT: イベント編集
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
+    const { id: eventId } = await params;
+    const body = await request.json();
+    const { title, description, image_url, show_creator, start_date, end_date, prizes, status } = body;
+
+    // イベントの作成者確認
+    const [events] = await pool.query(
+      `SELECT created_by FROM giveaway_events WHERE id = ?`,
+      [eventId]
+    );
+
+    if (!events || (events as any[]).length === 0) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+
+    const event = (events as any[])[0];
+
+    // 作成者のみ編集可能
+    if (event.created_by !== String(session.user.id)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    // イベント情報を更新
+    const totalWinners = prizes.reduce((sum: number, p: any) => sum + (p.winner_count || 1), 0);
+
+    await pool.execute(
+      `UPDATE giveaway_events
+       SET title = ?, description = ?, image_url = ?, show_creator = ?,
+           start_date = ?, end_date = ?, total_winners = ?, status = ?
+       WHERE id = ?`,
+      [title, description, image_url || null, show_creator !== false, start_date, end_date, totalWinners, status || 'active', eventId]
+    );
+
+    // 既存の賞品を削除して再作成
+    await pool.execute(`DELETE FROM giveaway_prizes WHERE event_id = ?`, [eventId]);
+
+    for (let i = 0; i < prizes.length; i++) {
+      const prize = prizes[i];
+      await pool.execute(
+        `INSERT INTO giveaway_prizes
+         (event_id, name, description, image_url, winner_count, display_order)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [eventId, prize.name, prize.description || null, prize.image_url || null, prize.winner_count || 1, i]
+      );
+    }
+
+    return NextResponse.json({ success: true, message: "イベントを更新しました" });
+  } catch (error: any) {
+    console.error("Error updating giveaway event:", error);
+    return NextResponse.json({
+      error: "Failed to update event",
+      details: error.message
+    }, { status: 500 });
+  }
+}

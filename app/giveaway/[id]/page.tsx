@@ -163,7 +163,7 @@ export default function GiveawayDetailPage() {
 
     setActionLoading(true);
     try {
-      const res = await fetch(`/api/giveaway/events?id=${event.id}`, {
+      const res = await fetch(`/api/giveaway/events/${event.id}`, {
         method: "DELETE",
       });
 
