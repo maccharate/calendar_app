@@ -44,6 +44,13 @@ export async function GET(request: Request) {
         [event.id]
       );
       event.prizes = prizes;
+      // 最初の賞品画像をメイン画像として設定
+      if (prizes && (prizes as any[]).length > 0) {
+        const firstPrize = (prizes as any[])[0];
+        event.main_image = firstPrize.image_url || event.image_url;
+      } else {
+        event.main_image = event.image_url;
+      }
     }
 
     return NextResponse.json({ events });
@@ -150,6 +157,9 @@ export async function POST(request: Request) {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${requestUrl.protocol}//${requestUrl.host}`;
         const giveawayUrl = `${baseUrl}/giveaway/${eventId}`;
 
+        // 最初の賞品画像をメイン画像として使用
+        const mainImage = (prizes && prizes.length > 0 && prizes[0].image_url) ? prizes[0].image_url : image_url;
+
         const webhookData = {
           embeds: [{
             title: "🎁 新しいプレゼント企画が作成されました",
@@ -182,7 +192,7 @@ export async function POST(request: Request) {
                 inline: false
               }
             ],
-            thumbnail: image_url ? { url: image_url } : undefined,
+            thumbnail: mainImage ? { url: mainImage } : undefined,
             timestamp: new Date().toISOString()
           }]
         };
