@@ -1226,21 +1226,33 @@ export default function HistoryPage() {
                             placeholder="https://example.com/image.jpg"
                             className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner"
                           />
-                          {manualAddForm.img && (
-                            <div className="mt-3">
-                              <p className="text-xs text-gray-500 mb-2">プレビュー:</p>
-                              <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-900/50 border border-gray-700">
-                                <img
-                                  src={manualAddForm.img}
-                                  alt="プレビュー"
-                                  className="w-full h-full object-contain"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).style.display = 'none';
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          )}
+                        </div>
+                      )}
+
+                      {/* 選択中の画像プレビュー（常に表示） */}
+                      {manualAddForm.img && (
+                        <div className="mt-4 p-3 bg-gray-900/50 rounded-xl border border-gray-700">
+                          <p className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                            <span className="text-green-400">✓</span>
+                            選択中の画像
+                          </p>
+                          <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-800/50 border border-gray-700">
+                            <img
+                              src={manualAddForm.img}
+                              alt="選択中の画像"
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setManualAddForm({ ...manualAddForm, img: '' })}
+                            className="mt-2 text-xs text-red-400 hover:text-red-300 transition-colors"
+                          >
+                            画像を削除
+                          </button>
                         </div>
                       )}
                     </div>
