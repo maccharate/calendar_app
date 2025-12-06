@@ -145,7 +145,7 @@ export default function EditGiveawayPage() {
 
     setSaving(true);
     try {
-      const res = await fetch(`/api/giveaway/events?id=${eventId}`, {
+      const res = await fetch(`/api/giveaway/events/${eventId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
