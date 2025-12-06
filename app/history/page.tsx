@@ -76,8 +76,9 @@ export default function HistoryPage() {
   const [templates, setTemplates] = useState<ProductTemplate[]>([]);
   const [images, setImages] = useState<StorageImage[]>([]);
   const [loadingImages, setLoadingImages] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [imageSearchQuery, setImageSearchQuery] = useState("");
-  const [imageInputMode, setImageInputMode] = useState<'storage' | 'url'>('storage');
+  const [imageInputMode, setImageInputMode] = useState<'url' | 'upload' | 'storage'>('url');
 
   // モーダル状態
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -405,11 +406,47 @@ export default function HistoryPage() {
     }
   };
 
+  // 画像アップロード処理
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("ファイルサイズは5MB以下にしてください");
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append("file", file);
+
+      const res = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formDataUpload,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setManualAddForm({ ...manualAddForm, img: data.url });
+        alert("画像をアップロードしました");
+        fetchImages(); // リストを更新
+      } else {
+        alert("アップロードに失敗しました");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("アップロードエラーが発生しました");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   // 手動追加モーダルを閉じる
   const handleCloseManualAddModal = () => {
     setIsManualAddModalOpen(false);
     setImageSearchQuery("");
-    setImageInputMode('storage');
+    setImageInputMode('url');
     setManualAddForm({
       product_name: "",
       brand: "",
@@ -1154,17 +1191,6 @@ export default function HistoryPage() {
                       <div className="flex gap-2 mb-3">
                         <button
                           type="button"
-                          onClick={() => setImageInputMode('storage')}
-                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            imageInputMode === 'storage'
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                          }`}
-                        >
-                          ストレージから選択
-                        </button>
-                        <button
-                          type="button"
                           onClick={() => setImageInputMode('url')}
                           className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                             imageInputMode === 'url'
@@ -1172,7 +1198,29 @@ export default function HistoryPage() {
                               : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                           }`}
                         >
-                          URLを入力
+                          URL入力
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setImageInputMode('upload')}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            imageInputMode === 'upload'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                          }`}
+                        >
+                          アップロード
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setImageInputMode('storage')}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            imageInputMode === 'storage'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                          }`}
+                        >
+                          ライブラリ
                         </button>
                       </div>
 
@@ -1216,7 +1264,7 @@ export default function HistoryPage() {
                         </div>
                       )}
 
-                      {/* URLモード */}
+                      {/* URL入力モード */}
                       {imageInputMode === 'url' && (
                         <div>
                           <input
@@ -1226,6 +1274,22 @@ export default function HistoryPage() {
                             placeholder="https://example.com/image.jpg"
                             className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner"
                           />
+                        </div>
+                      )}
+
+                      {/* アップロードモード */}
+                      {imageInputMode === 'upload' && (
+                        <div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            disabled={uploadingImage}
+                            className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer disabled:opacity-50"
+                          />
+                          {uploadingImage && (
+                            <p className="text-xs text-blue-400 mt-2">アップロード中...</p>
+                          )}
                         </div>
                       )}
 
