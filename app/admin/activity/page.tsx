@@ -150,7 +150,7 @@ export default function ActivityLogsPage() {
       <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold mb-8 font-display text-[var(--color-text-primary)]">
             アクティビティログ
           </h1>
 

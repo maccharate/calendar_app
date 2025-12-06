@@ -5,7 +5,7 @@ export default function OfflinePage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white flex flex-col items-center justify-center p-4">
       <div className="text-center max-w-md">
         <div className="text-6xl mb-6">📡</div>
-        <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold mb-4 font-display text-[var(--color-text-primary)]">
           オフラインです
         </h1>
         <p className="text-gray-400 mb-8">

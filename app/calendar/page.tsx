@@ -560,7 +560,7 @@ export default function CalendarPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl md:text-4xl font-display font-semibold mb-2 text-[var(--color-text-primary)] tracking-tight">
                   イベントカレンダー
                 </h1>
                 <p className="text-gray-400">抽選・先着イベントの管理</p>

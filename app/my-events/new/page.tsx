@@ -57,7 +57,7 @@ export default function MyEventsNewPage() {
             </button>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 font-display text-[var(--color-text-primary)]">
             マイイベント作成
           </h1>
           <p className="text-gray-400 text-sm mb-8">自分だけに表示される個人イベントを作成できます</p>

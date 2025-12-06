@@ -117,7 +117,7 @@ export default function NewTemplatePage() {
             >
               ← 戻る
             </button>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold font-display text-[var(--color-text-primary)]">
               テンプレート追加
             </h1>
           </div>
