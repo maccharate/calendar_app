@@ -44,7 +44,7 @@ export default function LoginPage() {
               className="relative rounded-full border-2 border-blue-500/30 group-hover:border-blue-400/70 transition-all duration-500"
             />
           </div>
-          <h1 className="text-3xl font-extrabold mt-8 font-display text-[var(--color-text-primary)] animate-[gradient_5s_infinite]">
+          <h1 className="text-3xl font-extrabold mt-8 font-semibold text-[var(--color-text-primary)] animate-[gradient_5s_infinite]">
             ちんぱんコミュニティ
           </h1>
           <p className="text-sm text-gray-400 mt-2">限定メンバー専用カレンダーポータル</p>

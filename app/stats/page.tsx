@@ -194,7 +194,7 @@ export default function StatsPage() {
           {/* ヘッダー */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold font-display text-[var(--color-text-primary)]">
+              <h1 className="text-3xl md:text-4xl font-bold font-semibold text-[var(--color-text-primary)]">
                 統計・分析
               </h1>
               <p className="text-gray-400 mt-1">

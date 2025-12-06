@@ -44,30 +44,30 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="bg-surface-secondary/95 backdrop-blur-sm border-b border-[rgba(196,186,176,0.08)] sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6">
+    <nav className="bg-surface-secondary/95 backdrop-blur-sm border-b border-[var(--color-border-subtle)] sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-16">
           {/* ロゴ */}
           <button
             onClick={() => handleNavClick("/calendar")}
-            className="flex items-center gap-3 hover:opacity-80 transition-all duration-250 group"
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-accent to-accent-dark rounded-lg flex items-center justify-center text-surface-primary font-display font-bold text-lg shadow-refined group-hover:shadow-refined-md transition-all">
+            <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-white font-bold shadow-refined">
               C
             </div>
-            <span className="text-xl font-display font-semibold tracking-tight hidden sm:block text-[var(--color-text-primary)]">ちんぱんコミュニティ</span>
+            <span className="text-lg font-semibold hidden sm:block text-[var(--color-text-primary)]">ちんぱんコミュニティ</span>
           </button>
 
           {/* デスクトップメニュー */}
-          <div className="hidden md:flex items-center gap-1.5">
+          <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <button
                 key={item.path}
                 onClick={() => handleNavClick(item.path)}
-                className={`px-4 py-2 rounded-md font-medium transition-all duration-250 text-sm ${
+                className={`px-3 py-2 rounded-md font-medium transition-colors text-sm ${
                   pathname === item.path
-                    ? "bg-accent text-surface-primary shadow-refined"
-                    : "text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)] hover:bg-surface-tertiary"
+                    ? "bg-accent text-white"
+                    : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary"
                 }`}
               >
                 {item.name}
@@ -79,15 +79,15 @@ export default function Navigation() {
               <div className="relative">
                 <button
                   onClick={() => setShowAdminMenu(!showAdminMenu)}
-                  className={`px-4 py-2 rounded-md font-medium transition-all duration-250 flex items-center gap-1 text-sm ${
+                  className={`px-3 py-2 rounded-md font-medium transition-colors flex items-center gap-1 text-sm ${
                     pathname?.startsWith("/admin")
-                      ? "bg-accent text-surface-primary shadow-refined"
-                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)] hover:bg-surface-tertiary"
+                      ? "bg-accent text-white"
+                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary"
                   }`}
                 >
                   管理
                   <svg
-                    className={`w-4 h-4 transition-transform duration-250 ${showAdminMenu ? "rotate-180" : ""}`}
+                    className={`w-4 h-4 transition-transform ${showAdminMenu ? "rotate-180" : ""}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -97,13 +97,13 @@ export default function Navigation() {
                 </button>
 
                 {showAdminMenu && (
-                  <div className="absolute top-full right-0 mt-2 w-52 bg-surface-elevated rounded-lg shadow-refined-lg border border-[var(--color-border-medium)] overflow-hidden z-50 animate-fade-in">
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-surface-elevated rounded-lg shadow-refined-lg border border-[var(--color-border-medium)] overflow-hidden z-50">
                     <button
                       onClick={() => {
                         handleNavClick("/admin/events");
                         setShowAdminMenu(false);
                       }}
-                      className="w-full px-4 py-3 text-left text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)] hover:bg-surface-tertiary transition-all duration-250 text-sm"
+                      className="w-full px-4 py-2.5 text-left text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary transition-colors text-sm"
                     >
                       イベント管理
                     </button>
@@ -112,7 +112,7 @@ export default function Navigation() {
                         handleNavClick("/admin/templates");
                         setShowAdminMenu(false);
                       }}
-                      className="w-full px-4 py-3 text-left text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)] hover:bg-surface-tertiary transition-all duration-250 text-sm"
+                      className="w-full px-4 py-2.5 text-left text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary transition-colors text-sm"
                     >
                       テンプレート管理
                     </button>
@@ -121,7 +121,7 @@ export default function Navigation() {
                         handleNavClick("/admin/activity");
                         setShowAdminMenu(false);
                       }}
-                      className="w-full px-4 py-3 text-left text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)] hover:bg-surface-tertiary transition-all duration-250 text-sm"
+                      className="w-full px-4 py-2.5 text-left text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary transition-colors text-sm"
                     >
                       アクティビティ
                     </button>
@@ -134,7 +134,7 @@ export default function Navigation() {
           {/* ハンバーガーメニューボタン（モバイル） */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-md hover:bg-surface-tertiary transition-all duration-250 text-[var(--color-text-secondary)]"
+            className="md:hidden p-2 rounded-md hover:bg-surface-tertiary transition-colors text-[var(--color-text-secondary)]"
           >
             <svg
               className="w-6 h-6"
@@ -163,7 +163,7 @@ export default function Navigation() {
           {/* ログアウトボタン（デスクトップ） */}
           <button
             onClick={() => router.push("/api/auth/signout")}
-            className="hidden md:block px-4 py-2 bg-[var(--color-error)] hover:bg-[#c46666] rounded-md font-medium transition-all duration-250 text-sm shadow-refined"
+            className="hidden md:block px-3 py-2 bg-[var(--color-error)] hover:bg-[#dc2626] rounded-md font-medium transition-colors text-sm text-white"
           >
             ログアウト
           </button>
@@ -171,16 +171,16 @@ export default function Navigation() {
 
         {/* モバイルメニュー */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-[var(--color-border-subtle)] animate-fade-in">
-            <div className="flex flex-col gap-1.5">
+          <div className="md:hidden py-4 border-t border-[var(--color-border-subtle)]">
+            <div className="flex flex-col gap-1">
               {navItems.map((item) => (
                 <button
                   key={item.path}
                   onClick={() => handleNavClick(item.path)}
-                  className={`px-4 py-3 rounded-md font-medium text-left transition-all duration-250 text-sm ${
+                  className={`px-4 py-2.5 rounded-md font-medium text-left transition-colors text-sm ${
                     pathname === item.path
-                      ? "bg-accent text-surface-primary shadow-refined"
-                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)] hover:bg-surface-tertiary"
+                      ? "bg-accent text-white"
+                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary"
                   }`}
                 >
                   {item.name}
@@ -192,15 +192,15 @@ export default function Navigation() {
                 <>
                   <button
                     onClick={() => setShowAdminMenu(!showAdminMenu)}
-                    className={`px-4 py-3 rounded-md font-medium text-left transition-all duration-250 flex items-center justify-between text-sm ${
+                    className={`px-4 py-2.5 rounded-md font-medium text-left transition-colors flex items-center justify-between text-sm ${
                       pathname?.startsWith("/admin")
-                        ? "bg-accent text-surface-primary shadow-refined"
-                        : "text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)] hover:bg-surface-tertiary"
+                        ? "bg-accent text-white"
+                        : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary"
                     }`}
                   >
                     管理
                     <svg
-                      className={`w-4 h-4 transition-transform duration-250 ${showAdminMenu ? "rotate-180" : ""}`}
+                      className={`w-4 h-4 transition-transform ${showAdminMenu ? "rotate-180" : ""}`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -210,13 +210,13 @@ export default function Navigation() {
                   </button>
 
                   {showAdminMenu && (
-                    <div className="pl-4 flex flex-col gap-1.5 animate-slide-in">
+                    <div className="pl-4 flex flex-col gap-1 mt-1">
                       <button
                         onClick={() => {
                           handleNavClick("/admin/events");
                           setShowAdminMenu(false);
                         }}
-                        className="px-4 py-2 rounded-md text-[var(--color-text-tertiary)] hover:text-[var(--color-accent-primary)] hover:bg-surface-tertiary text-left transition-all duration-250 text-sm"
+                        className="px-4 py-2 rounded-md text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary text-left transition-colors text-sm"
                       >
                         イベント管理
                       </button>
@@ -225,7 +225,7 @@ export default function Navigation() {
                           handleNavClick("/admin/templates");
                           setShowAdminMenu(false);
                         }}
-                        className="px-4 py-2 rounded-md text-[var(--color-text-tertiary)] hover:text-[var(--color-accent-primary)] hover:bg-surface-tertiary text-left transition-all duration-250 text-sm"
+                        className="px-4 py-2 rounded-md text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary text-left transition-colors text-sm"
                       >
                         テンプレート管理
                       </button>
@@ -234,7 +234,7 @@ export default function Navigation() {
                           handleNavClick("/admin/activity");
                           setShowAdminMenu(false);
                         }}
-                        className="px-4 py-2 rounded-md text-[var(--color-text-tertiary)] hover:text-[var(--color-accent-primary)] hover:bg-surface-tertiary text-left transition-all duration-250 text-sm"
+                        className="px-4 py-2 rounded-md text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary text-left transition-colors text-sm"
                       >
                         アクティビティ
                       </button>
@@ -248,7 +248,7 @@ export default function Navigation() {
                   router.push("/api/auth/signout");
                   setIsMenuOpen(false);
                 }}
-                className="px-4 py-3 bg-[var(--color-error)] hover:bg-[#c46666] rounded-md font-medium text-left transition-all duration-250 mt-2 text-sm shadow-refined"
+                className="px-4 py-2.5 bg-[var(--color-error)] hover:bg-[#dc2626] rounded-md font-medium text-left transition-colors mt-2 text-sm text-white"
               >
                 ログアウト
               </button>

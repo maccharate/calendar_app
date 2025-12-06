@@ -545,7 +545,7 @@ export default function HistoryPage() {
       <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold font-display text-[var(--color-text-primary)]">
+            <h1 className="text-3xl font-bold font-semibold text-[var(--color-text-primary)]">
               応募履歴
             </h1>
             <button
@@ -757,7 +757,7 @@ export default function HistoryPage() {
               <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
                 <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-700 shadow-2xl">
                   <div className="sticky top-0 p-6 border-b border-gray-700/50 flex justify-between items-center bg-gradient-to-r from-purple-500/10 to-pink-500/10 backdrop-blur-sm z-10">
-                    <h2 className="text-xl font-bold font-display text-[var(--color-text-primary)]">
+                    <h2 className="text-xl font-bold font-semibold text-[var(--color-text-primary)]">
                       取引詳細を編集
                     </h2>
                     <button
@@ -771,7 +771,7 @@ export default function HistoryPage() {
                   <div className="p-6 space-y-6">
                     {/* 商品テンプレート選択 */}
                     <div className="bg-gradient-to-br from-gray-800/70 to-gray-800/50 p-5 rounded-xl border border-gray-700/50 shadow-lg">
-                      <label className="block text-sm font-bold font-display text-[var(--color-text-primary)] mb-3">
+                      <label className="block text-sm font-bold font-semibold text-[var(--color-text-primary)] mb-3">
                         商品テンプレートから自動入力
                       </label>
                       <select
@@ -793,7 +793,7 @@ export default function HistoryPage() {
 
                     {/* 購入情報 */}
                     <div>
-                      <h3 className="text-sm font-bold font-display text-[var(--color-text-primary)] mb-4 pb-2 border-b border-green-500/20">
+                      <h3 className="text-sm font-bold font-semibold text-[var(--color-text-primary)] mb-4 pb-2 border-b border-green-500/20">
                         購入情報
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -872,7 +872,7 @@ export default function HistoryPage() {
                     {editForm.is_sold && (
                     <>
                     <div>
-                      <h3 className="text-sm font-bold font-display text-[var(--color-text-primary)] mb-4 pb-2 border-b border-purple-500/20">
+                      <h3 className="text-sm font-bold font-semibold text-[var(--color-text-primary)] mb-4 pb-2 border-b border-purple-500/20">
                         売却情報
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -920,7 +920,7 @@ export default function HistoryPage() {
 
                     {/* 経費・その他 */}
                     <div>
-                      <h3 className="text-sm font-bold font-display text-[var(--color-text-primary)] mb-4 pb-2 border-b border-orange-500/20">
+                      <h3 className="text-sm font-bold font-semibold text-[var(--color-text-primary)] mb-4 pb-2 border-b border-orange-500/20">
                         経費・その他
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -958,7 +958,7 @@ export default function HistoryPage() {
 
                     {/* メモ（常に表示） */}
                     <div>
-                      <label className="block text-xs font-semibold font-display text-[var(--color-text-primary)] mb-2">
+                      <label className="block text-xs font-semibold font-semibold text-[var(--color-text-primary)] mb-2">
                         メモ
                       </label>
                       <textarea
@@ -1010,7 +1010,7 @@ export default function HistoryPage() {
               <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
                 <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-2xl w-full max-w-md border border-gray-700 shadow-2xl">
                   <div className="p-6 border-b border-gray-700/50 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
-                    <h2 className="text-xl font-bold font-display text-[var(--color-text-primary)]">
+                    <h2 className="text-xl font-bold font-semibold text-[var(--color-text-primary)]">
                       抽選結果を入力
                     </h2>
                     <p className="text-sm text-gray-400 mt-1">{selectedEvent.title}</p>
@@ -1019,7 +1019,7 @@ export default function HistoryPage() {
                   <div className="p-6 space-y-6">
                     <div className="bg-gradient-to-br from-gray-800/70 to-gray-800/50 p-5 rounded-xl border border-gray-700/50 shadow-lg">
                       <p className="text-sm text-gray-400 mb-2 font-medium">応募口数</p>
-                      <p className="text-3xl font-bold font-display text-[var(--color-text-primary)]">
+                      <p className="text-3xl font-bold font-semibold text-[var(--color-text-primary)]">
                         {selectedEvent.application_count || 1}口
                       </p>
                     </div>
@@ -1068,7 +1068,7 @@ export default function HistoryPage() {
               <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
                 <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-2xl w-full max-w-md border border-gray-700 shadow-2xl">
                   <div className="p-6 border-b border-gray-700/50 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
-                    <h2 className="text-xl font-bold font-display text-[var(--color-text-primary)]">
+                    <h2 className="text-xl font-bold font-semibold text-[var(--color-text-primary)]">
                       購入記録を入力
                     </h2>
                     <p className="text-sm text-gray-400 mt-1">{selectedEvent.title}</p>
@@ -1119,7 +1119,7 @@ export default function HistoryPage() {
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
               <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-700 shadow-2xl">
                 <div className="sticky top-0 p-6 border-b border-gray-700/50 flex justify-between items-center bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm z-10">
-                  <h2 className="text-xl font-bold font-display text-[var(--color-text-primary)]">
+                  <h2 className="text-xl font-bold font-semibold text-[var(--color-text-primary)]">
                     購入記録を手動で追加
                   </h2>
                   <button
@@ -1133,7 +1133,7 @@ export default function HistoryPage() {
                 <div className="p-6 space-y-6">
                   {/* 商品テンプレート選択 */}
                   <div className="bg-gradient-to-br from-gray-800/70 to-gray-800/50 p-5 rounded-xl border border-gray-700/50 shadow-lg">
-                    <label className="block text-sm font-bold font-display text-[var(--color-text-primary)] mb-3">
+                    <label className="block text-sm font-bold font-semibold text-[var(--color-text-primary)] mb-3">
                       商品テンプレートから自動入力
                     </label>
                     <select
@@ -1155,7 +1155,7 @@ export default function HistoryPage() {
 
                   {/* 商品情報 */}
                   <div>
-                    <h3 className="text-sm font-bold font-display text-[var(--color-text-primary)] mb-4 pb-2 border-b border-cyan-500/20">
+                    <h3 className="text-sm font-bold font-semibold text-[var(--color-text-primary)] mb-4 pb-2 border-b border-cyan-500/20">
                       商品情報
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1324,7 +1324,7 @@ export default function HistoryPage() {
 
                   {/* 購入情報 */}
                   <div>
-                    <h3 className="text-sm font-bold font-display text-[var(--color-text-primary)] mb-4 pb-2 border-b border-green-500/20">
+                    <h3 className="text-sm font-bold font-semibold text-[var(--color-text-primary)] mb-4 pb-2 border-b border-green-500/20">
                       購入情報
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1403,7 +1403,7 @@ export default function HistoryPage() {
                   {manualAddForm.is_sold && (
                   <>
                   <div>
-                    <h3 className="text-sm font-bold font-display text-[var(--color-text-primary)] mb-4 pb-2 border-b border-purple-500/20">
+                    <h3 className="text-sm font-bold font-semibold text-[var(--color-text-primary)] mb-4 pb-2 border-b border-purple-500/20">
                       売却情報
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1451,7 +1451,7 @@ export default function HistoryPage() {
 
                   {/* 経費・その他 */}
                   <div>
-                    <h3 className="text-sm font-bold font-display text-[var(--color-text-primary)] mb-4 pb-2 border-b border-orange-500/20">
+                    <h3 className="text-sm font-bold font-semibold text-[var(--color-text-primary)] mb-4 pb-2 border-b border-orange-500/20">
                       経費・その他
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1489,7 +1489,7 @@ export default function HistoryPage() {
 
                   {/* メモ（常に表示） */}
                   <div>
-                    <label className="block text-xs font-semibold font-display text-[var(--color-text-primary)] mb-2">
+                    <label className="block text-xs font-semibold font-semibold text-[var(--color-text-primary)] mb-2">
                       メモ
                     </label>
                     <textarea

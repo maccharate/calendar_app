@@ -113,7 +113,7 @@ export default function GiveawayPage() {
       <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold font-display text-[var(--color-text-primary)]">
+            <h1 className="text-3xl font-bold font-semibold text-[var(--color-text-primary)]">
               プレゼント企画
             </h1>
             <button

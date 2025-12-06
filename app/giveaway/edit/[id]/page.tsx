@@ -208,7 +208,7 @@ export default function EditGiveawayPage() {
             ← 戻る
           </button>
 
-          <h1 className="text-3xl font-bold mb-8 font-display text-[var(--color-text-primary)]">
+          <h1 className="text-3xl font-bold mb-8 font-semibold text-[var(--color-text-primary)]">
             プレゼント企画を編集
           </h1>
 
