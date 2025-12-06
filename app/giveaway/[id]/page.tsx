@@ -280,7 +280,7 @@ export default function GiveawayDetailPage() {
           {/* タイトルとステータス */}
           <div className="flex justify-between items-start mb-6">
             <div className="flex-1">
-              <h1 className="text-4xl font-bold mb-3 font-display text-[var(--color-text-primary)]">
+              <h1 className="text-4xl font-bold mb-3 font-semibold text-[var(--color-text-primary)]">
                 {event.title}
               </h1>
               <div className="flex items-center gap-4">

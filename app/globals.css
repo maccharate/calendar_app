@@ -1,57 +1,54 @@
 /* ==============================
-   Design System - Refined Minimalism
+   Design System - Clean & Professional
 ============================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Typography */
-  --font-display: 'Crimson Pro', serif;
-  --font-body: 'Manrope', 'Noto Sans JP', sans-serif;
+  /* Typography - System Fonts */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', 'Hiragino Sans', sans-serif;
 
-  /* Colors - Warm Neutral Palette */
-  --color-bg-primary: #0a0908;
-  --color-bg-secondary: #161412;
-  --color-bg-tertiary: #1f1b18;
-  --color-bg-elevated: #2a2520;
+  /* Colors - Clean Neutral Palette */
+  --color-bg-primary: #0f0f0f;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-tertiary: #242424;
+  --color-bg-elevated: #2d2d2d;
 
-  --color-text-primary: #f5f1ed;
-  --color-text-secondary: #c4bab0;
-  --color-text-tertiary: #8a7f74;
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #a0a0a0;
+  --color-text-tertiary: #707070;
 
-  --color-accent-primary: #d4a574;
-  --color-accent-secondary: #b8956a;
-  --color-accent-tertiary: #9c7f5a;
+  --color-accent-primary: #3b82f6;
+  --color-accent-secondary: #2563eb;
+  --color-accent-tertiary: #1d4ed8;
 
-  --color-border-subtle: rgba(196, 186, 176, 0.08);
-  --color-border-medium: rgba(196, 186, 176, 0.15);
-  --color-border-strong: rgba(196, 186, 176, 0.25);
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-medium: rgba(255, 255, 255, 0.1);
+  --color-border-strong: rgba(255, 255, 255, 0.15);
 
   /* Status Colors */
-  --color-success: #7fba7a;
-  --color-warning: #d4a574;
-  --color-error: #d97777;
-  --color-info: #7a9aba;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
 
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -59,24 +56,24 @@ body {
 }
 
 /* ==============================
-   📅 FullCalendar - Refined Theme
+   📅 FullCalendar - Clean Theme
 ============================== */
 
 /* カレンダー全体 */
 .fc {
   background-color: transparent !important;
   color: var(--color-text-primary) !important;
-  font-family: var(--font-body) !important;
+  font-family: var(--font-sans) !important;
   font-weight: 400;
 }
 
 /* タイトル */
 .fc-toolbar-title {
   color: var(--color-text-primary) !important;
-  font-family: var(--font-display) !important;
+  font-family: var(--font-sans) !important;
   font-weight: 600 !important;
-  font-size: 1.75rem;
-  letter-spacing: -0.02em;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
 }
 
 /* ナビゲーションボタン */
@@ -86,15 +83,14 @@ body {
   color: var(--color-text-secondary) !important;
   font-weight: 500;
   border-radius: 6px !important;
-  padding: 8px 14px !important;
+  padding: 6px 12px !important;
   transition: all var(--transition-base);
-  font-family: var(--font-body) !important;
+  font-family: var(--font-sans) !important;
 }
 .fc .fc-button:hover {
   background: var(--color-bg-elevated) !important;
   border-color: var(--color-accent-primary) !important;
   color: var(--color-accent-primary) !important;
-  transform: translateY(-1px);
 }
 
 /* 曜日ヘッダー */
@@ -102,12 +98,12 @@ body {
   background-color: transparent !important;
   color: var(--color-text-tertiary) !important;
   font-weight: 600;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 16px 0;
+  letter-spacing: 0.05em;
+  padding: 12px 0;
   border: none !important;
-  font-family: var(--font-body) !important;
+  font-family: var(--font-sans) !important;
 }
 
 /* 日曜と土曜の色分け */
@@ -122,9 +118,9 @@ body {
 .fc .fc-daygrid-day-number {
   color: var(--color-text-secondary) !important;
   font-weight: 500;
-  font-size: 0.9375rem;
-  padding: 10px;
-  font-family: var(--font-body) !important;
+  font-size: 0.875rem;
+  padding: 8px;
+  font-family: var(--font-sans) !important;
 }
 
 /* グリッド線 */
@@ -135,7 +131,7 @@ body {
 
 /* 今日 */
 .fc .fc-day-today {
-  background: rgba(212, 165, 116, 0.06) !important;
+  background: rgba(59, 130, 246, 0.08) !important;
   position: relative;
 }
 .fc .fc-day-today .fc-daygrid-day-number {
@@ -154,12 +150,10 @@ body {
   border: none !important;
   border-radius: 4px !important;
   transition: all var(--transition-base);
-  font-family: var(--font-body) !important;
+  font-family: var(--font-sans) !important;
 }
 .fc-event:hover {
-  opacity: 0.85;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  opacity: 0.9;
 }
 /* ================================
    📅 リストビュー（listWeek）
@@ -177,7 +171,7 @@ body {
   background-color: transparent !important;
   color: var(--color-text-secondary) !important;
   font-weight: 600;
-  font-family: var(--font-body) !important;
+  font-family: var(--font-sans) !important;
 }
 
 /* 各イベント行 */
@@ -192,7 +186,6 @@ body {
 /* イベントホバー */
 .fc-list-event:hover {
   background-color: var(--color-bg-elevated) !important;
-  transform: translateX(4px);
 }
 
 /* 日付タイトルとイベントの仕切り線を消す */

@@ -18,7 +18,7 @@ export default function UsersPage() {
             >
               ← カレンダーに戻る
             </button>
-            <h1 className="text-3xl font-bold font-display text-[var(--color-text-primary)]">
+            <h1 className="text-3xl font-bold font-semibold text-[var(--color-text-primary)]">
               ユーザー管理
             </h1>
           </div>
