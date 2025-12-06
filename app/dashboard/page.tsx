@@ -127,7 +127,7 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto">
           {/* ヘッダー */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-4xl font-bold font-display text-[var(--color-text-primary)]">
               利益計算ダッシュボード
             </h1>
 

@@ -89,7 +89,7 @@ export default function TemplatesPage() {
               ← カレンダーに戻る
             </button>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold font-display text-[var(--color-text-primary)]">
                 商品テンプレート管理
               </h1>
               <button

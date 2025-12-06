@@ -92,7 +92,7 @@ export default function SettingsPage() {
             </button>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-4xl font-bold mb-8 font-display text-[var(--color-text-primary)]">
             設定
           </h1>
 

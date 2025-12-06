@@ -237,7 +237,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black p-4 md:p-6 text-white">
         {/* ヘッダー */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl font-bold font-display text-[var(--color-text-primary)] mb-2">
             管理者ダッシュボード
           </h1>
           <p className="text-gray-400">イベントとテンプレートの管理</p>
