@@ -334,6 +334,34 @@ export default function HistoryPage() {
     }
   };
 
+  // 履歴削除
+  const handleDeleteHistory = async () => {
+    if (!selectedEvent) return;
+
+    if (!confirm("この履歴を削除しますか？この操作は取り消せません。")) {
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/raffle/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          raffle_id: selectedEvent.id,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to delete history");
+
+      alert("履歴を削除しました");
+      setIsEditModalOpen(false);
+      fetchHistory(); // リロードして最新情報を取得
+    } catch (error) {
+      console.error("Error deleting history:", error);
+      alert("削除に失敗しました");
+    }
+  };
+
   // 手動追加保存
   const handleSaveManualAdd = async () => {
     // 商品名は必須
@@ -988,6 +1016,13 @@ export default function HistoryPage() {
                           className="w-full sm:w-auto px-6 py-3 border-2 border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 rounded-lg font-medium transition-colors"
                         >
                           キャンセル
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleDeleteHistory}
+                          className="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+                        >
+                          削除
                         </button>
                         <button
                           type="button"
