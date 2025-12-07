@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,5 +40,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-"gcs-key.json" 
+
+# certificates and credentials
+"gcs-key.json"
 gcs-key.json
+certs/*.pem
+certs/*.json
+!certs/README.md

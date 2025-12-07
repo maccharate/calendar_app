@@ -1,0 +1,64 @@
+# Cloud Run用Dockerfile
+# ConoHa VPS MySQL + Cloud Storage構成
+
+# ビルドステージ
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# 依存関係をコピーしてインストール
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# ソースコードをコピー
+COPY . .
+
+# 証明書用ディレクトリを作成
+RUN mkdir -p /app/certs
+
+# Next.jsアプリをビルド
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
+
+# 本番ステージ
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# 証明書格納ディレクトリ
+RUN mkdir -p /app/certs /secrets
+
+# セキュリティ: 非rootユーザーを作成
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+# 必要なファイルのみコピー
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+
+# Next.jsのstandalone buildを使用する場合
+# COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+# COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# ディレクトリの権限設定
+RUN chown -R nextjs:nodejs /app /secrets
+
+# 非rootユーザーに切り替え
+USER nextjs
+
+# Cloud Runのポート（8080）
+EXPOSE 8080
+
+# 環境変数
+ENV NODE_ENV=production
+ENV PORT=8080
+ENV HOSTNAME="0.0.0.0"
+
+# ヘルスチェック（オプション）
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:8080/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# アプリケーション起動
+CMD ["npm", "start"]
