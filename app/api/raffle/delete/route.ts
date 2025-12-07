@@ -7,9 +7,15 @@ export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id;
-    const { raffle_id } = await req.json();
 
-    if (!userId || !raffle_id) {
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { raffle_id, record_id } = await req.json();
+
+    // raffle_id がない手動追加レコードも削除できるように record_id を許可
+    if (raffle_id == null && record_id == null) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
@@ -17,7 +23,7 @@ export async function POST(req: Request) {
     await pool.query(
       `
       UPDATE raffle_status
-      SET applied = 0, 
+      SET applied = 0,
           status = 'pending',
           purchase_price = NULL,
           purchase_date = NULL,
@@ -31,9 +37,9 @@ export async function POST(req: Request) {
           notes = NULL,
           product_template_id = NULL,
           applied_at = NULL
-      WHERE user_id = ? AND raffle_id = ?
+      WHERE user_id = ? AND ${raffle_id != null ? "raffle_id = ?" : "id = ?"}
       `,
-      [userId, raffle_id]
+      [userId, raffle_id ?? record_id]
     );
 
     return NextResponse.json({ success: true });
