@@ -5,24 +5,29 @@ import { getToken } from 'next-auth/jwt';
 /**
  * ミドルウェア：全リクエストで認証とメンバーシップをチェック
  */
-export async function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname;
+const PUBLIC_PATHS = [
+  '/auth',            // ← ログイン画面など auth 配下は認証不要
+  '/api/auth',
+  '/offline',
+  '/_next',
+  '/favicon.ico',
+  '/manifest.json',
+  '/sw.js',
+  '/icon-',
+  '/access-denied',
+];
 
-  // 公開ページ（認証不要）
-  const publicPaths = [
-    '/api/auth',
-    '/offline',
-    '/_next',
-    '/favicon.ico',
-    '/manifest.json',
-    '/sw.js',
-    '/icon-',
-    '/auth',
-    '/access-denied',
-  ];
+export async function middleware(request: NextRequest) {
+  const url = request.nextUrl;
+  const path = url.pathname;
+
+  // ?error=unauthorized の画面ではこれ以上リダイレクトしない（ループ防止）
+  if (url.searchParams.get('error') === 'unauthorized') {
+    return NextResponse.next();
+  }
 
   // 公開ページはスキップ
-  if (publicPaths.some((publicPath) => path.startsWith(publicPath))) {
+  if (PUBLIC_PATHS.some((publicPath) => path === publicPath || path.startsWith(publicPath + '/'))) {
     return NextResponse.next();
   }
 
@@ -34,21 +39,22 @@ export async function middleware(request: NextRequest) {
 
   // 未認証の場合はログインページへリダイレクト
   if (!token) {
-    const url = new URL('/', request.url);
-    url.searchParams.set('error', 'unauthorized');
-    return NextResponse.redirect(url);
+    const redirectUrl = new URL('/auth/signin', request.url); // ← トップではなく /auth/signin へ
+    redirectUrl.searchParams.set('error', 'unauthorized');
+    return NextResponse.redirect(redirectUrl);
   }
 
   // メンバーシップチェック（本番環境のみ）
-  if (process.env.NODE_ENV === 'production' && process.env.ENABLE_MEMBERSHIP_CHECK === 'true') {
-    // データベースからユーザー情報を取得してメンバーシップを確認
-    // または、セッションに保存されたメンバーシップステータスを確認
+  if (
+    process.env.NODE_ENV === 'production' &&
+    process.env.ENABLE_MEMBERSHIP_CHECK === 'true'
+  ) {
     const isMember = token.isMember as boolean;
     const hasRequiredRole = token.hasRequiredRole as boolean;
 
     if (!isMember || !hasRequiredRole) {
-      const url = new URL('/access-denied', request.url);
-      return NextResponse.redirect(url);
+      const deniedUrl = new URL('/access-denied', request.url);
+      return NextResponse.redirect(deniedUrl);
     }
   }
 
@@ -56,9 +62,9 @@ export async function middleware(request: NextRequest) {
   if (path.startsWith('/admin')) {
     const isAdmin = token.isAdmin as boolean;
     if (!isAdmin) {
-      const url = new URL('/', request.url);
-      url.searchParams.set('error', 'forbidden');
-      return NextResponse.redirect(url);
+      const forbiddenUrl = new URL('/', request.url);
+      forbiddenUrl.searchParams.set('error', 'forbidden');
+      return NextResponse.redirect(forbiddenUrl);
     }
   }
 
@@ -67,12 +73,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
+    // _next/static, _next/image, favicon.ico は除外
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
