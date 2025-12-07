@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import Navigation from "@/components/Navigation";
+import { formatDateForInput } from "@/lib/dateUtils";
 
 interface Prize {
   id?: number;
@@ -93,16 +94,6 @@ export default function EditGiveawayPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatDateForInput = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
   const addPrize = () => {

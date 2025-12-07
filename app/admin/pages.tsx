@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
+import { formatDateForInput, getCurrentDateTimeLocal } from "@/lib/dateUtils";
 
 interface EventType {
   id: string;
@@ -468,8 +469,8 @@ function EventModal({
   const [formData, setFormData] = useState<Partial<EventType>>(
     event || {
       title: "",
-      start: new Date().toISOString().slice(0, 16),
-      end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
+      start: getCurrentDateTimeLocal(),
+      end: getCurrentDateTimeLocal(7),
       url: "",
       backgroundColor: "#3b82f6",
       extendedProps: {
@@ -518,8 +519,8 @@ function EventModal({
               <input
                 type="datetime-local"
                 required
-                value={formData.start?.slice(0, 16)}
-                onChange={(e) => setFormData({ ...formData, start: new Date(e.target.value).toISOString() })}
+                value={formatDateForInput(formData.start)}
+                onChange={(e) => setFormData({ ...formData, start: e.target.value })}
                 className="w-full px-4 py-2 bg-gray-700/50 rounded-lg border border-gray-600/50 focus:border-blue-500 focus:outline-none"
               />
             </div>
@@ -528,8 +529,8 @@ function EventModal({
               <input
                 type="datetime-local"
                 required
-                value={formData.end?.slice(0, 16)}
-                onChange={(e) => setFormData({ ...formData, end: new Date(e.target.value).toISOString() })}
+                value={formatDateForInput(formData.end)}
+                onChange={(e) => setFormData({ ...formData, end: e.target.value })}
                 className="w-full px-4 py-2 bg-gray-700/50 rounded-lg border border-gray-600/50 focus:border-blue-500 focus:outline-none"
               />
             </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Navigation from "@/components/Navigation";
+import { formatDateForInput } from "@/lib/dateUtils";
 
 interface ImageData {
   fileName: string;
@@ -39,22 +40,6 @@ export default function EditEventPage() {
     fetchEvent();
   }, [eventId]);
 
-  const toDatetimeLocal = (value: string | null | undefined) => {
-    if (!value) return "";
-    // Try to parse into a Date. Accept various DB formats like
-    // "YYYY-MM-DD HH:MM:SS" or ISO strings. Produce `YYYY-MM-DDTHH:MM`.
-    let d = new Date(value);
-    if (isNaN(d.getTime())) {
-      // Try replacing space with 'T' (MySQL default format)
-      d = new Date(value.replace(" ", "T"));
-    }
-    if (isNaN(d.getTime())) return value;
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-      d.getHours()
-    )}:${pad(d.getMinutes())}`;
-  };
-
   useEffect(() => {
     if (uploadMode === "gallery") {
       fetchImages();
@@ -69,8 +54,8 @@ export default function EditEventPage() {
         setFormData({
           site: data.site || "",
           title: data.title || "",
-          starttime: toDatetimeLocal(data.starttime) || "",
-          endtime: toDatetimeLocal(data.endtime) || "",
+          starttime: formatDateForInput(data.starttime) || "",
+          endtime: formatDateForInput(data.endtime) || "",
           link: data.link || "",
           img: data.img || "",
           event_type: data.event_type || "raffle",
