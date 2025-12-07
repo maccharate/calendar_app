@@ -214,7 +214,7 @@ export default function StatsPage() {
                     : "text-gray-400 hover:text-white"
                 }`}
               >
-                👤 自分のデータ
+                自分のデータ
               </button>
               <button
                 onClick={() => setDataScope("all")}
@@ -224,7 +224,7 @@ export default function StatsPage() {
                     : "text-gray-400 hover:text-white"
                 }`}
               >
-                👥 みんなのデータ
+                みんなのデータ
               </button>
             </div>
           </div>

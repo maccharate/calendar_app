@@ -349,16 +349,36 @@ export default function GiveawayDetailPage() {
             </div>
           )}
 
-          {/* 当選情報 */}
+          {/* 当選情報 - 大きく目立つ表示 */}
           {event.my_winnings && event.my_winnings.length > 0 && (
-            <div className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-600/50 rounded-xl p-6 mb-6">
-              <h3 className="text-xl font-bold mb-3 text-yellow-400">おめでとうございます！</h3>
-              <p className="text-white mb-2">以下の賞品に当選しました：</p>
-              {event.my_winnings.map((winning) => (
-                <div key={winning.id} className="text-white font-bold">
-                  {winning.prize_name}
+            <div className="bg-gradient-to-br from-yellow-500 via-orange-500 to-red-500 rounded-2xl p-1 mb-8 animate-pulse">
+              <div className="bg-gray-900 rounded-2xl p-8 md:p-12">
+                <div className="text-center">
+                  <div className="text-6xl md:text-8xl mb-4">🎉</div>
+                  <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
+                    おめでとうございます！
+                  </h2>
+                  <p className="text-xl md:text-2xl text-gray-300 mb-8">あなたは当選しました！</p>
+                  <div className="space-y-4">
+                    {event.my_winnings.map((winning) => (
+                      <div
+                        key={winning.id}
+                        className="bg-gradient-to-r from-yellow-600/30 to-orange-600/30 border-2 border-yellow-500/50 rounded-xl p-6 backdrop-blur-sm"
+                      >
+                        <div className="flex items-center justify-center gap-3">
+                          <span className="text-3xl">🏆</span>
+                          <span className="text-2xl md:text-3xl font-bold text-white">
+                            {winning.prize_name}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-gray-400 mt-8 text-sm md:text-base">
+                    当選日時: {new Date(event.my_winnings[0].won_at).toLocaleString("ja-JP")}
+                  </p>
                 </div>
-              ))}
+              </div>
             </div>
           )}
 
