@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import { useRouter } from "next/navigation";
+import { formatDateForDateInput } from "@/lib/dateUtils";
 
 interface HistoryEvent {
   record_id: number;
@@ -190,10 +191,10 @@ export default function HistoryPage() {
     setSelectedEvent(event);
     setEditForm({
       purchase_price: event.purchase_price ? Math.floor(event.purchase_price).toString() : "",
-      purchase_date: event.purchase_date ? new Date(event.purchase_date).toISOString().split('T')[0] : "",
+      purchase_date: formatDateForDateInput(event.purchase_date),
       purchase_shipping: event.purchase_shipping ? Math.floor(event.purchase_shipping).toString() : "",
       sale_price: event.sale_price ? Math.floor(event.sale_price).toString() : "",
-      sale_date: event.sale_date ? new Date(event.sale_date).toISOString().split('T')[0] : "",
+      sale_date: formatDateForDateInput(event.sale_date),
       platform: event.platform || "",
       fees: event.fees ? Math.floor(event.fees).toString() : "",
       shipping_cost: event.shipping_cost ? Math.floor(event.shipping_cost).toString() : "",
@@ -348,6 +349,8 @@ export default function HistoryPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           raffle_id: selectedEvent.id,
+          record_id: selectedEvent.record_id,
+          is_manual: selectedEvent.is_manual,
         }),
       });
 
