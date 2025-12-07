@@ -39,10 +39,11 @@ export async function middleware(request: NextRequest) {
 
   // 未認証の場合はログインページへリダイレクト
   if (!token) {
-    const redirectUrl = new URL('/auth/signin', request.url); // ← トップではなく /auth/signin へ
+    const redirectUrl = new URL('/api/auth/signin', request.url); // ★ ここだけ変更
     redirectUrl.searchParams.set('error', 'unauthorized');
     return NextResponse.redirect(redirectUrl);
   }
+
 
   // メンバーシップチェック（本番環境のみ）
   if (
