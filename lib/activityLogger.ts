@@ -20,7 +20,8 @@ export type ActivityAction =
   | "delete_giveaway"
   | "enter_giveaway"
   | "cancel_entry"
-  | "draw_lottery";
+  | "draw_lottery"
+  | "auto_draw_lottery";
 
 export interface LogActivityOptions {
   targetType?: string;
