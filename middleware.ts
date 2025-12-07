@@ -17,6 +17,8 @@ export async function middleware(request: NextRequest) {
     '/manifest.json',
     '/sw.js',
     '/icon-',
+    '/auth',
+    '/access-denied',
   ];
 
   // 公開ページはスキップ
