@@ -348,7 +348,6 @@ export default function HistoryPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           raffle_id: selectedEvent.id,
-          record_id: selectedEvent.record_id,
         }),
       });
 
