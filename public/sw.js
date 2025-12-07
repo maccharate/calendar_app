@@ -1,5 +1,5 @@
 // Service Worker for PWA
-const CACHE_NAME = 'chimpan-calendar-v1';
+const CACHE_NAME = 'chimpan-calendar-v2';
 const urlsToCache = [
   '/',
   '/calendar',
@@ -67,6 +67,11 @@ self.addEventListener('fetch', (event) => {
         // なければネットワークから取得
         return fetch(event.request)
           .then((response) => {
+            // リダイレクトレスポンス（3xx）はキャッシュせずにそのまま返す
+            if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+              return response;
+            }
+
             // レスポンスが有効でない場合はそのまま返す
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
