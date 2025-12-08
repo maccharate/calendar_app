@@ -2,6 +2,14 @@ import NextAuth from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import { checkDiscordMembershipWithBot } from "@/lib/discordAuth";
 
+// 管理者のDiscord ID
+const ADMIN_USER_IDS = [
+  "547775428526473217",
+  "549913811172196362",
+  "501024205916078083",
+  "642197951216746528"
+];
+
 export const authOptions = {
   providers: [
     DiscordProvider({
@@ -10,12 +18,16 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    // ★ Discord メンバー判定 → JWT に保存
+    // Discord メンバー判定 + 管理者判定 → JWT に保存
     async jwt({ token, account }: any) {
       // 初回サインイン時だけ Discord の情報が入ってくる
       if (account && account.provider === "discord") {
-        const userId = token.sub as string; // or account.providerAccountId
+        const userId = token.sub as string;
 
+        // 管理者フラグを設定
+        token.isAdmin = ADMIN_USER_IDS.includes(userId);
+
+        // メンバーシップチェック
         if (process.env.ENABLE_MEMBERSHIP_CHECK === "true") {
           try {
             const { isMember, hasRequiredRole, roles } =
@@ -40,9 +52,10 @@ export const authOptions = {
       return token;
     },
 
-    // ★ セッションにも結果を載せておく（必要なら）
+    // セッションにも結果を載せておく
     async session({ session, token }: any) {
       session.user.id = token.sub;
+      session.user.isAdmin = token.isAdmin; // 管理者フラグ
       session.user.isMember = token.isMember ?? true;
       session.user.hasRequiredRole = token.hasRequiredRole ?? true;
       return session;
