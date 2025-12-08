@@ -17,7 +17,7 @@ const PUBLIC_PATHS = [
   '/access-denied',
 ];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const url = request.nextUrl;
   const path = url.pathname;
 
