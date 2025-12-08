@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { pool, testConnection } from '@/lib/db';
+import { pool} from '@/lib/db';
 
 /**
  * ヘルスチェックエンドポイント

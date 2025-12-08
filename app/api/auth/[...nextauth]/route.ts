@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
+import { checkDiscordMembershipWithBot } from "@/lib/discordAuth";
 
 // 管理者のDiscord ID
 const ADMIN_USER_IDS = [
@@ -17,17 +18,46 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account, profile }: any) {
-      // 初回ログイン時に管理者フラグを設定
-      if (account && profile) {
-        const userId = profile.id || token.sub;
+    // Discord メンバー判定 + 管理者判定 → JWT に保存
+    async jwt({ token, account }: any) {
+      // 初回サインイン時だけ Discord の情報が入ってくる
+      if (account && account.provider === "discord") {
+        const userId = token.sub as string;
+
+        // 管理者フラグを設定
         token.isAdmin = ADMIN_USER_IDS.includes(userId);
+
+        // メンバーシップチェック
+        if (process.env.ENABLE_MEMBERSHIP_CHECK === "true") {
+          try {
+            const { isMember, hasRequiredRole, roles } =
+              await checkDiscordMembershipWithBot(userId);
+
+            token.isMember = isMember;
+            token.hasRequiredRole = hasRequiredRole;
+            token.roles = roles;
+          } catch (e) {
+            console.error("membership check failed", e);
+            // 失敗したら弾く運用にする場合
+            token.isMember = false;
+            token.hasRequiredRole = false;
+          }
+        } else {
+          // チェックOFFなら全員OK扱い
+          token.isMember = true;
+          token.hasRequiredRole = true;
+        }
       }
+
       return token;
     },
+
+    // セッションにも結果を載せておく
     async session({ session, token }: any) {
-      session.user.id = token.sub; // DiscordユーザーIDをセッションに追加
-      session.user.isAdmin = token.isAdmin; // 管理者フラグを追加
+      session.user.id = token.sub;
+      session.user.isAdmin = token.isAdmin; // 管理者フラグ
+      session.user.isMember = token.isMember ?? true;
+      session.user.hasRequiredRole = token.hasRequiredRole ?? true;
       return session;
     },
   },
@@ -35,5 +65,4 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };
