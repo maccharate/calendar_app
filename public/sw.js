@@ -1,5 +1,5 @@
 // Service Worker for PWA
-const CACHE_NAME = 'chimpan-calendar-v2';
+const CACHE_NAME = 'chimpan-calendar-v3';
 const urlsToCache = [
   '/',
   '/calendar',
@@ -41,8 +41,20 @@ self.addEventListener('activate', (event) => {
 
 // ネットワークリクエストの処理
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // 認証関連のリクエストは常にネットワーク優先（キャッシュしない）
+  if (url.pathname.startsWith('/api/auth') ||
+      url.pathname.startsWith('/auth') ||
+      url.pathname === '/api/auth/signin' ||
+      url.pathname === '/api/auth/signout' ||
+      url.pathname === '/api/auth/session') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   // API リクエストは常にネットワーク優先
-  if (event.request.url.includes('/api/')) {
+  if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request)
         .catch(() => {
