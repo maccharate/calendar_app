@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { testConnection } from '@/lib/db';
+import { testDbConnection } from '@/lib/dbHealth';
 
 /**
  * ヘルスチェックエンドポイント
  */
 export async function GET() {
   try {
-    await testConnection();
+    await testDbConnection();
     return NextResponse.json({ status: 'ok' });
   } catch (error) {
     console.error('Health check failed:', error);
