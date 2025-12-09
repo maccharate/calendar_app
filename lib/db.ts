@@ -9,3 +9,13 @@ export const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0
 });
+
+// DB 接続確認用ヘルパー
+export async function testConnection(): Promise<void> {
+  const connection = await pool.getConnection();
+  try {
+    await connection.query('SELECT 1');
+  } finally {
+    connection.release();
+  }
+}
