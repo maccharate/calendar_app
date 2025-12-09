@@ -1,7 +1,6 @@
 // Service Worker for PWA
 const CACHE_NAME = 'chimpan-calendar-v2';
-// ルートや認証付きページはリダイレクトを返すことがあるため
-// ここではオフライン専用ページのみプリキャッシュする
+// 認証ページはリダイレクトを返す可能性があるためオフラインページのみプリキャッシュ
 const urlsToCache = ['/offline'];
 
 // インストール時にキャッシュを作成
@@ -38,16 +37,14 @@ self.addEventListener('activate', (event) => {
 
 // ネットワークリクエストの処理
 self.addEventListener('fetch', (event) => {
-  // ナビゲーションはネットワーク優先。サービスワーカーから
-  // リダイレクトレスポンスを返すと PWA 起動時に失敗するため
-  // リダイレクトを検知したらそのままネットワーク結果を返す。
+  // ナビゲーションはネットワーク優先。リダイレクトレスポンスはそのまま返し、
+  // 失敗時のみオフラインページへフォールバック。
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // opaqueredirect などをキャッシュに載せない
           if (response.type === 'opaqueredirect' || response.redirected) {
-            return fetch(response.url);
+            return response;
           }
           return response;
         })
@@ -60,42 +57,48 @@ self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('/api/')) {
     event.respondWith(
       fetch(event.request)
-        .catch(() => new Response(
-          JSON.stringify({ error: 'オフラインです' }),
-          { headers: { 'Content-Type': 'application/json' } }
-        ))
+        .catch(() => {
+          return new Response(
+            JSON.stringify({ error: 'オフラインです' }),
+            { headers: { 'Content-Type': 'application/json' } }
+          );
+        })
     );
     return;
   }
 
-  // それ以外（静的アセットなど）はキャッシュファースト
+  // それ以外はキャッシュファースト戦略
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
+        // リダイレクトレスポンスがキャッシュされていた場合はネットワークから取り直す
         if (response) {
-          // リダイレクトレスポンスがキャッシュされていた場合は
-          // 再度ネットワークへフォールバック
           if (response.type === 'opaqueredirect' || response.redirected) {
             return fetch(event.request).catch(() => caches.match('/offline'));
           }
           return response;
         }
 
+        // なければネットワークから取得
         return fetch(event.request)
-          .then((response) => {
-            if (!response || response.status !== 200 || response.type !== 'basic' || response.redirected) {
-              return response;
+          .then((networkResponse) => {
+            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic' || networkResponse.redirected) {
+              return networkResponse;
             }
 
-            const responseToCache = response.clone();
+            // レスポンスをクローンしてキャッシュに保存
+            const responseToCache = networkResponse.clone();
             caches.open(CACHE_NAME)
               .then((cache) => {
                 cache.put(event.request, responseToCache);
               });
 
-            return response;
+            return networkResponse;
           })
-          .catch(() => caches.match('/offline'));
+          .catch(() => {
+            // オフライン時のフォールバック
+            return caches.match('/offline');
+          });
       })
   );
 });
