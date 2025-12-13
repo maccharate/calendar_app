@@ -154,8 +154,21 @@ export default function CalendarPage() {
             borderColor = "#ef4444";
           }
 
+          const extendedProps = {
+            ...e.extendedProps,
+            event_type: e.event_type,
+            advance: e.extendedProps?.advance ?? e.event_type === "advance",
+          };
+
+          const endTime =
+            extendedProps.advance && new Date(e.end || e.start) < new Date(e.start)
+              ? e.start
+              : e.end;
+
           return {
             ...e,
+            end: endTime,
+            extendedProps,
             backgroundColor,
             borderColor,
             textColor,
@@ -220,6 +233,12 @@ export default function CalendarPage() {
     if (!filters.showEnded) {
       const now = new Date();
       filtered = filtered.filter((event) => {
+        // 先着イベントは販売開始時刻を過ぎたら終了とみなす
+        if (event.extendedProps?.advance) {
+          const startDate = new Date(event.start);
+          return startDate >= now;
+        }
+
         const endDate = new Date(event.end || event.start);
         return endDate >= now; // 終了時間が現在時刻より後
       });
