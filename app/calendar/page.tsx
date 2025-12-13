@@ -154,8 +154,21 @@ export default function CalendarPage() {
             borderColor = "#ef4444";
           }
 
+          const extendedProps = {
+            ...e.extendedProps,
+            event_type: e.event_type,
+            advance: e.extendedProps?.advance ?? e.event_type === "advance",
+          };
+
+          const endTime =
+            extendedProps.advance && new Date(e.end || e.start) < new Date(e.start)
+              ? e.start
+              : e.end;
+
           return {
             ...e,
+            end: endTime,
+            extendedProps,
             backgroundColor,
             borderColor,
             textColor,
