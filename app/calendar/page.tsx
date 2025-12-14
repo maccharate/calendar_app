@@ -523,6 +523,9 @@ export default function CalendarPage() {
       const end = new Date(e.end || e.start);
       start.setHours(0, 0, 0, 0);
       end.setHours(23, 59, 59, 999);
+    if (e.extendedProps?.event_type === 'advance') {
+      return start.getTime() === clickedDate.getTime();
+    }
       return start <= clickedDate && clickedDate <= end;
     });
 

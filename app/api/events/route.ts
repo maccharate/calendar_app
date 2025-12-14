@@ -59,12 +59,13 @@ export async function GET() {
       } else if (row.is_personal) {
         status = "mine";
       }
+      const eventEnd = row.event_type === 'advance' ? row.start : row.end;
       return {
         id: row.id.toString(),
         title: row.title,
         url: row.url || "#",
         start: row.start,
-        end: row.end,
+        end: eventEnd, 
         site: row.site,
         img: row.img,
         event_type: row.event_type,
