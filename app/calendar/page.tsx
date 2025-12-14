@@ -137,6 +137,43 @@ export default function CalendarPage() {
         // API が { events: [...] } を返す場合と配列を直接返す場合の両対応
         const eventsArray: ApiEventResponse[] = Array.isArray(data) ? data : data.events || [];
 
+        const normalizeExtendedProps = (
+          props: ApiEventResponse["extendedProps"],
+          eventType?: string,
+        ) => ({
+          ...props,
+          event_type: eventType,
+          advance: props?.advance ?? eventType === "advance",
+        });
+
+        const resolveEndTime = (
+          event: ApiEventResponse,
+          extendedProps: ApiEventResponse["extendedProps"],
+        ) => {
+          const startIso = new Date(event.start).toISOString();
+          const closeToDeadline = extendedProps?.close_to_deadline;
+
+          if (extendedProps?.advance) {
+            // 先着イベントは終了時刻を開始時刻に固定して扱う
+            return startIso;
+          }
+
+          if (!closeToDeadline) {
+            return event.end || startIso;
+          }
+
+          const startDate = new Date(startIso);
+          const endDate = event.end ? new Date(event.end) : undefined;
+
+          if (endDate && startDate.toDateString() === endDate.toDateString()) {
+            return event.end;
+          }
+
+          const endOfStartDate = new Date(startDate);
+          endOfStartDate.setHours(23, 59, 59, 999);
+          return endOfStartDate.toISOString();
+        };
+
         // 色分けプロパティを付与してからセット
         const colored = eventsArray.map((e: ApiEventResponse) => {
           let backgroundColor = "#6B7280"; // デフォルト: 未応募(グレー)
@@ -156,41 +193,11 @@ export default function CalendarPage() {
             borderColor = "#ef4444";
           }
 
-          const extendedProps = {
-            ...e.extendedProps,
-            event_type: e.event_type,
-            advance: e.extendedProps?.advance ?? e.event_type === "advance",
-          };
-
-          const closeToDeadline = extendedProps?.close_to_deadline;
-
-          const resolveEndTime = () => {
-            const startIso = new Date(e.start).toISOString();
-
-            if (extendedProps.advance) {
-              // 先着イベントは終了時刻を無視して開始時刻のみ扱う
-              return startIso;
-            }
-
-            if (!closeToDeadline) {
-              return e.end || startIso;
-            }
-
-            const startDate = new Date(startIso);
-            const endDate = e.end ? new Date(e.end) : undefined;
-
-            if (endDate && startDate.toDateString() === endDate.toDateString()) {
-              return e.end;
-            }
-
-            const endOfStartDate = new Date(startDate);
-            endOfStartDate.setHours(23, 59, 59, 999);
-            return endOfStartDate.toISOString();
-          };
+          const extendedProps = normalizeExtendedProps(e.extendedProps, e.event_type);
 
           return {
             ...e,
-            end: resolveEndTime(),
+            end: resolveEndTime(e, extendedProps),
             extendedProps,
             backgroundColor,
             borderColor,
