@@ -164,21 +164,31 @@ export default function CalendarPage() {
 
           const closeToDeadline = extendedProps?.close_to_deadline;
 
-          const startDate = new Date(e.start);
-          const endDate = new Date(e.end);
+          const resolveEndTime = () => {
+            if (extendedProps.advance) {
+              // 先着イベントは終了時刻を無視して開始時刻のみ扱う
+              return e.start;
+            }
 
-          // 先着イベントは終了時刻を無視して開始時刻のみ扱う
-          const endTime = extendedProps.advance
-            ? e.start
-            : closeToDeadline
-              ? startDate.toDateString() === endDate.toDateString()
-                ? e.end
-                : new Date(startDate.setHours(23, 59, 59, 999)).toISOString()
-              : e.end;
+            if (!closeToDeadline) {
+              return e.end;
+            }
+
+            const startDate = new Date(e.start);
+            const endDate = e.end ? new Date(e.end) : undefined;
+
+            if (endDate && startDate.toDateString() === endDate.toDateString()) {
+              return e.end;
+            }
+
+            const endOfStartDate = new Date(startDate);
+            endOfStartDate.setHours(23, 59, 59, 999);
+            return endOfStartDate.toISOString();
+          };
 
           return {
             ...e,
-            end: endTime,
+            end: resolveEndTime(),
             extendedProps,
             backgroundColor,
             borderColor,
