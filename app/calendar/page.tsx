@@ -9,6 +9,7 @@ import listPlugin from "@fullcalendar/list";
 import jaLocale from "@fullcalendar/core/locales/ja";
 import { EventClickArg } from "@fullcalendar/core";
 import Navigation from "@/components/Navigation";
+import moment from "moment";
 
 interface EventType {
   id: string;
@@ -30,6 +31,7 @@ interface EventType {
     isPersonal?: boolean;
     isPublic?: boolean;
     event_type?: string;  // ← これを追加
+    close_to_deadline?: boolean;
   };
 }
 
@@ -59,6 +61,7 @@ interface ApiEventResponse {
     application_count?: number;
     isPersonal?: boolean;
     isPublic?: boolean;
+    close_to_deadline?: boolean;
   };
 }
 
@@ -160,10 +163,16 @@ export default function CalendarPage() {
             advance: e.extendedProps?.advance ?? e.event_type === "advance",
           };
 
+          const closeToDeadline = extendedProps?.close_to_deadline;
+
           // 先着イベントは終了時刻を無視して開始時刻のみ扱う
           const endTime = extendedProps.advance
             ? e.start
-            : e.end;
+            : closeToDeadline
+              ? moment(e.end).isSame(moment(e.start), "day")
+                ? e.end
+                : moment(e.start).endOf("day").toDate()
+              : e.end;
 
           return {
             ...e,
