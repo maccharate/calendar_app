@@ -29,7 +29,7 @@ interface EventType {
     application_count?: number;
     isPersonal?: boolean;
     isPublic?: boolean;
-    event_type?: string;  // ← これを追加
+    event_type?: string;
     close_to_deadline?: boolean;
   };
 }
@@ -165,16 +165,18 @@ export default function CalendarPage() {
           const closeToDeadline = extendedProps?.close_to_deadline;
 
           const resolveEndTime = () => {
+            const startIso = new Date(e.start).toISOString();
+
             if (extendedProps.advance) {
               // 先着イベントは終了時刻を無視して開始時刻のみ扱う
-              return e.start;
+              return startIso;
             }
 
             if (!closeToDeadline) {
-              return e.end;
+              return e.end || startIso;
             }
 
-            const startDate = new Date(e.start);
+            const startDate = new Date(startIso);
             const endDate = e.end ? new Date(e.end) : undefined;
 
             if (endDate && startDate.toDateString() === endDate.toDateString()) {
