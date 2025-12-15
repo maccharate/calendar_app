@@ -7,13 +7,12 @@
  * - 先着イベント: 開始10分前
  * - 抽選イベント: 開始時、終了30分前
  */
-
 const mysql = require('mysql2/promise');
 const webpush = require('web-push');
 require('dotenv').config({ path: '.env.local' });
 
 // VAPID設定
-webpush.setVAPIDDetails(
+webpush.setVapidDetails(                // ← ここだけ修正！
   'mailto:' + (process.env.VAPID_MAILTO || 'admin@example.com'),
   process.env.VAPID_PUBLIC_KEY,
   process.env.VAPID_PRIVATE_KEY
