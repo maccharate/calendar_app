@@ -263,7 +263,7 @@ export default function EditEventPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      開始日時 *
+                      開始日時 * (日本時間)
                       <span className="text-xs text-gray-400 ml-2">
                         {formData.event_type === "raffle" ? "(抽選開始)" : "(販売開始)"}
                       </span>
@@ -279,7 +279,7 @@ export default function EditEventPage() {
 
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      終了日時 *
+                      終了日時 * (日本時間)
                       <span className="text-xs text-gray-400 ml-2">
                         {formData.event_type === "raffle" ? "(抽選締切)" : "(販売終了予定)"}
                       </span>

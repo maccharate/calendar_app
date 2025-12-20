@@ -153,8 +153,11 @@ export async function POST(request: Request) {
     if (webhookUrl) {
       try {
         // プレゼントページのURL構築
-        const requestUrl = new URL(request.url);
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${requestUrl.protocol}//${requestUrl.host}`;
+        // NEXT_PUBLIC_BASE_URLまたはNEXTAUTH_URLを優先、フォールバックとしてrequest.urlを使用
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || (() => {
+          const requestUrl = new URL(request.url);
+          return `${requestUrl.protocol}//${requestUrl.host}`;
+        })();
         const giveawayUrl = `${baseUrl}/giveaway/${eventId}`;
 
         // 最初の賞品画像をメイン画像として使用
