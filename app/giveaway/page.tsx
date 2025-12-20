@@ -62,7 +62,25 @@ export default function GiveawayPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (event: GiveawayEvent) => {
+    // 実際の日時をチェックして動的にステータスを判定
+    const now = new Date();
+    const start = new Date(event.start_date);
+    const end = new Date(event.end_date);
+
+    let status = event.status;
+
+    // activeステータスの場合、実際の日時をチェック
+    if (status === 'active') {
+      if (now < start) {
+        // まだ開始していない
+        status = 'draft'; // 下書き扱い
+      } else if (now > end) {
+        // 終了している
+        status = 'ended';
+      }
+    }
+
     const badges: Record<string, { label: string; color: string }> = {
       draft: { label: "下書き", color: "bg-gray-600" },
       active: { label: "応募受付中", color: "bg-green-600" },
@@ -196,7 +214,7 @@ export default function GiveawayPage() {
 
                   <div className="p-4">
                     {/* ステータスバッジ */}
-                    <div className="mb-3">{getStatusBadge(event.status)}</div>
+                    <div className="mb-3">{getStatusBadge(event)}</div>
 
                     {/* タイトル */}
                     <h3 className="text-xl font-bold mb-2 line-clamp-2">
