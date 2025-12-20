@@ -2,7 +2,7 @@
   "name": "ちんぱんコミュニティ カレンダー",
   "short_name": "ちんぱんカレンダー",
   "description": "メンバー限定のスケジュール管理ポータル",
-  "start_url": "/",
+  "start_url": "/calendar",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#3b82f6",
