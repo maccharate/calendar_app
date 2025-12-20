@@ -10,9 +10,11 @@ export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminMenu, setShowAdminMenu] = useState(false);
+  const [unenteredGiveawayCount, setUnenteredGiveawayCount] = useState(0);
 
   useEffect(() => {
     checkAdmin();
+    fetchUnenteredGiveaways();
   }, []);
 
   const checkAdmin = async () => {
@@ -27,13 +29,35 @@ export default function Navigation() {
     }
   };
 
+  const fetchUnenteredGiveaways = async () => {
+    try {
+      const res = await fetch("/api/giveaway/events?status=active");
+      if (res.ok) {
+        const data = await res.json();
+        const now = new Date();
+
+        // 未応募かつ応募期間中のイベントをカウント
+        const count = data.events.filter((event: any) => {
+          const start = new Date(event.start_date);
+          const end = new Date(event.end_date);
+          const isActive = now >= start && now <= end;
+          return !event.user_entered && isActive;
+        }).length;
+
+        setUnenteredGiveawayCount(count);
+      }
+    } catch (error) {
+      console.error("Error fetching giveaway count:", error);
+    }
+  };
+
   const baseNavItems = [
-    { name: "カレンダー", path: "/calendar" },
-    { name: "ダッシュボード", path: "/dashboard" },
-    { name: "統計", path: "/stats" },
-    { name: "履歴", path: "/history" },
-    { name: "プレゼント", path: "/giveaway" },
-    { name: "設定", path: "/settings" },
+    { name: "カレンダー", path: "/calendar", badge: 0 },
+    { name: "ダッシュボード", path: "/dashboard", badge: 0 },
+    { name: "統計", path: "/stats", badge: 0 },
+    { name: "履歴", path: "/history", badge: 0 },
+    { name: "プレゼント", path: "/giveaway", badge: unenteredGiveawayCount },
+    { name: "設定", path: "/settings", badge: 0 },
   ];
 
   const navItems = baseNavItems;
@@ -64,13 +88,18 @@ export default function Navigation() {
               <button
                 key={item.path}
                 onClick={() => handleNavClick(item.path)}
-                className={`px-3 py-2 rounded-md font-medium transition-colors text-sm ${
+                className={`px-3 py-2 rounded-md font-medium transition-colors text-sm relative ${
                   pathname === item.path
                     ? "bg-accent text-white"
                     : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary"
                 }`}
               >
                 {item.name}
+                {item.badge > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {item.badge}
+                  </span>
+                )}
               </button>
             ))}
 
@@ -177,13 +206,20 @@ export default function Navigation() {
                 <button
                   key={item.path}
                   onClick={() => handleNavClick(item.path)}
-                  className={`px-4 py-2.5 rounded-md font-medium text-left transition-colors text-sm ${
+                  className={`px-4 py-2.5 rounded-md font-medium text-left transition-colors text-sm relative ${
                     pathname === item.path
                       ? "bg-accent text-white"
                       : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary"
                   }`}
                 >
-                  {item.name}
+                  <span className="flex items-center justify-between">
+                    <span>{item.name}</span>
+                    {item.badge > 0 && (
+                      <span className="bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                        {item.badge}
+                      </span>
+                    )}
+                  </span>
                 </button>
               ))}
 

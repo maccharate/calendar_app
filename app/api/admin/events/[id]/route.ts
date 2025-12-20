@@ -3,6 +3,24 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../auth/[...nextauth]/route";
 import { pool } from "../../../../../lib/db";
 
+// 日時を編集用の形式に変換（タイムゾーン情報を削除）
+function formatDateTimeForAPI(date: Date | string): string {
+  if (!date) return '';
+
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+
+  // MySQL DATETIME形式で返す（YYYY-MM-DD HH:mm:ss）
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const seconds = String(d.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 // 管理者のDiscord ID
 const ADMIN_USER_IDS = ["547775428526473217", "549913811172196362", "501024205916078083"];
 
@@ -167,8 +185,23 @@ export async function GET(
     const params = await context.params;
     const eventId = params.id;
 
+    // DATE_FORMATを使って日時を文字列として取得（タイムゾーン変換を回避）
     const [events] = await pool.query(
-      `SELECT * FROM calendar_events WHERE id = ?`,
+      `SELECT
+        id,
+        site,
+        title,
+        DATE_FORMAT(starttime, '%Y-%m-%d %H:%i:%s') as starttime,
+        DATE_FORMAT(endtime, '%Y-%m-%d %H:%i:%s') as endtime,
+        link,
+        img,
+        event_type,
+        created_by,
+        is_public,
+        created_at,
+        updated_at
+      FROM calendar_events
+      WHERE id = ?`,
       [eventId]
     );
 

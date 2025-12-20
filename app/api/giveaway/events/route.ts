@@ -8,6 +8,7 @@ import { logActivity } from "../../../../lib/activityLogger";
 // イベント一覧取得
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const userId = searchParams.get("userId");
@@ -37,7 +38,7 @@ export async function GET(request: Request) {
 
     const [events] = await pool.query(query, params);
 
-    // 各イベントの賞品を取得
+    // 各イベントの賞品と現在のユーザーの応募状態を取得
     for (const event of events as any[]) {
       const [prizes] = await pool.query(
         `SELECT * FROM giveaway_prizes WHERE event_id = ? ORDER BY display_order ASC`,
@@ -50,6 +51,17 @@ export async function GET(request: Request) {
         event.main_image = firstPrize.image_url || event.image_url;
       } else {
         event.main_image = event.image_url;
+      }
+
+      // 現在のユーザーの応募状態を取得
+      if (session?.user?.id) {
+        const [entries] = await pool.query(
+          `SELECT id FROM giveaway_entries WHERE event_id = ? AND user_id = ?`,
+          [event.id, session.user.id]
+        );
+        event.user_entered = (entries as any[]).length > 0;
+      } else {
+        event.user_entered = false;
       }
     }
 
