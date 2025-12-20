@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import { useRouter } from "next/navigation";
 import { formatDateForDateInput } from "@/lib/dateUtils";
@@ -89,6 +89,7 @@ export default function HistoryPage() {
 
   // フィルター状態
   const [filter, setFilter] = useState<'all' | 'won' | 'lost' | 'pending'>('all');
+  const [selectedMonth, setSelectedMonth] = useState<string>('all'); // 月フィルター: 'all' or 'YYYY-MM'
 
   const router = useRouter();
 
@@ -177,12 +178,43 @@ export default function HistoryPage() {
     }
   };
 
+  // 利用可能な月のリストを生成（応募日から）
+  const availableMonths = React.useMemo(() => {
+    const monthSet = new Set<string>();
+    events.forEach(event => {
+      if (event.applied_at) {
+        const date = new Date(event.applied_at);
+        if (!isNaN(date.getTime()) && date.getFullYear() >= 2000) {
+          const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          monthSet.add(yearMonth);
+        }
+      }
+    });
+    return Array.from(monthSet).sort().reverse(); // 新しい月が上に来るようにソート
+  }, [events]);
+
   // フィルタリングロジック
   const filteredEvents = events.filter(event => {
-    if (filter === 'all') return true;
-    if (filter === 'won') return event.result_status === 'won' || event.result_status === 'partial' || event.result_status === 'purchased';
-    if (filter === 'lost') return event.result_status === 'lost' || event.result_status === 'not_purchased';
-    if (filter === 'pending') return event.result_status === 'pending';
+    // 結果ステータスフィルター
+    if (filter === 'won' && !(event.result_status === 'won' || event.result_status === 'partial' || event.result_status === 'purchased')) {
+      return false;
+    }
+    if (filter === 'lost' && !(event.result_status === 'lost' || event.result_status === 'not_purchased')) {
+      return false;
+    }
+    if (filter === 'pending' && event.result_status !== 'pending') {
+      return false;
+    }
+
+    // 月フィルター
+    if (selectedMonth !== 'all') {
+      if (!event.applied_at) return false;
+      const date = new Date(event.applied_at);
+      if (isNaN(date.getTime()) || date.getFullYear() < 2000) return false;
+      const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      if (yearMonth !== selectedMonth) return false;
+    }
+
     return true;
   });
 
@@ -614,44 +646,70 @@ export default function HistoryPage() {
             </div>
           )}
 
-          {/* フィルターボタン */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'all'
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-800/40 text-gray-400 hover:bg-gray-700/40'
-                }`}
-            >
-              すべて
-            </button>
-            <button
-              onClick={() => setFilter('won')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'won'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-800/40 text-gray-400 hover:bg-gray-700/40'
-                }`}
-            >
-              当選
-            </button>
-            <button
-              onClick={() => setFilter('lost')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'lost'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-800/40 text-gray-400 hover:bg-gray-700/40'
-                }`}
-            >
-              落選
-            </button>
-            <button
-              onClick={() => setFilter('pending')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'pending'
-                ? 'bg-yellow-600 text-white'
-                : 'bg-gray-800/40 text-gray-400 hover:bg-gray-700/40'
-                }`}
-            >
-              結果待ち
-            </button>
+          {/* フィルター */}
+          <div className="mb-6 space-y-4">
+            {/* 月選択 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">表示期間</label>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="px-4 py-2 bg-gray-800/40 border border-gray-700/50 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+              >
+                <option value="all">全期間</option>
+                {availableMonths.map(month => {
+                  const [year, monthNum] = month.split('-');
+                  return (
+                    <option key={month} value={month}>
+                      {year}年{parseInt(monthNum)}月
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            {/* ステータスフィルター */}
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">ステータス</label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setFilter('all')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'all'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-800/40 text-gray-400 hover:bg-gray-700/40'
+                    }`}
+                >
+                  すべて
+                </button>
+                <button
+                  onClick={() => setFilter('won')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'won'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-800/40 text-gray-400 hover:bg-gray-700/40'
+                    }`}
+                >
+                  当選
+                </button>
+                <button
+                  onClick={() => setFilter('lost')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'lost'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-800/40 text-gray-400 hover:bg-gray-700/40'
+                    }`}
+                >
+                  落選
+                </button>
+                <button
+                  onClick={() => setFilter('pending')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'pending'
+                    ? 'bg-yellow-600 text-white'
+                    : 'bg-gray-800/40 text-gray-400 hover:bg-gray-700/40'
+                    }`}
+                >
+                  結果待ち
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* 履歴リスト */}
