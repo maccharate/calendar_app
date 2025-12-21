@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { pool } from "../../../../lib/db";
 
+// 管理者のDiscord ID
+const ADMIN_USER_IDS = ["547775428526473217", "549913811172196362", "501024205916078083","642197951216746528"];
+
 /**
  * GET /api/admin/platform-requests
  * すべてのプラットフォーム追加リクエストを取得（管理者のみ）
@@ -16,7 +19,8 @@ export async function GET() {
     }
 
     // 管理者権限チェック
-    if (!session.user.isAdmin) {
+    const isAdmin = ADMIN_USER_IDS.includes(session.user.id);
+    if (!isAdmin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -68,7 +72,8 @@ export async function POST(request: Request) {
     }
 
     // 管理者権限チェック
-    if (!session.user.isAdmin) {
+    const isAdmin = ADMIN_USER_IDS.includes(session.user.id);
+    if (!isAdmin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
