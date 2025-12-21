@@ -19,6 +19,11 @@ interface Winning {
   won_at: string;
 }
 
+interface Winner {
+  username: string;
+  prize_name: string;
+}
+
 interface GiveawayEvent {
   id: string;
   title: string;
@@ -36,6 +41,7 @@ interface GiveawayEvent {
   prizes: Prize[];
   has_entered: boolean;
   my_winnings: Winning[];
+  all_winners?: Winner[];  // 全当選者リスト（抽選済みの場合のみ）
 }
 
 export default function GiveawayDetailPage() {
