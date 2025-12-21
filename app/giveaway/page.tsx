@@ -70,14 +70,25 @@ export default function GiveawayPage() {
 
     let status = event.status;
 
-    // activeステータスの場合、実際の日時をチェック
-    if (status === 'active') {
+    // 抽選済みの場合は常に「抽選済み」を表示
+    if (status === 'drawn') {
+      status = 'drawn';
+    }
+    // キャンセルの場合は常に「キャンセル」を表示
+    else if (status === 'cancelled') {
+      status = 'cancelled';
+    }
+    // activeまたはendedステータスの場合、実際の日時をチェック
+    else if (status === 'active' || status === 'ended') {
       if (now < start) {
         // まだ開始していない
-        status = 'draft'; // 下書き扱い
+        status = 'draft';
       } else if (now > end) {
         // 終了している
         status = 'ended';
+      } else {
+        // 開始済みで終了前 = 応募受付中
+        status = 'active';
       }
     }
 
