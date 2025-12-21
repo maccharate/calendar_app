@@ -210,7 +210,7 @@ export default function PlatformSettingsPage() {
                     </div>
 
                     {editingPlatform === platform.id ? (
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-nowrap items-center gap-2">
                         <input
                           type="number"
                           step="0.1"
@@ -218,37 +218,37 @@ export default function PlatformSettingsPage() {
                           max="100"
                           value={editingFeeRate}
                           onChange={(e) => setEditingFeeRate(e.target.value)}
-                          className="w-20 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                          className="w-16 sm:w-20 px-2 sm:px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
                           placeholder="%"
                         />
                         <button
                           onClick={() => handleSaveFeeRate(platform.id)}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
+                          className="px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                         >
                           保存
                         </button>
                         <button
                           onClick={() => setEditingPlatform(null)}
-                          className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-sm font-medium transition-colors"
+                          className="px-2 sm:px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                         >
                           キャンセル
                         </button>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-blue-400">
+                      <div className="flex flex-nowrap items-center gap-2">
+                        <span className="text-xl sm:text-2xl font-bold text-blue-400">
                           {platform.fee_rate}%
                         </span>
                         <button
                           onClick={() => handleEditClick(platform)}
-                          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors"
+                          className="px-3 sm:px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                         >
                           編集
                         </button>
                         {platform.custom_id && (
                           <button
                             onClick={() => handleResetToDefault(platform.id)}
-                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors"
+                            className="px-2 sm:px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                           >
                             リセット
                           </button>
