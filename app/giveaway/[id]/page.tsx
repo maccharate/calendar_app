@@ -443,6 +443,43 @@ export default function GiveawayDetailPage() {
             </div>
           </div>
 
+          {/* 当選者発表 / 抽選中 */}
+          {(() => {
+            const now = new Date();
+            const end = new Date(event.end_date);
+            const hasEnded = now > end || event.status === 'ended';
+
+            if (event.status === 'drawn' && event.all_winners && event.all_winners.length > 0) {
+              // 抽選済み - 当選者を表示
+              return (
+                <div className="bg-blue-900/20 backdrop-blur-sm rounded-xl p-6 border border-blue-700/50 mb-6">
+                  <h2 className="text-2xl font-bold mb-4 text-blue-400">🎉 当選者発表</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {event.all_winners.map((winner: any, index: number) => (
+                      <div
+                        key={index}
+                        className="bg-gray-900/50 rounded-lg p-3 border border-gray-700/50"
+                      >
+                        <p className="text-sm text-gray-400 mb-1">{winner.prize_name}</p>
+                        <p className="text-white font-bold">{winner.username}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            } else if (hasEnded && event.status !== 'drawn') {
+              // 終了済みだが未抽選 - 抽選中を表示
+              return (
+                <div className="bg-orange-900/20 backdrop-blur-sm rounded-xl p-6 border border-orange-700/50 mb-6 text-center">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-400 mb-3"></div>
+                  <h2 className="text-2xl font-bold text-orange-400">抽選中...</h2>
+                  <p className="text-gray-400 mt-2">まもなく当選者が発表されます</p>
+                </div>
+              );
+            }
+            return null;
+          })()}
+
           {/* アクションボタン */}
           <div className="flex gap-4 justify-center">
             {canEnter(event) && !event.has_entered && (
