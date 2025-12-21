@@ -82,9 +82,11 @@ export default function Navigation() {
             onClick={() => handleNavClick("/calendar")}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-white font-bold shadow-refined">
-              C
-            </div>
+            <img
+              src="https://chimpancommunity.com/src/icon/logo_no_txt.png"
+              alt="Logo"
+              className="w-9 h-9 rounded-lg shadow-refined"
+            />
             <span className="text-lg font-semibold hidden sm:block text-[var(--color-text-primary)]">ちんぱんコミュニティ</span>
           </button>
 
