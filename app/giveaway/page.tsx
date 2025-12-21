@@ -27,6 +27,7 @@ export default function GiveawayPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [events, setEvents] = useState<GiveawayEvent[]>([]);
+  const [allEvents, setAllEvents] = useState<GiveawayEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("active");
 
@@ -40,26 +41,63 @@ export default function GiveawayPage() {
     if (session) {
       fetchEvents();
     }
-  }, [session, statusFilter]);
+  }, [session]);
+
+  // ステータスフィルターが変更されたら、実際の日時に基づいてフィルタリング
+  useEffect(() => {
+    filterEvents();
+  }, [allEvents, statusFilter]);
 
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (statusFilter && statusFilter !== "all") {
-        params.append("status", statusFilter);
-      }
-
-      const res = await fetch(`/api/giveaway/events?${params}`);
+      // すべてのイベントを取得
+      const res = await fetch('/api/giveaway/events');
       if (res.ok) {
         const data = await res.json();
-        setEvents(data.events);
+        setAllEvents(data.events);
       }
     } catch (error) {
       console.error("Error fetching events:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const filterEvents = () => {
+    if (!allEvents) return;
+
+    const now = new Date();
+
+    const filtered = allEvents.filter((event) => {
+      const start = new Date(event.start_date);
+      const end = new Date(event.end_date);
+
+      // 実際のステータスを判定
+      let actualStatus = event.status;
+
+      if (actualStatus === 'drawn') {
+        actualStatus = 'drawn';
+      } else if (actualStatus === 'cancelled') {
+        actualStatus = 'cancelled';
+      } else if (actualStatus === 'active' || actualStatus === 'ended') {
+        if (now < start) {
+          actualStatus = 'draft';
+        } else if (now > end) {
+          actualStatus = 'ended';
+        } else {
+          actualStatus = 'active';
+        }
+      }
+
+      // フィルターに一致するか確認
+      if (statusFilter === 'all') {
+        return true;
+      }
+      return actualStatus === statusFilter;
+    });
+
+    setEvents(filtered);
   };
 
   const getStatusBadge = (event: GiveawayEvent) => {

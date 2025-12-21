@@ -14,7 +14,10 @@ export async function GET(
     // イベント情報取得
     const [events] = await pool.query(
       `SELECT
-        ge.*,
+        ge.id, ge.title, ge.description, ge.image_url, ge.created_by, ge.creator_name,
+        ge.show_creator, ge.total_winners, ge.status, ge.created_at, ge.updated_at, ge.drawn_at,
+        DATE_FORMAT(ge.start_date, '%Y-%m-%d %H:%i:%s') as start_date,
+        DATE_FORMAT(ge.end_date, '%Y-%m-%d %H:%i:%s') as end_date,
         (SELECT COUNT(*) FROM giveaway_entries WHERE event_id = ge.id) as entry_count,
         (SELECT COUNT(*) FROM giveaway_winners WHERE event_id = ge.id) as winner_count
        FROM giveaway_events ge
@@ -53,6 +56,19 @@ export async function GET(
         [eventId, session.user.id]
       );
       event.my_winnings = winners;
+    }
+
+    // 抽選済みの場合は全当選者を取得
+    if (event.status === 'drawn') {
+      const [allWinners] = await pool.query(
+        `SELECT gw.username, gp.name as prize_name
+         FROM giveaway_winners gw
+         JOIN giveaway_prizes gp ON gw.prize_id = gp.id
+         WHERE gw.event_id = ?
+         ORDER BY gp.display_order ASC, gw.created_at ASC`,
+        [eventId]
+      );
+      event.all_winners = allWinners;
     }
 
     return NextResponse.json({ event });
