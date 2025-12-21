@@ -20,12 +20,12 @@ export async function POST(request: Request) {
 
     // Find events that:
     // 1. Have status 'active' or 'ended'
-    // 2. End date is more than 1 hour ago
+    // 2. End date is more than 5 minutes ago
     // 3. Not yet drawn
     const [events] = await pool.query(
       `SELECT * FROM giveaway_events
        WHERE status IN ('active', 'ended')
-       AND end_date <= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+       AND end_date <= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
        AND (drawn_at IS NULL OR status != 'drawn')
        ORDER BY end_date ASC`,
       []
@@ -179,6 +179,57 @@ async function drawEvent(event: any) {
       }
     }
   );
+
+  // Discord Webhook送信（当選者発表）
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  if (webhookUrl && totalWinners > 0) {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'https://calendar.chimpancommunity.com';
+      const giveawayUrl = `${baseUrl}/giveaway/${event_id}`;
+
+      const webhookData = {
+        embeds: [{
+          title: "🎉 当選者が決定しました！",
+          description: `${event.title} の抽選が完了しました`,
+          color: 0x00FF00, // 緑色
+          fields: [
+            {
+              name: "企画名",
+              value: event.title,
+              inline: false
+            },
+            {
+              name: "当選者数",
+              value: `${totalWinners}名`,
+              inline: true
+            },
+            {
+              name: "総応募数",
+              value: `${entries.length}名`,
+              inline: true
+            },
+            {
+              name: "結果確認",
+              value: `[詳細を見る](${giveawayUrl})`,
+              inline: false
+            }
+          ],
+          timestamp: new Date().toISOString()
+        }]
+      };
+
+      await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(webhookData)
+      });
+
+      console.log(`Discord webhook sent for event ${event_id}`);
+    } catch (webhookError) {
+      console.error("Discord webhook error:", webhookError);
+      // Webhookエラーは無視（抽選自体は成功とする）
+    }
+  }
 
   return {
     event_id,

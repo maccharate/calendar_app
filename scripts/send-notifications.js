@@ -24,6 +24,7 @@ const pool = mysql.createPool({
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'raffle_db',
+  timezone: '+09:00',  // JST (日本標準時) を明示的に設定
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -53,6 +54,12 @@ async function sendAdvanceEventNotifications(now) {
   const tenMinutesLater = new Date(now.getTime() + 10 * 60 * 1000);
   const elevenMinutesLater = new Date(now.getTime() + 11 * 60 * 1000);
 
+  // デバッグログ: 時刻計算の確認
+  console.log('[DEBUG advance_start] now (UTC):', now.toISOString());
+  console.log('[DEBUG advance_start] now (JST):', now.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }));
+  console.log('[DEBUG advance_start] from (10min later UTC):', tenMinutesLater.toISOString());
+  console.log('[DEBUG advance_start] from (10min later JST):', tenMinutesLater.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }));
+
   const [events] = await pool.query(
     `SELECT id, title, starttime, img, link
      FROM calendar_events
@@ -61,6 +68,13 @@ async function sendAdvanceEventNotifications(now) {
        AND starttime < ?`,
     [tenMinutesLater, elevenMinutesLater]
   );
+
+  console.log(`[DEBUG advance_start] Found ${events.length} events`);
+  if (events.length > 0) {
+    events.forEach(event => {
+      console.log(`[DEBUG advance_start] Event: id=${event.id}, title=${event.title}, starttime=${event.starttime}`);
+    });
+  }
 
   for (const event of events) {
     await sendToInterestedUsers(event, 'advance_start', {
@@ -98,6 +112,14 @@ async function sendRaffleEndNotifications(now) {
   const thirtyMinutesLater = new Date(now.getTime() + 30 * 60 * 1000);
   const thirtyOneMinutesLater = new Date(now.getTime() + 31 * 60 * 1000);
 
+  // デバッグログ: 時刻計算の確認
+  console.log('[DEBUG raffle_end] now (UTC):', now.toISOString());
+  console.log('[DEBUG raffle_end] now (JST):', now.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }));
+  console.log('[DEBUG raffle_end] from (30min later UTC):', thirtyMinutesLater.toISOString());
+  console.log('[DEBUG raffle_end] from (30min later JST):', thirtyMinutesLater.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }));
+  console.log('[DEBUG raffle_end] to (31min later UTC):', thirtyOneMinutesLater.toISOString());
+  console.log('[DEBUG raffle_end] to (31min later JST):', thirtyOneMinutesLater.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }));
+
   const [events] = await pool.query(
     `SELECT id, title, endtime, img, link
      FROM calendar_events
@@ -106,6 +128,13 @@ async function sendRaffleEndNotifications(now) {
        AND endtime < ?`,
     [thirtyMinutesLater, thirtyOneMinutesLater]
   );
+
+  console.log(`[DEBUG raffle_end] Found ${events.length} events`);
+  if (events.length > 0) {
+    events.forEach(event => {
+      console.log(`[DEBUG raffle_end] Event: id=${event.id}, title=${event.title}, endtime=${event.endtime}`);
+    });
+  }
 
   for (const event of events) {
     await sendToInterestedUsers(event, 'raffle_end', {
