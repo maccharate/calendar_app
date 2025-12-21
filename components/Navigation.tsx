@@ -36,12 +36,18 @@ export default function Navigation() {
         const data = await res.json();
         const now = new Date();
 
-        // 未応募かつ応募期間中のイベントをカウント
+        // 現在のユーザーIDを取得
+        const sessionRes = await fetch("/api/auth/session");
+        const session = await sessionRes.json();
+        const currentUserId = session?.user?.id;
+
+        // 未応募かつ応募期間中かつ作成者でないイベントをカウント
         const count = data.events.filter((event: any) => {
           const start = new Date(event.start_date);
           const end = new Date(event.end_date);
           const isActive = now >= start && now <= end;
-          return !event.user_entered && isActive;
+          const isNotCreator = currentUserId && event.created_by !== currentUserId;
+          return !event.user_entered && isActive && isNotCreator;
         }).length;
 
         setUnenteredGiveawayCount(count);
