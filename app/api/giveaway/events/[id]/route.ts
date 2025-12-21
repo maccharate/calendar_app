@@ -65,7 +65,7 @@ export async function GET(
          FROM giveaway_winners gw
          JOIN giveaway_prizes gp ON gw.prize_id = gp.id
          WHERE gw.event_id = ?
-         ORDER BY gp.display_order ASC, gw.created_at ASC`,
+         ORDER BY gp.display_order ASC, gw.id ASC`,
         [eventId]
       );
       event.all_winners = allWinners;
