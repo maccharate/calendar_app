@@ -230,6 +230,34 @@ export default function SettingsPage() {
           </h1>
 
           <div className="space-y-6">
+            {/* 販売先・手数料設定リンク */}
+            <button
+              onClick={() => router.push("/settings/platforms")}
+              className="w-full bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-blue-500/50 transition-colors text-left"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold mb-2 text-blue-400">販売先・手数料設定</h2>
+                  <p className="text-sm text-gray-400">
+                    各販売先の手数料率をカスタマイズしたり、新しい販売先を申請できます
+                  </p>
+                </div>
+                <svg
+                  className="w-6 h-6 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </div>
+            </button>
+
             {/* 応募設定 */}
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
               <h2 className="text-xl font-bold mb-4 text-blue-400">応募設定</h2>

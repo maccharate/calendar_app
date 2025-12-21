@@ -76,7 +76,7 @@ export default function Navigation() {
   return (
     <nav className="bg-surface-secondary/95 backdrop-blur-sm border-b border-[var(--color-border-subtle)] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* ロゴ */}
           <button
             onClick={() => handleNavClick("/calendar")}
@@ -85,9 +85,9 @@ export default function Navigation() {
             <img
               src="https://chimpancommunity.com/src/icon/logo_no_txt.png"
               alt="Logo"
-              className="w-9 h-9 rounded-lg shadow-refined"
+              className="w-8 h-8 rounded-lg shadow-refined"
             />
-            <span className="text-lg font-semibold hidden sm:block text-[var(--color-text-primary)]">ちんぱんコミュニティ</span>
+            <span className="text-base font-semibold hidden sm:block text-[var(--color-text-primary)]">ちんぱんコミュニティ</span>
           </button>
 
           {/* デスクトップメニュー */}
