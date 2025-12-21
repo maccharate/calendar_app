@@ -395,7 +395,7 @@ export default function CalendarPage() {
         const notification = document.createElement("div");
         notification.className =
           "fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-[100] animate-fade-in";
-        notification.textContent = "✓ 応募しました!";
+        notification.textContent = commentData.event_type === 'advance' ? "✓ 狙いました!" : "✓ 応募しました!";
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 3000);
 
@@ -405,7 +405,7 @@ export default function CalendarPage() {
         await fetchEvents();
         await fetchEventStats();
       } else {
-        alert("応募に失敗しました");
+        alert(commentData.event_type === 'advance' ? "登録に失敗しました" : "応募に失敗しました");
       }
     } catch (error) {
       console.error(error);
@@ -417,7 +417,7 @@ export default function CalendarPage() {
   const handleApplyClick = (event: EventType) => {
     // モーダル非表示設定の場合、即座に1口応募
     if (!userSettings.show_application_modal) {
-      handleQuickApply(event.id);
+      handleQuickApply(event.id, event.extendedProps?.event_type);
       return;
     }
 
@@ -434,7 +434,7 @@ export default function CalendarPage() {
   };
 
   // ワンクリック応募
-  const handleQuickApply = async (raffleId: string) => {
+  const handleQuickApply = async (raffleId: string, eventType?: string) => {
     try {
       const res = await fetch("/api/raffle/apply", {
         method: "POST",
@@ -450,7 +450,7 @@ export default function CalendarPage() {
         const notification = document.createElement("div");
         notification.className =
           "fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-[100] animate-fade-in";
-        notification.textContent = "✓ 1口応募しました!";
+        notification.textContent = eventType === 'advance' ? "✓ 狙いました!" : "✓ 1口応募しました!";
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 3000);
 
@@ -458,7 +458,7 @@ export default function CalendarPage() {
         await fetchEvents();
         await fetchEventStats();
       } else {
-        alert("応募に失敗しました");
+        alert(eventType === 'advance' ? "登録に失敗しました" : "応募に失敗しました");
       }
     } catch (error) {
       console.error(error);
@@ -848,7 +848,7 @@ export default function CalendarPage() {
                           <div className="space-y-1">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="px-2 py-0.5 bg-green-500/20 text-green-300 text-xs rounded border border-green-500/50">
-                                応募済み {event.extendedProps?.application_count && event.extendedProps.application_count > 1 && `(${event.extendedProps.application_count}口)`}
+                                {event.extendedProps?.event_type === 'advance' ? '狙っています' : '応募済み'} {event.extendedProps?.application_count && event.extendedProps.application_count > 1 && `(${event.extendedProps.application_count}口)`}
                               </span>
                               {event.extendedProps?.lottery_number && (
                                 <span className="text-xs text-gray-400">
@@ -954,7 +954,7 @@ export default function CalendarPage() {
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="px-2 py-0.5 bg-green-500/20 text-green-300 text-xs rounded border border-green-500/50">
-                              応募済み
+                              {event.extendedProps?.event_type === 'advance' ? '狙っています' : '応募済み'}
                             </span>
                             {event.extendedProps?.lottery_number && (
                               <span className="text-xs text-gray-400">
@@ -1338,7 +1338,7 @@ export default function CalendarPage() {
                   <div className="bg-green-900/20 border border-green-800 rounded-lg p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <h3 className="font-bold text-green-400">
-                        応募済み
+                        {selectedEvent.extendedProps?.event_type === 'advance' ? '狙っています' : '応募済み'}
                       </h3>
                       <button
                         onClick={() => {
