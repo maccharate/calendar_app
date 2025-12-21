@@ -1253,20 +1253,26 @@ export default function CalendarPage() {
                   </div>
                 )}
 
-                {/* 応募統計 */}
+                {/* 応募統計 / 狙っている人数 */}
                 {eventStats[selectedEvent.id] && (
                   <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-                    <h3 className="text-sm font-semibold text-blue-400 mb-3">応募統計</h3>
+                    <h3 className="text-sm font-semibold text-blue-400 mb-3">
+                      {selectedEvent.extendedProps?.event_type === 'advance' ? '狙っている人数' : '応募統計'}
+                    </h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-gray-400 text-xs">総応募数</p>
+                        <p className="text-gray-400 text-xs">
+                          {selectedEvent.extendedProps?.event_type === 'advance' ? '総ターゲット数' : '総応募数'}
+                        </p>
                         <p className="text-2xl font-bold">
                           {eventStats[selectedEvent.id].total_applications}
                           <span className="text-sm text-gray-400 ml-1">件</span>
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-400 text-xs">応募者数</p>
+                        <p className="text-gray-400 text-xs">
+                          {selectedEvent.extendedProps?.event_type === 'advance' ? '狙っている人数' : '応募者数'}
+                        </p>
                         <p className="text-2xl font-bold">
                           {eventStats[selectedEvent.id].unique_users}
                           <span className="text-sm text-gray-400 ml-1">人</span>
@@ -1276,7 +1282,9 @@ export default function CalendarPage() {
                     {eventStats[selectedEvent.id].total_applications >
                       eventStats[selectedEvent.id].unique_users && (
                         <p className="text-xs text-gray-500 mt-2">
-                          ※ 複数回応募している人がいます
+                          {selectedEvent.extendedProps?.event_type === 'advance'
+                            ? '※ 複数回狙っている人がいます'
+                            : '※ 複数回応募している人がいます'}
                         </p>
                       )}
                   </div>
