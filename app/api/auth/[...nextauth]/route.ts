@@ -17,6 +17,9 @@ export const authOptions = {
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
     }),
   ],
+  pages: {
+    signIn: "/auth/signin",
+  },
   callbacks: {
     // Discord メンバー判定 + 管理者判定 → JWT に保存
     async jwt({ token, account }: any) {
