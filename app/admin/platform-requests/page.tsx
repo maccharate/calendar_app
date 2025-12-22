@@ -32,15 +32,23 @@ export default function AdminPlatformRequestsPage() {
   const fetchRequests = async () => {
     try {
       const res = await fetch("/api/admin/platform-requests");
+      console.log("API Response status:", res.status);
+
       if (res.ok) {
         const data = await res.json();
-        setRequests(data.requests);
+        console.log("API Response data:", data);
+        setRequests(data.requests || []);
       } else if (res.status === 403) {
         alert("管理者権限が必要です");
         router.push("/");
+      } else {
+        const errorData = await res.json();
+        console.error("API Error:", errorData);
+        alert(`エラー: ${errorData.error || 'データ取得に失敗しました'}`);
       }
     } catch (error) {
       console.error("Error fetching requests:", error);
+      alert(`エラー: ${error}`);
     } finally {
       setLoading(false);
     }
