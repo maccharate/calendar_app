@@ -291,6 +291,15 @@ export default function Navigation() {
                       >
                         アクティビティ
                       </button>
+                      <button
+                        onClick={() => {
+                          handleNavClick("/admin/platform-requests");
+                          setShowAdminMenu(false);
+                        }}
+                        className="px-4 py-2 rounded-md text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-surface-tertiary text-left transition-colors text-sm"
+                      >
+                        販売先リクエスト
+                      </button>
                     </div>
                   )}
                 </>
