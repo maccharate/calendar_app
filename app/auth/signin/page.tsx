@@ -45,23 +45,15 @@ function SignInContent() {
       <div className="max-w-md w-full">
         {/* Logo and App Name */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-            <svg
-              className="w-12 h-12 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
+          <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+            <img
+              src="https://chimpancommunity.com/src/icon/logo_no_txt.png"
+              alt="ちんぱんコミュニティ"
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-3xl font-bold mb-2">ちんぱんコミュニティ</h1>
-          <p className="text-gray-400">カレンダー&抽選アプリ</p>
+          <p className="text-gray-400">カレンダーアプリ</p>
         </div>
 
         {/* Error Message */}
