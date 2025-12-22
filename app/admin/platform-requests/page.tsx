@@ -14,8 +14,6 @@ interface PlatformRequest {
   reviewed_at: string | null;
   reviewed_by: number | null;
   review_note: string | null;
-  requested_by_username: string;
-  reviewed_by_username: string | null;
 }
 
 export default function AdminPlatformRequestsPage() {
@@ -140,7 +138,7 @@ export default function AdminPlatformRequestsPage() {
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{request.platform_name}</h3>
                         <div className="space-y-1 text-sm text-gray-400">
-                          <p>申請者: {request.requested_by_username}</p>
+                          <p>申請者ID: {request.user_id}</p>
                           <p>手数料率: {request.default_fee_rate}%</p>
                           <p>
                             申請日: {new Date(request.requested_at).toLocaleDateString('ja-JP', {
@@ -223,13 +221,13 @@ export default function AdminPlatformRequestsPage() {
                           </span>
                         </div>
                         <div className="space-y-1 text-sm text-gray-400">
-                          <p>申請者: {request.requested_by_username}</p>
+                          <p>申請者ID: {request.user_id}</p>
                           <p>手数料率: {request.default_fee_rate}%</p>
                           <p>
                             処理日: {request.reviewed_at ? new Date(request.reviewed_at).toLocaleDateString('ja-JP') : '-'}
                           </p>
-                          {request.reviewed_by_username && (
-                            <p>処理者: {request.reviewed_by_username}</p>
+                          {request.reviewed_by && (
+                            <p>処理者ID: {request.reviewed_by}</p>
                           )}
                         </div>
                         {request.review_note && (

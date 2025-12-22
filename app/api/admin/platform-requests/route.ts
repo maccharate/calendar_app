@@ -34,12 +34,8 @@ export async function GET() {
         pr.requested_at,
         pr.reviewed_at,
         pr.reviewed_by,
-        pr.review_note,
-        u.username as requested_by_username,
-        reviewer.username as reviewed_by_username
+        pr.review_note
        FROM platform_requests pr
-       LEFT JOIN users u ON pr.user_id = u.id
-       LEFT JOIN users reviewer ON pr.reviewed_by = reviewer.id
        ORDER BY
          CASE pr.status
            WHEN 'pending' THEN 1
