@@ -24,6 +24,9 @@ export default function NewEventPage() {
     link: "",
     img: "",
     event_type: "raffle",
+    min_points_required: 0,
+    points_requirement_type: "none",
+    requirement_message: "",
   });
 
   // 画像ギャラリー
@@ -398,6 +401,63 @@ export default function NewEventPage() {
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* 応募条件（ポイント） */}
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
+              <h2 className="text-xl font-bold mb-4 text-purple-400">応募条件（アクティビティポイント）</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">ポイント制限</label>
+                  <select
+                    value={formData.points_requirement_type}
+                    onChange={(e) => setFormData({ ...formData, points_requirement_type: e.target.value })}
+                    className="w-full px-4 py-2 bg-gray-700/50 rounded-lg border border-gray-600/50 focus:border-purple-500/50 focus:outline-none"
+                  >
+                    <option value="none">制限なし（全員応募可能）</option>
+                    <option value="current_month">今月のポイント</option>
+                    <option value="previous_month">前月のポイント</option>
+                    <option value="all_time">累計ポイント</option>
+                  </select>
+                  <p className="text-xs text-gray-400 mt-1">
+                    ポイント: ログイン5pt/日、応募1pt/回
+                  </p>
+                </div>
+
+                {formData.points_requirement_type !== 'none' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        必要ポイント
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={formData.min_points_required}
+                        onChange={(e) => setFormData({ ...formData, min_points_required: parseInt(e.target.value) || 0 })}
+                        className="w-full px-4 py-2 bg-gray-700/50 rounded-lg border border-gray-600/50 focus:border-purple-500/50 focus:outline-none"
+                        placeholder="例: 30"
+                      />
+                      <p className="text-xs text-gray-400 mt-1">
+                        このポイント以上のユーザーのみ応募可能
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        条件未達時のメッセージ（任意）
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.requirement_message}
+                        onChange={(e) => setFormData({ ...formData, requirement_message: e.target.value })}
+                        className="w-full px-4 py-2 bg-gray-700/50 rounded-lg border border-gray-600/50 focus:border-purple-500/50 focus:outline-none"
+                        placeholder="例: このイベントは前月30pt以上のアクティブユーザー限定です"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

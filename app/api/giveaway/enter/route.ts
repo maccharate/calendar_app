@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { pool } from "../../../../lib/db";
 import { logActivity } from "../../../../lib/activityLogger";
+import { checkPointsEligibility } from "../../../../lib/activityPoints";
 
 export async function POST(request: Request) {
   try {
@@ -16,7 +17,9 @@ export async function POST(request: Request) {
 
     // イベント存在確認
     const [events] = await pool.query(
-      `SELECT id, status, start_date, end_date, created_by FROM giveaway_events WHERE id = ?`,
+      `SELECT id, status, start_date, end_date, created_by,
+              min_points_required, points_requirement_type, requirement_message
+       FROM giveaway_events WHERE id = ?`,
       [event_id]
     ) as any;
 
@@ -57,6 +60,21 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
+    // ポイント要件チェック
+    const { eligible, userPoints, message } = await checkPointsEligibility(
+      session.user.id,
+      event.min_points_required || 0,
+      event.points_requirement_type || 'none'
+    );
+
+    if (!eligible) {
+      return NextResponse.json({
+        error: event.requirement_message || message || "ポイント要件を満たしていません",
+        userPoints,
+        required: event.min_points_required
+      }, { status: 403 });
+    }
+
     // 重複チェック
     const [existing] = await pool.query(
       `SELECT id FROM giveaway_entries WHERE event_id = ? AND user_id = ?`,
@@ -82,6 +100,19 @@ export async function POST(request: Request) {
        SET total_entries = (SELECT COUNT(*) FROM giveaway_entries WHERE event_id = ?)
        WHERE id = ?`,
       [event_id, event_id]
+    );
+
+    // アクティビティポイント加算（応募で1pt）
+    const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    await pool.execute(
+      `INSERT INTO user_monthly_activity
+        (user_id, year_month, application_count, total_points, updated_at)
+       VALUES (?, ?, 1, 1, NOW())
+       ON DUPLICATE KEY UPDATE
+         application_count = application_count + 1,
+         total_points = total_points + 1,
+         updated_at = NOW()`,
+      [session.user.id, yearMonth]
     );
 
     // アクティビティログ
