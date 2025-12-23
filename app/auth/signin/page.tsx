@@ -97,7 +97,25 @@ function SignInContent() {
           </button>
 
           <p className="text-xs text-gray-500 text-center mt-6">
-            ログインすることで、利用規約とプライバシーポリシーに同意したものとみなされます。
+            ログインすることで、
+            <a
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 underline mx-1"
+            >
+              利用規約
+            </a>
+            と
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 underline mx-1"
+            >
+              プライバシーポリシー
+            </a>
+            に同意したものとみなされます。
           </p>
         </div>
 
