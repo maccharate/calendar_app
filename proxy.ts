@@ -9,6 +9,8 @@ const PUBLIC_PATHS = [
   '/auth',            // ← ログイン画面など auth 配下は認証不要
   '/api/auth',
   '/api/giveaway/auto-draw',  // ← cron用の自動抽選API（独自のAPIキー認証を使用）
+  '/privacy',         // ← プライバシーポリシー
+  '/terms',           // ← 利用規約
   '/offline',
   '/_next',
   '/favicon.ico',
