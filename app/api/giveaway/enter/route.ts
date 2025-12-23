@@ -102,19 +102,6 @@ export async function POST(request: Request) {
       [event_id, event_id]
     );
 
-    // アクティビティポイント加算（応募で1pt）
-    const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    await pool.execute(
-      `INSERT INTO user_monthly_activity
-        (user_id, year_month, application_count, total_points, updated_at)
-       VALUES (?, ?, 1, 1, NOW())
-       ON DUPLICATE KEY UPDATE
-         application_count = application_count + 1,
-         total_points = total_points + 1,
-         updated_at = NOW()`,
-      [session.user.id, yearMonth]
-    );
-
     // アクティビティログ
     await logActivity(
       session.user.id,
