@@ -38,13 +38,14 @@ export async function POST(request: Request) {
 
     const currentCount = existing[0].count;
     const needed = application_count - currentCount;
+    const isFirstApplication = currentCount === 0;
 
     if (needed > 0) {
       // 不足分を追加
       for (let i = 0; i < needed; i++) {
         await pool.execute(
-          `INSERT INTO raffle_status 
-           (user_id, raffle_id, status, result_status, lottery_number, application_comment, applied, applied_at) 
+          `INSERT INTO raffle_status
+           (user_id, raffle_id, status, result_status, lottery_number, application_comment, applied, applied_at)
            VALUES (?, ?, 'pending', 'pending', ?, ?, 1, NOW())`,
           [
             userId,
@@ -102,6 +103,22 @@ export async function POST(request: Request) {
         request,
       }
     );
+
+    // アクティビティポイント加算（初回応募時のみ1pt）
+    if (isFirstApplication) {
+      const now = new Date();
+      const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      await pool.execute(
+        `INSERT INTO user_monthly_activity
+          (user_id, year_month, application_count, total_points, updated_at)
+         VALUES (?, ?, 1, 1, NOW())
+         ON DUPLICATE KEY UPDATE
+           application_count = application_count + 1,
+           total_points = total_points + 1,
+           updated_at = NOW()`,
+        [userId, yearMonth]
+      );
+    }
 
     return NextResponse.json({
       success: true,
