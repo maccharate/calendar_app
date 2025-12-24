@@ -16,6 +16,7 @@ export async function GET(
       `SELECT
         ge.id, ge.title, ge.description, ge.image_url, ge.created_by, ge.creator_name,
         ge.show_creator, ge.total_winners, ge.status, ge.created_at, ge.updated_at, ge.drawn_at,
+        ge.min_points_required, ge.points_requirement_type, ge.requirement_message,
         DATE_FORMAT(ge.start_date, '%Y-%m-%d %H:%i:%s') as start_date,
         DATE_FORMAT(ge.end_date, '%Y-%m-%d %H:%i:%s') as end_date,
         (SELECT COUNT(*) FROM giveaway_entries WHERE event_id = ge.id) as entry_count,
@@ -142,7 +143,7 @@ export async function PUT(
 
     const { id: eventId } = await params;
     const body = await request.json();
-    const { title, description, image_url, show_creator, start_date, end_date, prizes, status } = body;
+    const { title, description, image_url, show_creator, start_date, end_date, prizes, status, min_points_required, points_requirement_type, requirement_message } = body;
 
     // イベントの作成者確認
     const [events] = await pool.query(
@@ -167,9 +168,10 @@ export async function PUT(
     await pool.execute(
       `UPDATE giveaway_events
        SET title = ?, description = ?, image_url = ?, show_creator = ?,
-           start_date = ?, end_date = ?, total_winners = ?, status = ?
+           start_date = ?, end_date = ?, total_winners = ?, status = ?,
+           min_points_required = ?, points_requirement_type = ?, requirement_message = ?
        WHERE id = ?`,
-      [title, description, image_url || null, show_creator !== false, start_date, end_date, totalWinners, status || 'active', eventId]
+      [title, description, image_url || null, show_creator !== false, start_date, end_date, totalWinners, status || 'active', min_points_required || 0, points_requirement_type || 'none', requirement_message || null, eventId]
     );
 
     // 既存の賞品を削除して再作成
