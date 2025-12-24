@@ -1,10 +1,17 @@
 // Service Worker for PWA
-const CACHE_NAME = 'chimpan-calendar-v4';
+const CACHE_NAME = 'chimpan-calendar-v5';
 const urlsToCache = [
   '/calendar',
   '/dashboard',
   '/offline',
 ];
+
+// SKIP_WAITINGメッセージを受信
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
 
 // インストール時にキャッシュを作成
 self.addEventListener('install', (event) => {
@@ -18,6 +25,7 @@ self.addEventListener('install', (event) => {
         console.log('Cache install error:', error);
       })
   );
+  // 新しいService Workerを即座にアクティブにする
   self.skipWaiting();
 });
 
@@ -33,9 +41,11 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
+    }).then(() => {
+      // すべてのクライアントで新しいService Workerを即座に使用
+      return self.clients.claim();
     })
   );
-  self.clients.claim();
 });
 
 // ネットワークリクエストの処理
@@ -66,7 +76,36 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // それ以外はキャッシュファースト戦略
+  // HTML、JavaScript、CSSファイルはネットワークファースト
+  if (url.pathname.endsWith('.html') ||
+      url.pathname.endsWith('.js') ||
+      url.pathname.endsWith('.css') ||
+      url.pathname === '/' ||
+      url.pathname.startsWith('/calendar') ||
+      url.pathname.startsWith('/giveaway') ||
+      url.pathname.startsWith('/dashboard') ||
+      url.pathname.startsWith('/_next/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // レスポンスが有効な場合はキャッシュに保存
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // ネットワークエラー時はキャッシュから返す
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // それ以外（画像など）はキャッシュファースト戦略
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

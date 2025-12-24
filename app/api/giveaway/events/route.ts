@@ -93,6 +93,9 @@ export async function POST(request: Request) {
       start_date,
       end_date,
       prizes, // 配列: [{ name, description, image_url, winner_count }]
+      min_points_required,
+      points_requirement_type,
+      requirement_message,
     } = data;
 
     // バリデーション
@@ -109,8 +112,8 @@ export async function POST(request: Request) {
     await pool.execute(
       `INSERT INTO giveaway_events
        (id, title, description, image_url, created_by, creator_name, show_creator,
-        start_date, end_date, status, total_winners)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`,
+        start_date, end_date, status, total_winners, min_points_required, points_requirement_type, requirement_message)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)`,
       [
         eventId,
         title,
@@ -121,7 +124,10 @@ export async function POST(request: Request) {
         show_creator !== false, // デフォルトtrue
         start_date,
         end_date,
-        totalWinners
+        totalWinners,
+        min_points_required || 0,
+        points_requirement_type || 'none',
+        requirement_message || null,
       ]
     );
 

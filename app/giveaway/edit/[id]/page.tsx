@@ -45,6 +45,11 @@ export default function EditGiveawayPage() {
   const [endDate, setEndDate] = useState("");
   const [prizes, setPrizes] = useState<Prize[]>([]);
 
+  // 応募条件
+  const [minPointsRequired, setMinPointsRequired] = useState(0);
+  const [pointsRequirementType, setPointsRequirementType] = useState<'none' | 'current_month' | 'previous_month' | 'all_time'>('none');
+  const [requirementMessage, setRequirementMessage] = useState("");
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/");
@@ -83,6 +88,11 @@ export default function EditGiveawayPage() {
         setEndDate(formatDateForInput(ev.end_date));
 
         setPrizes(ev.prizes || [{ name: "", description: "", image_url: "", winner_count: 1 }]);
+
+        // 応募条件
+        setMinPointsRequired(ev.min_points_required || 0);
+        setPointsRequirementType(ev.points_requirement_type || 'none');
+        setRequirementMessage(ev.requirement_message || "");
       } else if (res.status === 404) {
         alert("イベントが見つかりません");
         router.push("/giveaway");
@@ -134,6 +144,14 @@ export default function EditGiveawayPage() {
       return;
     }
 
+    // ポイント要件のバリデーション
+    if (pointsRequirementType !== 'none') {
+      if (minPointsRequired < 0 || isNaN(minPointsRequired)) {
+        alert("最低必要ポイントは0以上の数値を入力してください");
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       const res = await fetch(`/api/giveaway/events/${eventId}`, {
@@ -147,6 +165,9 @@ export default function EditGiveawayPage() {
           start_date: startDate,
           end_date: endDate,
           prizes,
+          min_points_required: minPointsRequired,
+          points_requirement_type: pointsRequirementType,
+          requirement_message: requirementMessage,
         }),
       });
 
@@ -303,6 +324,69 @@ export default function EditGiveawayPage() {
                 </div>
               </div>
             </div>
+
+            {/* 応募条件（条件がある場合のみ表示） */}
+            {(minPointsRequired > 0 || pointsRequirementType !== 'none') && (
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
+                <h2 className="text-xl font-bold mb-4">応募条件（オプション）</h2>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">
+                      ポイント要件の種類
+                    </label>
+                    <select
+                      value={pointsRequirementType}
+                      onChange={(e) => setPointsRequirementType(e.target.value as any)}
+                      className="w-full bg-gray-900/70 border-2 border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500"
+                    >
+                      <option value="none">なし（誰でも応募可能）</option>
+                      <option value="current_month">今月のポイント</option>
+                      <option value="previous_month">前月のポイント</option>
+                      <option value="all_time">累計ポイント</option>
+                    </select>
+                  </div>
+
+                  {pointsRequirementType !== 'none' && (
+                    <>
+                      <div>
+                        <label className="block text-sm text-gray-400 mb-2">
+                          最低必要ポイント
+                        </label>
+                        <input
+                          type="text"
+                          value={minPointsRequired}
+                          onChange={(e) => setMinPointsRequired(parseInt(e.target.value) || 0)}
+                          className="w-full bg-gray-900/70 border-2 border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500"
+                          placeholder="例: 10"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm text-gray-400 mb-2">
+                          カスタムメッセージ（オプション）
+                        </label>
+                        <textarea
+                          value={requirementMessage}
+                          onChange={(e) => setRequirementMessage(e.target.value)}
+                          className="w-full bg-gray-900/70 border-2 border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500"
+                          rows={2}
+                          placeholder="ポイント不足時に表示されるメッセージ"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className="text-sm text-gray-400 bg-gray-900/50 rounded-lg p-4">
+                    <p className="font-semibold mb-2">💡 ポイントについて</p>
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>ログイン: 5ポイント/日</li>
+                      <li>イベント応募: 1ポイント/イベント</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* 賞品設定 */}
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">

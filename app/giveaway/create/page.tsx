@@ -174,6 +174,14 @@ export default function CreateGiveawayPage() {
       return;
     }
 
+    // ポイント要件のバリデーション
+    if (pointsRequirementType !== 'none') {
+      if (minPointsRequired < 0 || isNaN(minPointsRequired)) {
+        alert("最低必要ポイントは0以上の数値を入力してください");
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/giveaway/events", {
