@@ -59,8 +59,8 @@ interface StorageImage {
   uploadedAt: string;
 }
 
-// プラットフォームごとの手数料率（%）
-const PLATFORM_FEE_RATES: Record<string, number> = {
+// プラットフォームごとのデフォルト手数料率（%）
+const DEFAULT_PLATFORM_FEE_RATES: Record<string, number> = {
   'Mercari': 10,        // メルカリ 10%
   'SNKRDUNK': 9.5,      // スニダン 9.5%
   'StockX': 12,         // StockX 約12%（為替・配送により変動）
@@ -71,6 +71,7 @@ const PLATFORM_FEE_RATES: Record<string, number> = {
 
 export default function HistoryPage() {
   const [events, setEvents] = useState<HistoryEvent[]>([]);
+  const [platformFeeRates, setPlatformFeeRates] = useState<Record<string, number>>(DEFAULT_PLATFORM_FEE_RATES);
   const [stats, setStats] = useState<HistoryStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<HistoryEvent | null>(null);
@@ -134,7 +135,29 @@ export default function HistoryPage() {
   useEffect(() => {
     fetchHistory();
     fetchTemplates();
+    fetchPlatformFees();
   }, []);
+
+  const fetchPlatformFees = async () => {
+    try {
+      const res = await fetch("/api/user/platform-fees");
+      if (res.ok) {
+        const data = await res.json();
+        const customRates: Record<string, number> = {};
+
+        // APIから取得したプラットフォーム手数料率をマッピング
+        data.platforms.forEach((platform: { name: string; fee_rate: number }) => {
+          customRates[platform.name] = platform.fee_rate;
+        });
+
+        // デフォルト値とマージ
+        setPlatformFeeRates({ ...DEFAULT_PLATFORM_FEE_RATES, ...customRates });
+      }
+    } catch (error) {
+      console.error("Error fetching platform fees:", error);
+      // エラー時はデフォルト値を使用
+    }
+  };
 
   const fetchHistory = async () => {
     try {
@@ -264,7 +287,7 @@ export default function HistoryPage() {
 
     // プラットフォームが選択されていて、売却価格が入力されている場合
     if (platform && salePrice > 0) {
-      const feeRate = PLATFORM_FEE_RATES[platform];
+      const feeRate = platformFeeRates[platform];
       if (feeRate !== undefined && feeRate > 0) {
         const calculatedFee = Math.floor(salePrice * (feeRate / 100));
         setEditForm(prev => ({
@@ -273,7 +296,7 @@ export default function HistoryPage() {
         }));
       }
     }
-  }, [editForm.platform, editForm.sale_price]);
+  }, [editForm.platform, editForm.sale_price, platformFeeRates]);
 
   // 結果入力モーダルを開く
   const handleResultClick = (event: HistoryEvent) => {

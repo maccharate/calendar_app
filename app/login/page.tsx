@@ -41,7 +41,7 @@ export default function LoginPage() {
               alt="Chimpan Logo"
               width={120}
               height={120}
-              className="relative rounded-full border-2 border-blue-500/30 group-hover:border-blue-400/70 transition-all duration-500"
+              className="relative rounded-3xl border-2 border-blue-500/30 group-hover:border-blue-400/70 transition-all duration-500"
             />
           </div>
           <h1 className="text-3xl font-extrabold mt-8 font-semibold text-[var(--color-text-primary)] animate-[gradient_5s_infinite]">
