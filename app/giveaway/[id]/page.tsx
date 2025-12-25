@@ -42,6 +42,9 @@ interface GiveawayEvent {
   has_entered: boolean;
   my_winnings: Winning[];
   all_winners?: Winner[];  // 全当選者リスト（抽選済みの場合のみ）
+  min_points_required?: number;
+  points_requirement_type?: 'none' | 'current_month' | 'previous_month' | 'all_time';
+  requirement_message?: string;
 }
 
 export default function GiveawayDetailPage() {
@@ -376,6 +379,33 @@ export default function GiveawayDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* 応募条件 */}
+          {event.points_requirement_type && event.points_requirement_type !== 'none' && event.min_points_required && event.min_points_required > 0 && (
+            <div className="bg-purple-900/20 backdrop-blur-sm rounded-xl p-6 border border-purple-700/50 mb-6">
+              <h3 className="text-xl font-bold mb-3 text-purple-400">📋 応募条件</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">⭐</span>
+                  <div>
+                    <p className="text-white font-medium text-lg">
+                      必要ポイント: <span className="text-purple-400 font-bold">{event.min_points_required}pt</span>
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      {event.points_requirement_type === 'current_month' && '今月のアクティビティポイント'}
+                      {event.points_requirement_type === 'previous_month' && '前月のアクティビティポイント'}
+                      {event.points_requirement_type === 'all_time' && '累計アクティビティポイント'}
+                    </p>
+                  </div>
+                </div>
+                {event.requirement_message && (
+                  <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
+                    <p className="text-gray-300 whitespace-pre-wrap">{event.requirement_message}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* 応募状態 */}
           {event.has_entered && (
