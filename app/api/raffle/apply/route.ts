@@ -128,8 +128,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("Error applying:", error);
     return NextResponse.json({
-      error: "Failed to apply",
-      details: error.message
+      error: "応募処理に失敗しました。しばらくしてから再度お試しください。"
     }, { status: 500 });
   }
 }
@@ -155,8 +154,7 @@ export async function DELETE(request: Request) {
   } catch (error: any) {
     console.error("Error deleting application:", error);
     return NextResponse.json({
-      error: "Failed to delete application",
-      details: error.message
+      error: "削除処理に失敗しました。しばらくしてから再度お試しください。"
     }, { status: 500 });
   }
 }

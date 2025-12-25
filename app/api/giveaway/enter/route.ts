@@ -122,8 +122,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("Error entering giveaway:", error);
     return NextResponse.json({
-      error: "Failed to enter giveaway",
-      details: error.message
+      error: "応募処理に失敗しました。しばらくしてから再度お試しください。"
     }, { status: 500 });
   }
 }
@@ -187,8 +186,7 @@ export async function DELETE(request: Request) {
   } catch (error: any) {
     console.error("Error canceling entry:", error);
     return NextResponse.json({
-      error: "Failed to cancel entry",
-      details: error.message
+      error: "キャンセル処理に失敗しました。しばらくしてから再度お試しください。"
     }, { status: 500 });
   }
 }
