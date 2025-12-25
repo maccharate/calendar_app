@@ -218,6 +218,15 @@ export default function HistoryPage() {
 
   // フィルタリングロジック
   const filteredEvents = events.filter(event => {
+    // デバッグログ
+    if (filter === 'lost') {
+      console.log('[Filter Debug]', {
+        title: event.title,
+        result_status: event.result_status,
+        passes: (event.result_status === 'lost' || event.result_status === 'not_purchased')
+      });
+    }
+
     // 結果ステータスフィルター
     if (filter === 'won' && !(event.result_status === 'won' || event.result_status === 'partial' || event.result_status === 'purchased')) {
       return false;
