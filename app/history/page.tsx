@@ -1016,11 +1016,11 @@ export default function HistoryPage() {
                             className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all shadow-inner"
                           >
                             <option value="">選択してください</option>
-                            <option value="Mercari">メルカリ（手数料 10%）</option>
-                            <option value="SNKRDUNK">スニダン（手数料 9.5%）</option>
-                            <option value="StockX">StockX（手数料 12%）</option>
-                            <option value="YahooAuctions">ヤフオク（手数料 10%）</option>
-                            <option value="Rakuma">ラクマ（手数料 6.6%）</option>
+                            <option value="Mercari">メルカリ（手数料 {platformFeeRates['Mercari']}%）</option>
+                            <option value="SNKRDUNK">スニダン（手数料 {platformFeeRates['SNKRDUNK']}%）</option>
+                            <option value="StockX">StockX（手数料 {platformFeeRates['StockX']}%）</option>
+                            <option value="YahooAuctions">ヤフオク（手数料 {platformFeeRates['YahooAuctions']}%）</option>
+                            <option value="Rakuma">ラクマ（手数料 {platformFeeRates['Rakuma']}%）</option>
                             <option value="Other">その他（手動入力）</option>
                           </select>
                           <p className="text-xs text-gray-500 mt-2 bg-purple-500/5 p-2 rounded-lg border border-purple-500/20">
@@ -1554,11 +1554,11 @@ export default function HistoryPage() {
                           className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all shadow-inner"
                         >
                           <option value="">選択してください</option>
-                          <option value="Mercari">メルカリ（手数料 10%）</option>
-                          <option value="SNKRDUNK">スニダン（手数料 9.5%）</option>
-                          <option value="StockX">StockX（手数料 12%）</option>
-                          <option value="YahooAuctions">ヤフオク（手数料 10%）</option>
-                          <option value="Rakuma">ラクマ（手数料 6.6%）</option>
+                          <option value="Mercari">メルカリ（手数料 {platformFeeRates['Mercari']}%）</option>
+                          <option value="SNKRDUNK">スニダン（手数料 {platformFeeRates['SNKRDUNK']}%）</option>
+                          <option value="StockX">StockX（手数料 {platformFeeRates['StockX']}%）</option>
+                          <option value="YahooAuctions">ヤフオク（手数料 {platformFeeRates['YahooAuctions']}%）</option>
+                          <option value="Rakuma">ラクマ（手数料 {platformFeeRates['Rakuma']}%）</option>
                           <option value="Other">その他（手動入力）</option>
                         </select>
                         <p className="text-xs text-gray-500 mt-2 bg-purple-500/5 p-2 rounded-lg border border-purple-500/20">
