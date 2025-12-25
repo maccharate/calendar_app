@@ -66,7 +66,17 @@ export async function checkPointsEligibility(
 
   try {
     const [rows] = await pool.query(query, params);
-    const userPoints = parseInt((rows as any[])[0].points);
+
+    console.log('[checkPointsEligibility] Query result rows:', rows);
+
+    // データがない場合も考慮
+    if (!rows || (rows as any[]).length === 0) {
+      console.log('[checkPointsEligibility] No data found - userPoints: 0');
+      const message = `応募には${requirementType === 'current_month' ? '今月' : requirementType === 'previous_month' ? '前月' : '累計'}${minPointsRequired}pt以上必要です（現在: 0pt、あと${minPointsRequired}pt必要）`;
+      return { eligible: false, userPoints: 0, message };
+    }
+
+    const userPoints = parseInt((rows as any[])[0].points) || 0;
 
     const eligible = userPoints >= minPointsRequired;
     const shortfall = eligible ? 0 : minPointsRequired - userPoints;
@@ -83,12 +93,23 @@ export async function checkPointsEligibility(
 
     return { eligible, userPoints, message };
   } catch (error) {
-    console.error('[checkPointsEligibility] Error:', error);
-    // エラー時は条件を確認できないので応募不可にする（安全側に変更）
+    console.error('[checkPointsEligibility] Error details:', error);
+    console.error('[checkPointsEligibility] Query was:', query);
+    console.error('[checkPointsEligibility] Params were:', params);
+
+    // テーブルが存在しない場合のエラーチェック
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("doesn't exist") || errorMessage.includes("Table") || errorMessage.includes("table")) {
+      console.error('[checkPointsEligibility] Table does not exist - treating as 0 points');
+      const message = `応募には${requirementType === 'current_month' ? '今月' : requirementType === 'previous_month' ? '前月' : '累計'}${minPointsRequired}pt以上必要です（現在: 0pt、あと${minPointsRequired}pt必要）`;
+      return { eligible: false, userPoints: 0, message };
+    }
+
+    // その他のエラーの場合はエラーメッセージを返す
     return {
       eligible: false,
       userPoints: 0,
-      message: 'ポイント情報の取得に失敗しました。しばらくしてから再度お試しください。'
+      message: `ポイント情報の取得に失敗しました: ${errorMessage}`
     };
   }
 }
