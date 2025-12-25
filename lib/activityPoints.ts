@@ -8,8 +8,17 @@ export async function checkPointsEligibility(
   minPointsRequired: number,
   requirementType: string
 ): Promise<{ eligible: boolean; userPoints: number; message?: string }> {
+  console.log('[checkPointsEligibility] userId:', userId, 'minPointsRequired:', minPointsRequired, 'requirementType:', requirementType);
+
   // 条件なしの場合は常に適格
-  if (requirementType === 'none' || minPointsRequired === 0) {
+  if (requirementType === 'none') {
+    console.log('[checkPointsEligibility] No requirement - eligible');
+    return { eligible: true, userPoints: 0 };
+  }
+
+  // ポイント要件が0以下の場合も条件なし
+  if (minPointsRequired <= 0) {
+    console.log('[checkPointsEligibility] Points requirement <= 0 - eligible');
     return { eligible: true, userPoints: 0 };
   }
 
@@ -62,6 +71,8 @@ export async function checkPointsEligibility(
     const eligible = userPoints >= minPointsRequired;
     const shortfall = eligible ? 0 : minPointsRequired - userPoints;
 
+    console.log('[checkPointsEligibility] userPoints:', userPoints, 'required:', minPointsRequired, 'eligible:', eligible);
+
     let message = '';
     if (!eligible) {
       const typeText =
@@ -72,9 +83,13 @@ export async function checkPointsEligibility(
 
     return { eligible, userPoints, message };
   } catch (error) {
-    console.error('Error checking points eligibility:', error);
-    // エラー時はとりあえず応募可能にする（安全側）
-    return { eligible: true, userPoints: 0 };
+    console.error('[checkPointsEligibility] Error:', error);
+    // エラー時は条件を確認できないので応募不可にする（安全側に変更）
+    return {
+      eligible: false,
+      userPoints: 0,
+      message: 'ポイント情報の取得に失敗しました。しばらくしてから再度お試しください。'
+    };
   }
 }
 
