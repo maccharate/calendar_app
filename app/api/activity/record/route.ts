@@ -92,7 +92,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("[API Error] /api/activity/record:", error);
     return NextResponse.json(
-      { error: "Failed to record activity", details: error.message },
+      { error: "アクティビティの記録に失敗しました。しばらくしてから再度お試しください。" },
       { status: 500 }
     );
   }

@@ -8,17 +8,13 @@ export async function checkPointsEligibility(
   minPointsRequired: number,
   requirementType: string
 ): Promise<{ eligible: boolean; userPoints: number; message?: string }> {
-  console.log('[checkPointsEligibility] userId:', userId, 'minPointsRequired:', minPointsRequired, 'requirementType:', requirementType);
-
   // 条件なしの場合は常に適格
   if (requirementType === 'none') {
-    console.log('[checkPointsEligibility] No requirement - eligible');
     return { eligible: true, userPoints: 0 };
   }
 
   // ポイント要件が0以下の場合も条件なし
   if (minPointsRequired <= 0) {
-    console.log('[checkPointsEligibility] Points requirement <= 0 - eligible');
     return { eligible: true, userPoints: 0 };
   }
 
@@ -67,11 +63,8 @@ export async function checkPointsEligibility(
   try {
     const [rows] = await pool.query(query, params);
 
-    console.log('[checkPointsEligibility] Query result rows:', rows);
-
     // データがない場合も考慮
     if (!rows || (rows as any[]).length === 0) {
-      console.log('[checkPointsEligibility] No data found - userPoints: 0');
       const message = `応募には${requirementType === 'current_month' ? '今月' : requirementType === 'previous_month' ? '前月' : '累計'}${minPointsRequired}pt以上必要です（現在: 0pt、あと${minPointsRequired}pt必要）`;
       return { eligible: false, userPoints: 0, message };
     }
@@ -80,8 +73,6 @@ export async function checkPointsEligibility(
 
     const eligible = userPoints >= minPointsRequired;
     const shortfall = eligible ? 0 : minPointsRequired - userPoints;
-
-    console.log('[checkPointsEligibility] userPoints:', userPoints, 'required:', minPointsRequired, 'eligible:', eligible);
 
     let message = '';
     if (!eligible) {
@@ -93,23 +84,11 @@ export async function checkPointsEligibility(
 
     return { eligible, userPoints, message };
   } catch (error) {
-    console.error('[checkPointsEligibility] Error details:', error);
-    console.error('[checkPointsEligibility] Query was:', query);
-    console.error('[checkPointsEligibility] Params were:', params);
-
-    // テーブルが存在しない場合のエラーチェック
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    if (errorMessage.includes("doesn't exist") || errorMessage.includes("Table") || errorMessage.includes("table")) {
-      console.error('[checkPointsEligibility] Table does not exist - treating as 0 points');
-      const message = `応募には${requirementType === 'current_month' ? '今月' : requirementType === 'previous_month' ? '前月' : '累計'}${minPointsRequired}pt以上必要です（現在: 0pt、あと${minPointsRequired}pt必要）`;
-      return { eligible: false, userPoints: 0, message };
-    }
-
-    // その他のエラーの場合はエラーメッセージを返す
+    // エラー時は応募不可として扱う
     return {
       eligible: false,
       userPoints: 0,
-      message: `ポイント情報の取得に失敗しました: ${errorMessage}`
+      message: 'ポイント情報の取得に失敗しました。しばらくしてから再度お試しください。'
     };
   }
 }
@@ -157,7 +136,6 @@ export async function getUserPoints(
     const [rows] = await pool.query(query, params);
     return parseInt((rows as any[])[0].points);
   } catch (error) {
-    console.error('Error getting user points:', error);
     return 0;
   }
 }
