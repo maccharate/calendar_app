@@ -577,96 +577,78 @@ export default function CalendarPage() {
       <Navigation />
 
       <main className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white pb-20">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          {/* ヘッダー */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-display font-semibold mb-2 text-[var(--color-text-primary)] tracking-tight">
-                  イベントカレンダー
-                </h1>
-                <p className="text-gray-400">抽選・先着イベントの管理</p>
-              </div>
-              {!isMobile && (
-                <div className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          {/* ビュー切り替えとマイイベント追加 */}
+          {isMobile && (
+            <div className="mb-4">
+              <div className="flex gap-2 mb-2">
+                <div className="flex-1 bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-2 flex gap-2">
                   <button
-                    onClick={() => router.push("/my-events/new")}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-all flex items-center gap-2"
+                    onClick={() => setViewMode("today")}
+                    className={`flex-1 py-2 rounded-lg font-medium transition-all text-sm ${viewMode === "today"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-800 text-gray-300"
+                      }`}
                   >
-                    <span className="text-xl">+</span>
-                    マイイベント追加
+                    今日
                   </button>
-                  <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-lg px-4 py-2">
-                    <p className="text-xs text-gray-400">総イベント数</p>
-                    <p className="text-2xl font-bold text-blue-400">{events.length}</p>
-                  </div>
-                  <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-lg px-4 py-2">
-                    <p className="text-xs text-gray-400">表示中</p>
-                    <p className="text-2xl font-bold text-purple-400">{filteredEvents.length}</p>
-                  </div>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`flex-1 py-2 rounded-lg font-medium transition-all text-sm ${viewMode === "list"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-800 text-gray-300"
+                      }`}
+                  >
+                    リスト
+                  </button>
+                  <button
+                    onClick={() => setViewMode("calendar")}
+                    className={`flex-1 py-2 rounded-lg font-medium transition-all text-sm ${viewMode === "calendar"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-800 text-gray-300"
+                      }`}
+                  >
+                    カレンダー
+                  </button>
                 </div>
-              )}
+                <button
+                  onClick={() => router.push("/my-events/new")}
+                  className="px-4 bg-purple-600 hover:bg-purple-700 rounded-xl font-medium transition-all flex items-center justify-center"
+                >
+                  <span className="text-xl">+</span>
+                </button>
+              </div>
             </div>
-            {isMobile && (
+          )}
+
+          {/* デスクトップ用 */}
+          {!isMobile && (
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-sm text-gray-400">
+                {events.length}件中 {filteredEvents.length}件表示
+              </div>
               <button
                 onClick={() => router.push("/my-events/new")}
-                className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
+                className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-all flex items-center gap-2 text-sm"
               >
-                <span className="text-xl">+</span>
-                マイイベント追加
-              </button>
-            )}
-          </div>
-
-          {/* ビュー切り替え（モバイル） */}
-          {isMobile && (
-            <div className="mb-6 bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-2 flex gap-2">
-              <button
-                onClick={() => setViewMode("today")}
-                className={`flex-1 py-3 rounded-lg font-medium transition-all ${viewMode === "today"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-800 text-gray-300"
-                  }`}
-              >
-                今日
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`flex-1 py-3 rounded-lg font-medium transition-all ${viewMode === "list"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-800 text-gray-300"
-                  }`}
-              >
-                リスト
-              </button>
-              <button
-                onClick={() => setViewMode("calendar")}
-                className={`flex-1 py-3 rounded-lg font-medium transition-all ${viewMode === "calendar"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-800 text-gray-300"
-                  }`}
-              >
-                カレンダー
+                <span className="text-lg">+</span>
+                マイイベント
               </button>
             </div>
           )}
 
           {/* フィルター＆ソート */}
-          <div className="mb-6">
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-4 md:mb-0">
-                <h2 className="font-bold text-blue-400">
-                  絞り込み・並び替え
-                </h2>
-                <button
-                  onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  className="md:hidden text-gray-400 hover:text-white"
-                >
-                  {isFilterOpen ? "▲ 閉じる" : "▼ 開く"}
-                </button>
-              </div>
+          <div className="mb-4">
+            <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-3">
+              <button
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className="w-full flex items-center justify-between text-sm font-medium text-gray-400 hover:text-white"
+              >
+                <span>🔍 フィルター</span>
+                <span>{isFilterOpen ? "▲" : "▼"}</span>
+              </button>
 
-              <div className={`${isFilterOpen ? "block" : "hidden"} md:block space-y-4 md:space-y-0`}>
+              <div className={`${isFilterOpen ? "block mt-3 pt-3 border-t border-gray-800" : "hidden"} md:block md:mt-3 md:pt-3 md:border-t md:border-gray-800 space-y-4 md:space-y-0`}>
                 {/* フィルター */}
                 <div className="mb-4">
                   <h3 className="text-sm font-semibold text-gray-400 mb-2">ステータス</h3>
