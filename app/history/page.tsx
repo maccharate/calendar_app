@@ -1046,9 +1046,9 @@ export default function HistoryPage() {
                             className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-inner"
                             placeholder="0"
                           />
-                          {editForm.platform && PLATFORM_FEE_RATES[editForm.platform] > 0 && (
+                          {editForm.platform && platformFeeRates[editForm.platform] > 0 && (
                             <p className="text-xs bg-gradient-to-r from-blue-500/10 to-cyan-500/10 text-blue-400 mt-2 p-2 rounded-lg border border-blue-500/20">
-                              ✓ {editForm.platform}: {PLATFORM_FEE_RATES[editForm.platform]}% で自動計算済み
+                              ✓ {editForm.platform}: {platformFeeRates[editForm.platform]}% で自動計算済み
                             </p>
                           )}
                         </div>
@@ -1584,9 +1584,9 @@ export default function HistoryPage() {
                           className="w-full bg-gray-800/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-inner"
                           placeholder="0"
                         />
-                        {manualAddForm.platform && PLATFORM_FEE_RATES[manualAddForm.platform] > 0 && (
+                        {manualAddForm.platform && platformFeeRates[manualAddForm.platform] > 0 && (
                           <p className="text-xs bg-gradient-to-r from-blue-500/10 to-cyan-500/10 text-blue-400 mt-2 p-2 rounded-lg border border-blue-500/20">
-                            ✓ {manualAddForm.platform}: {PLATFORM_FEE_RATES[manualAddForm.platform]}% で自動計算済み
+                            ✓ {manualAddForm.platform}: {platformFeeRates[manualAddForm.platform]}% で自動計算済み
                           </p>
                         )}
                       </div>
