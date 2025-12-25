@@ -110,7 +110,7 @@ export async function POST(request: Request) {
       const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       await pool.execute(
         `INSERT INTO user_monthly_activity
-          (user_id, year_month, application_count, total_points, updated_at)
+          (user_id, \`year_month\`, application_count, total_points, updated_at)
          VALUES (?, ?, 1, 1, NOW())
          ON DUPLICATE KEY UPDATE
            application_count = application_count + 1,
