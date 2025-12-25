@@ -37,7 +37,7 @@ export async function checkPointsEligibility(
       query = `
         SELECT COALESCE(SUM(total_points), 0) as points
         FROM user_monthly_activity
-        WHERE user_id = ? AND year_month = ?
+        WHERE user_id = ? AND \`year_month\` = ?
       `;
       params = [userId, currentMonth];
       break;
@@ -46,7 +46,7 @@ export async function checkPointsEligibility(
       query = `
         SELECT COALESCE(SUM(total_points), 0) as points
         FROM user_monthly_activity
-        WHERE user_id = ? AND year_month = ?
+        WHERE user_id = ? AND \`year_month\` = ?
       `;
       params = [userId, previousMonth];
       break;
@@ -134,14 +134,14 @@ export async function getUserPoints(
     case 'current_month':
       query = `SELECT COALESCE(SUM(total_points), 0) as points
                FROM user_monthly_activity
-               WHERE user_id = ? AND year_month = ?`;
+               WHERE user_id = ? AND \`year_month\` = ?`;
       params = [userId, currentMonth];
       break;
 
     case 'previous_month':
       query = `SELECT COALESCE(SUM(total_points), 0) as points
                FROM user_monthly_activity
-               WHERE user_id = ? AND year_month = ?`;
+               WHERE user_id = ? AND \`year_month\` = ?`;
       params = [userId, previousMonth];
       break;
 
