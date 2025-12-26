@@ -16,7 +16,7 @@ export default async function HomePage() {
       {/* Owl Icon */}
       <div className="mb-8">
         <img
-          src="/icon-192.png"
+          src="https://chimpancommunity.com/src/icon/logo_no_txt.png"
           alt="Owl Calendar"
           className="w-32 h-32 mx-auto transition-transform hover:scale-105"
           style={{
