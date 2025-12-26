@@ -48,7 +48,7 @@ function SignInContent() {
           <div className="w-28 h-28 mx-auto mb-6 flex items-center justify-center">
             <img
               src="https://chimpancommunity.com/src/icon/logo_no_txt.png"
-              alt="Owl Calendar"
+              alt="Chimpan Calendar"
               className="w-full h-full object-contain transition-transform hover:scale-105"
               style={{
                 borderRadius: '22.5%',
@@ -60,7 +60,7 @@ function SignInContent() {
             />
           </div>
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-            Owl Calendar
+            Chimpan Calendar
           </h1>
           <p className="text-xl text-blue-300 mb-2">for ちんぱんコミュニティ</p>
           <p className="text-gray-400 text-sm">メンバー専用スケジュール管理アプリ</p>

@@ -62,7 +62,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
-        <title>Owl Calendar - ちんぱんコミュニティ</title>
+        <title>Chimpan Calendar - ちんぱんコミュニティ</title>
         <meta name="description" content="ちんぱんコミュニティメンバー専用のスケジュール管理アプリ" />
 
         {/* Favicon */}
@@ -81,18 +81,18 @@ export default function RootLayout({
         {/* Apple Specific */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Owl Calendar" />
+        <meta name="apple-mobile-web-app-title" content="Chimpan Calendar" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
 
         {/* OGP for Social Media */}
-        <meta property="og:title" content="Owl Calendar - ちんぱんコミュニティ" />
+        <meta property="og:title" content="Chimpan Calendar - ちんぱんコミュニティ" />
         <meta property="og:description" content="メンバー専用スケジュール管理アプリ" />
         <meta property="og:image" content="/icon-512.png" />
         <meta property="og:type" content="website" />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Owl Calendar" />
+        <meta name="twitter:title" content="Chimpan Calendar" />
         <meta name="twitter:description" content="ちんぱんコミュニティ専用カレンダー" />
         <meta name="twitter:image" content="/icon-512.png" />
       </head>
