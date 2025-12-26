@@ -170,8 +170,8 @@ self.addEventListener('push', (event) => {
   const data = event.data.json();
   const options = {
     body: data.body || '',
-    icon: data.icon || '/icon-192x192.png',
-    badge: '/icon-96x96.png',
+    icon: data.icon || 'https://chimpancommunity.com/src/icon/logo_no_txt.png',
+    badge: 'https://chimpancommunity.com/src/icon/logo_no_txt.png',
     vibrate: [200, 100, 200],
     data: {
       url: data.url || '/',
