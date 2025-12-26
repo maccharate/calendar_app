@@ -13,11 +13,11 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-slate-900 via-blue-950 to-slate-950 text-white text-center px-4">
-      {/* Owl Icon */}
+      {/* App Icon */}
       <div className="mb-8">
         <img
           src="https://chimpancommunity.com/src/icon/logo_no_txt.png"
-          alt="Owl Calendar"
+          alt="Chimpan Calendar"
           className="w-32 h-32 mx-auto transition-transform hover:scale-105"
           style={{
             borderRadius: '22.5%',
@@ -31,7 +31,7 @@ export default async function HomePage() {
 
       {/* App Name */}
       <h1 className="text-5xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-        Owl Calendar
+        Chimpan Calendar
       </h1>
 
       {/* Community Attribution */}

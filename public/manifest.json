@@ -1,6 +1,6 @@
 {
-  "name": "Owl Calendar - ちんぱんコミュニティ",
-  "short_name": "Owl Calendar",
+  "name": "Chimpan Calendar - ちんぱんコミュニティ",
+  "short_name": "Chimpan Calendar",
   "description": "ちんぱんコミュニティメンバー専用のスケジュール管理アプリ",
   "start_url": "/calendar",
   "display": "standalone",

@@ -87,7 +87,7 @@ export default function Navigation() {
               alt="Logo"
               className="w-8 h-8 rounded-lg shadow-refined"
             />
-            <span className="text-sm sm:text-base font-semibold text-[var(--color-text-primary)]">ちんぱんコミュニティ</span>
+            <span className="text-sm sm:text-base font-semibold text-[var(--color-text-primary)]">Chimpan Calendar</span>
           </button>
 
           {/* デスクトップメニュー */}
