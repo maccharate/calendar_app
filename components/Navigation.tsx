@@ -64,6 +64,7 @@ export default function Navigation() {
     { name: "履歴", path: "/history", badge: 0 },
     { name: "プレゼント", path: "/giveaway", badge: unenteredGiveawayCount },
     { name: "設定", path: "/settings", badge: 0 },
+    { name: "ヘルプ", path: "/help", badge: 0 },
   ];
 
   const navItems = baseNavItems;
