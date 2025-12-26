@@ -4,32 +4,13 @@ import Navigation from "@/components/Navigation";
 import { useState } from "react";
 
 export default function HelpPage() {
-  const [openSection, setOpenSection] = useState<string | null>("login");
+  const [openSection, setOpenSection] = useState<string | null>("calendar");
 
   const toggleSection = (section: string) => {
     setOpenSection(openSection === section ? null : section);
   };
 
   const sections = [
-    {
-      id: "login",
-      title: "ログイン方法",
-      content: (
-        <div className="space-y-4">
-          <p>Chimpan CalendarはDiscordアカウントでログインします。</p>
-          <ol className="list-decimal list-inside space-y-2 ml-4">
-            <li>トップページの「Discordでログイン」ボタンをクリック</li>
-            <li>Discordの認証画面で「認証」をクリック</li>
-            <li>自動的にカレンダーページにリダイレクトされます</li>
-          </ol>
-          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mt-4">
-            <p className="text-sm text-blue-200">
-              <strong>ヒント:</strong> ちんぱんコミュニティのメンバーのみアクセスできます
-            </p>
-          </div>
-        </div>
-      ),
-    },
     {
       id: "calendar",
       title: "カレンダー機能",
@@ -94,9 +75,9 @@ export default function HelpPage() {
             <li>「応募する」ボタンをクリック</li>
             <li>必要に応じて以下を入力：
               <ul className="list-disc list-inside ml-6 mt-2 space-y-1 text-sm">
-                <li><strong>抽選番号:</strong> 応募後に発行された番号</li>
+                <li><strong>抽選番号:</strong> 応募後に発行された番号（抽選イベントの場合）</li>
                 <li><strong>結果発表日:</strong> 当選発表の日時</li>
-                <li><strong>コメント:</strong> メモや備考</li>
+                <li><strong>コメント:</strong> メモや備考（先着の場合は販売開始時刻など）</li>
                 <li><strong>応募口数:</strong> 何口応募したか（1-30口）</li>
               </ul>
             </li>
@@ -231,6 +212,37 @@ export default function HelpPage() {
       ),
     },
     {
+      id: "request",
+      title: "機能リクエスト",
+      content: (
+        <div className="space-y-4">
+          <p className="text-sm">新機能の提案や改善要望を匿名で送信できます。</p>
+
+          <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+            <h4 className="font-semibold text-base mb-3">リクエストを送信する</h4>
+            <p className="text-sm text-gray-400 mb-4">
+              以下のフォームから、機能追加や改善のアイデアを送信してください。<br />
+              匿名での送信が可能です。
+            </p>
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLSf_YOUR_FORM_ID/viewform"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-6 py-3 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/50 rounded-lg transition-colors font-semibold text-sm"
+            >
+              リクエストフォームを開く
+            </a>
+          </div>
+
+          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mt-4">
+            <p className="text-sm text-blue-200">
+              <strong>お願い:</strong> できるだけ具体的に記述していただけると、実装の参考になります。
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
       id: "faq",
       title: "よくある質問",
       content: (
@@ -325,7 +337,7 @@ export default function HelpPage() {
             </h3>
             <p className="text-sm text-gray-400">
               Discordサーバーで質問してください。<br />
-              メンバーが優しくサポートします！
+              オーナーが回答します。
             </p>
           </div>
         </div>
