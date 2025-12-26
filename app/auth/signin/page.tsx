@@ -45,15 +45,25 @@ function SignInContent() {
       <div className="max-w-md w-full">
         {/* Logo and App Name */}
         <div className="text-center mb-8">
-          <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+          <div className="w-28 h-28 mx-auto mb-6 flex items-center justify-center">
             <img
-              src="https://chimpancommunity.com/src/icon/logo_no_txt.png"
-              alt="ちんぱんコミュニティ"
-              className="w-full h-full object-contain"
+              src="/icon-192.png"
+              alt="Owl Calendar"
+              className="w-full h-full object-contain transition-transform hover:scale-105"
+              style={{
+                borderRadius: '22.5%',
+                boxShadow: `
+                  0 20px 40px -10px rgba(0, 0, 0, 0.5),
+                  0 15px 20px -10px rgba(0, 0, 0, 0.4)
+                `
+              }}
             />
           </div>
-          <h1 className="text-3xl font-bold mb-2">ちんぱんコミュニティ</h1>
-          <p className="text-gray-400">カレンダーアプリ</p>
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            Owl Calendar
+          </h1>
+          <p className="text-xl text-blue-300 mb-2">for ちんぱんコミュニティ</p>
+          <p className="text-gray-400 text-sm">メンバー専用スケジュール管理アプリ</p>
         </div>
 
         {/* Error Message */}

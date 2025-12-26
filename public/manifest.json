@@ -1,21 +1,21 @@
 {
-  "name": "ちんぱんコミュニティ カレンダーアプリ",
-  "short_name": "ちんぱんアプリ",
-  "description": "メンバー限定のスケジュール管理ポータル",
+  "name": "Owl Calendar - ちんぱんコミュニティ",
+  "short_name": "Owl Calendar",
+  "description": "ちんぱんコミュニティメンバー専用のスケジュール管理アプリ",
   "start_url": "/calendar",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#0f172a",
   "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://chimpancommunity.com/src/icon/logo_no_txt.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://chimpancommunity.com/src/icon/logo_no_txt.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -29,14 +29,14 @@
       "short_name": "カレンダー",
       "description": "イベントカレンダーを開く",
       "url": "/calendar",
-      "icons": [{ "src": "https://chimpancommunity.com/src/icon/logo_no_txt.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "ダッシュボード",
       "short_name": "ダッシュボード",
       "description": "利益計算ダッシュボードを開く",
       "url": "/dashboard",
-      "icons": [{ "src": "https://chimpancommunity.com/src/icon/logo_no_txt.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

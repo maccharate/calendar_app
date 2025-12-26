@@ -62,13 +62,39 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
+        <title>Owl Calendar - ちんぱんコミュニティ</title>
+        <meta name="description" content="ちんぱんコミュニティメンバー専用のスケジュール管理アプリ" />
+
+        {/* Favicon */}
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+
+        {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
+
+        {/* Theme Color */}
         <meta name="theme-color" content="#3b82f6" />
+
+        {/* Mobile Web App */}
         <meta name="mobile-web-app-capable" content="yes" />
+
+        {/* Apple Specific */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="ちんぱんカレンダー" />
+        <meta name="apple-mobile-web-app-title" content="Owl Calendar" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+
+        {/* OGP for Social Media */}
+        <meta property="og:title" content="Owl Calendar - ちんぱんコミュニティ" />
+        <meta property="og:description" content="メンバー専用スケジュール管理アプリ" />
+        <meta property="og:image" content="/icon-512.png" />
+        <meta property="og:type" content="website" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Owl Calendar" />
+        <meta name="twitter:description" content="ちんぱんコミュニティ専用カレンダー" />
+        <meta name="twitter:image" content="/icon-512.png" />
       </head>
       <body className="text-gray-100">
         <SessionProvider>{children}</SessionProvider>
