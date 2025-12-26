@@ -47,7 +47,7 @@ function SignInContent() {
         <div className="text-center mb-8">
           <div className="w-28 h-28 mx-auto mb-6 flex items-center justify-center">
             <img
-              src="/icon-192.png"
+              src="https://chimpancommunity.com/src/icon/logo_no_txt.png"
               alt="Owl Calendar"
               className="w-full h-full object-contain transition-transform hover:scale-105"
               style={{
