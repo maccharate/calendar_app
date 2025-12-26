@@ -444,18 +444,21 @@ export default function StatsPage() {
                       key={site.site}
                       className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/50"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <span className={`text-lg font-bold w-8 ${
+                      <div className="flex items-center justify-between mb-2 gap-2">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <span className={`text-lg font-bold w-8 flex-shrink-0 ${
                             index < 3 ? "text-yellow-400" : "text-gray-500"
                           }`}>
                             #{index + 1}
                           </span>
-                          <span className="font-semibold truncate max-w-[200px] md:max-w-none">
+                          <span
+                            className="font-semibold truncate"
+                            title={site.site}
+                          >
                             {site.site}
                           </span>
                         </div>
-                        <span className={`text-xl font-bold ${getWinRateColor(winRate)}`}>
+                        <span className={`text-xl font-bold flex-shrink-0 ${getWinRateColor(winRate)}`}>
                           {winRate.toFixed(1)}%
                         </span>
                       </div>
@@ -490,49 +493,56 @@ export default function StatsPage() {
           </div>
 
           {/* サイト別詳細テーブル */}
-          <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 mb-8 overflow-x-auto">
+          <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 mb-8">
             <h2 className="text-xl font-bold mb-4">サイト別詳細データ</h2>
-            
+
             {sortedSiteStats.length > 0 ? (
-              <table className="w-full min-w-[600px]">
-                <thead>
-                  <tr className="text-left text-gray-400 text-sm border-b border-gray-700">
-                    <th className="pb-3 font-medium">サイト名</th>
-                    <th className="pb-3 font-medium text-right">応募数</th>
-                    <th className="pb-3 font-medium text-right">当選</th>
-                    <th className="pb-3 font-medium text-right">落選</th>
-                    {dataScope === "me" && <th className="pb-3 font-medium text-right">未確定</th>}
-                    <th className="pb-3 font-medium text-right">当選率</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedSiteStats.map((site) => {
-                    const winRate = site.eventWinRate;
-                    return (
-                      <tr key={site.site} className="border-b border-gray-700/50 hover:bg-gray-700/20">
-                        <td className="py-3 font-medium">{site.site}</td>
-                        <td className="py-3 text-right text-gray-300">
-                          {site.applications}
-                        </td>
-                        <td className="py-3 text-right text-green-400">
-                          {site.won}
-                        </td>
-                        <td className="py-3 text-right text-red-400">
-                          {site.lost}
-                        </td>
-                        {dataScope === "me" && (
-                          <td className="py-3 text-right text-yellow-400">
-                            {site.pending || 0}
+              <div className="overflow-x-auto -mx-6 px-6">
+                <table className="w-full">
+                  <thead>
+                    <tr className="text-left text-gray-400 text-xs md:text-sm border-b border-gray-700">
+                      <th className="pb-3 font-medium min-w-[120px] max-w-[200px]">サイト名</th>
+                      <th className="pb-3 font-medium text-right whitespace-nowrap px-2">応募数</th>
+                      <th className="pb-3 font-medium text-right whitespace-nowrap px-2">当選</th>
+                      <th className="pb-3 font-medium text-right whitespace-nowrap px-2">落選</th>
+                      {dataScope === "me" && <th className="pb-3 font-medium text-right whitespace-nowrap px-2">未確定</th>}
+                      <th className="pb-3 font-medium text-right whitespace-nowrap px-2">当選率</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedSiteStats.map((site) => {
+                      const winRate = site.eventWinRate;
+                      return (
+                        <tr key={site.site} className="border-b border-gray-700/50 hover:bg-gray-700/20">
+                          <td
+                            className="py-3 font-medium min-w-[120px] max-w-[200px] truncate"
+                            title={site.site}
+                          >
+                            {site.site}
                           </td>
-                        )}
-                        <td className={`py-3 text-right font-bold ${getWinRateColor(winRate)}`}>
-                          {winRate.toFixed(1)}%
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          <td className="py-3 text-right text-gray-300 whitespace-nowrap px-2 text-sm">
+                            {site.applications}
+                          </td>
+                          <td className="py-3 text-right text-green-400 whitespace-nowrap px-2 text-sm">
+                            {site.won}
+                          </td>
+                          <td className="py-3 text-right text-red-400 whitespace-nowrap px-2 text-sm">
+                            {site.lost}
+                          </td>
+                          {dataScope === "me" && (
+                            <td className="py-3 text-right text-yellow-400 whitespace-nowrap px-2 text-sm">
+                              {site.pending || 0}
+                            </td>
+                          )}
+                          <td className={`py-3 text-right font-bold whitespace-nowrap px-2 text-sm ${getWinRateColor(winRate)}`}>
+                            {winRate.toFixed(1)}%
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             ) : (
               <div className="text-center py-12 text-gray-400">
                 まだデータがありません

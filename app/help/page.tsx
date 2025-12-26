@@ -13,7 +13,7 @@ export default function HelpPage() {
   const sections = [
     {
       id: "login",
-      title: "🚀 ログイン方法",
+      title: "ログイン方法",
       content: (
         <div className="space-y-4">
           <p>Chimpan CalendarはDiscordアカウントでログインします。</p>
@@ -24,7 +24,7 @@ export default function HelpPage() {
           </ol>
           <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mt-4">
             <p className="text-sm text-blue-200">
-              💡 <strong>ヒント:</strong> ちんぱんコミュニティのメンバーのみアクセスできます
+              <strong>ヒント:</strong> ちんぱんコミュニティのメンバーのみアクセスできます
             </p>
           </div>
         </div>
@@ -32,7 +32,7 @@ export default function HelpPage() {
     },
     {
       id: "calendar",
-      title: "📅 カレンダー機能",
+      title: "カレンダー機能",
       content: (
         <div className="space-y-4">
           <h4 className="font-semibold text-lg">イベントの種類</h4>
@@ -85,7 +85,7 @@ export default function HelpPage() {
     },
     {
       id: "apply",
-      title: "✅ 応募・管理方法",
+      title: "応募・管理方法",
       content: (
         <div className="space-y-4">
           <h4 className="font-semibold text-lg">応募する</h4>
@@ -110,7 +110,7 @@ export default function HelpPage() {
 
           <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4 mt-4">
             <p className="text-sm text-yellow-200">
-              ⚠️ <strong>注意:</strong> 24時間以内に締切のイベントは警告マークが表示されます
+              <strong>注意:</strong> 24時間以内に締切のイベントは警告マークが表示されます
             </p>
           </div>
         </div>
@@ -118,7 +118,7 @@ export default function HelpPage() {
     },
     {
       id: "myevents",
-      title: "📝 マイイベント作成",
+      title: "マイイベント作成",
       content: (
         <div className="space-y-4">
           <p>個人的に管理したいイベントを作成できます。</p>
@@ -140,7 +140,7 @@ export default function HelpPage() {
     },
     {
       id: "giveaway",
-      title: "🎁 プレゼント企画",
+      title: "プレゼント企画",
       content: (
         <div className="space-y-4">
           <h4 className="font-semibold text-lg">プレゼント企画とは？</h4>
@@ -159,7 +159,7 @@ export default function HelpPage() {
 
           <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 mt-4">
             <p className="text-sm text-green-200">
-              🎉 <strong>お知らせ:</strong> 未応募の企画がある場合、ナビゲーションにバッジが表示されます
+              <strong>お知らせ:</strong> 未応募の企画がある場合、ナビゲーションにバッジが表示されます
             </p>
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function HelpPage() {
     },
     {
       id: "dashboard",
-      title: "💰 ダッシュボード（利益計算）",
+      title: "ダッシュボード（利益計算）",
       content: (
         <div className="space-y-4">
           <p>応募したイベントの収支を管理できます。</p>
@@ -193,7 +193,7 @@ export default function HelpPage() {
     },
     {
       id: "stats",
-      title: "📊 統計",
+      title: "統計",
       content: (
         <div className="space-y-4">
           <p>応募履歴や活動状況を確認できます。</p>
@@ -210,7 +210,7 @@ export default function HelpPage() {
     },
     {
       id: "settings",
-      title: "⚙️ 設定",
+      title: "設定",
       content: (
         <div className="space-y-4">
           <h4 className="font-semibold text-lg">通知設定</h4>
@@ -232,7 +232,7 @@ export default function HelpPage() {
     },
     {
       id: "faq",
-      title: "❓ よくある質問",
+      title: "よくある質問",
       content: (
         <div className="space-y-4">
           <div>
