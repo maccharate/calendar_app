@@ -647,28 +647,6 @@ export default function HistoryPage() {
             </button>
           </div>
 
-          {/* 統計情報 */}
-          {stats && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-gray-800/40 p-4 rounded-xl border border-gray-700/50">
-                <p className="text-gray-400 text-sm">総応募数</p>
-                <p className="text-2xl font-bold">{stats.applied}</p>
-              </div>
-              <div className="bg-green-900/20 p-4 rounded-xl border border-green-500/30">
-                <p className="text-green-400 text-sm">当選数</p>
-                <p className="text-2xl font-bold text-green-400">{stats.won}</p>
-              </div>
-              <div className="bg-red-900/20 p-4 rounded-xl border border-red-500/30">
-                <p className="text-red-400 text-sm">落選数</p>
-                <p className="text-2xl font-bold text-red-400">{stats.lost}</p>
-              </div>
-              <div className="bg-purple-900/20 p-4 rounded-xl border border-purple-500/30">
-                <p className="text-purple-400 text-sm">当選率</p>
-                <p className="text-2xl font-bold text-purple-400">{stats.rate}%</p>
-              </div>
-            </div>
-          )}
-
           {/* フィルター */}
           <div className="mb-6 space-y-4">
             {/* 月選択 */}
