@@ -4,7 +4,7 @@ export default function TermsOfServicePage() {
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">利用規約</h1>
-          <p className="text-gray-400">最終更新日: 2024年12月</p>
+          <p className="text-gray-400">最終更新日: 2025年12月</p>
         </div>
 
         <div className="space-y-6 text-gray-300">
@@ -92,6 +92,28 @@ export default function TermsOfServicePage() {
             <p>
               本利用規約に関するお問い合わせは、ちんぱんコミュニティのDiscordサーバーまでご連絡ください。
             </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-white mb-3">9. AIチャット機能</h2>
+            <p className="mb-2">本サービスには、統計情報の確認やアプリの使い方を質問できるAIチャット機能が含まれます。</p>
+            <ul className="list-disc list-inside ml-4 space-y-1">
+              <li>
+                <span className="font-bold text-red-400">パスワード、クレジットカード番号、マイナンバー、免許証番号などの機密情報や個人を特定できる情報を入力しないでください</span>
+              </li>
+              <li>
+                会話内容は基本的に確認しませんが、セキュリティ脅威の検知や不適切な内容の検知、サービス改善のために分析される場合があります
+              </li>
+              <li>
+                AIチャットの利用には1日あたり80,000クレジットの上限があります（モデルによって消費クレジットが異なります）
+              </li>
+              <li>
+                会話内容はGoogle Gemini APIに送信されます。詳細はプライバシーポリシーをご確認ください
+              </li>
+              <li>
+                AIによる回答の正確性は保証されません。重要な判断には必ず自身で確認してください
+              </li>
+            </ul>
           </section>
         </div>
 

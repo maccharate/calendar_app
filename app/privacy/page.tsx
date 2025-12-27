@@ -4,7 +4,7 @@ export default function PrivacyPolicyPage() {
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">プライバシーポリシー</h1>
-          <p className="text-gray-400">最終更新日: 2024年12月</p>
+          <p className="text-gray-400">最終更新日: 2025年12月</p>
         </div>
 
         <div className="space-y-6 text-gray-300">
@@ -74,6 +74,63 @@ export default function PrivacyPolicyPage() {
             <p>
               本プライバシーポリシーに関するお問い合わせは、ちんぱんコミュニティのDiscordサーバーまでご連絡ください。
             </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-white mb-3">8. AIチャット機能における情報の取り扱い</h2>
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-bold text-blue-400 mb-2">収集する情報</h3>
+                <ul className="list-disc list-inside ml-4 space-y-1">
+                  <li>AIチャットの会話内容（質問と回答）</li>
+                  <li>トークン使用量</li>
+                  <li>選択したモデル（Flash/Pro）</li>
+                  <li>会話の日時</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-blue-400 mb-2">利用目的</h3>
+                <ul className="list-disc list-inside ml-4 space-y-1">
+                  <li>統計情報の提供</li>
+                  <li>アプリの使い方に関する質問への回答</li>
+                  <li>サービス改善のための分析</li>
+                  <li>不適切な内容やセキュリティ脅威の検知</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-blue-400 mb-2">第三者への提供</h3>
+                <ul className="list-disc list-inside ml-4 space-y-1">
+                  <li>
+                    会話内容は<span className="font-bold">Google Gemini API</span>に送信され、AI応答の生成に使用されます
+                  </li>
+                  <li>
+                    Google Gemini APIのデータ取り扱いについては、<a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Googleプライバシーポリシー</a>をご確認ください
+                  </li>
+                  <li>
+                    会話内容は基本的に管理者が確認することはありませんが、セキュリティ脅威の検知や不適切な内容の検知、サービス品質向上のために分析される場合があります
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-blue-400 mb-2">データの保存期間</h3>
+                <ul className="list-disc list-inside ml-4 space-y-1">
+                  <li>会話履歴は直近50件まで保存されます</li>
+                  <li>トークン使用量は日次で記録され、定期的にリセットされます</li>
+                  <li>アカウント削除時に関連データも削除されます</li>
+                </ul>
+              </div>
+
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mt-4">
+                <h3 className="font-bold text-red-400 mb-2">⚠️ 重要な注意事項</h3>
+                <p className="text-red-300">
+                  AIチャットには、パスワード、クレジットカード番号、マイナンバー、免許証番号などの<span className="font-bold">機密情報や個人を特定できる情報を絶対に入力しないでください</span>。これらの情報が入力された場合、Google Gemini APIに送信され、当サービスではその責任を負いかねます。
+                </p>
+              </div>
+            </div>
           </section>
         </div>
 
