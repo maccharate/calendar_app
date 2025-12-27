@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // レート制限用のメモリストア（本番環境ではRedisなどを使用推奨）
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
