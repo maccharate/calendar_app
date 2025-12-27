@@ -155,10 +155,9 @@ async function sendToInterestedUsers(event, notificationType, notification) {
   }[notificationType];
 
   const [users] = await pool.query(
-    `SELECT DISTINCT u.id, ps.endpoint, ps.p256dh, ps.auth
-     FROM users u
-     INNER JOIN push_subscriptions ps ON u.id = ps.user_id
-     INNER JOIN notification_settings ns ON u.id = ns.user_id
+    `SELECT DISTINCT ps.user_id, ps.endpoint, ps.p256dh, ps.auth
+     FROM push_subscriptions ps
+     INNER JOIN notification_settings ns ON ps.user_id = ns.user_id
      WHERE ns.notifications_enabled = TRUE
        AND ns.${settingColumn} = TRUE`,
   );
@@ -168,7 +167,7 @@ async function sendToInterestedUsers(event, notificationType, notification) {
     const [history] = await pool.query(
       `SELECT id FROM notification_history
        WHERE user_id = ? AND event_id = ? AND notification_type = ?`,
-      [user.id, event.id, notificationType]
+      [user.user_id, event.id, notificationType]
     );
 
     if (history.length > 0) {
@@ -198,12 +197,12 @@ async function sendToInterestedUsers(event, notificationType, notification) {
       await pool.execute(
         `INSERT INTO notification_history (user_id, event_id, notification_type)
          VALUES (?, ?, ?)`,
-        [user.id, event.id, notificationType]
+        [user.user_id, event.id, notificationType]
       );
 
-      console.log(`通知送信: user=${user.id}, event=${event.id}, type=${notificationType}`);
+      console.log(`通知送信: user=${user.user_id}, event=${event.id}, type=${notificationType}`);
     } catch (error) {
-      console.error(`通知送信失敗: user=${user.id}`, error);
+      console.error(`通知送信失敗: user=${user.user_id}`, error);
 
       // サブスクリプションが無効な場合は削除
       if (error.statusCode === 410) {
