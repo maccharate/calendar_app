@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 
 // Vertex AI初期化（新しいSDK）
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_CLOUD_API_KEY || '');
@@ -27,10 +27,10 @@ const tools = {
       name: 'get_user_stats',
       description: 'ユーザーの統計情報（総応募数、当選数、当選率など）を取得します',
       parameters: {
-        type: 'OBJECT' as const,
+        type: SchemaType.OBJECT,
         properties: {
           period: {
-            type: 'STRING' as const,
+            type: SchemaType.STRING,
             description: '期間を指定（this_month, last_month, all_time）',
             enum: ['this_month', 'last_month', 'all_time'],
           },
@@ -42,10 +42,10 @@ const tools = {
       name: 'get_site_stats',
       description: 'サイト別の統計情報（当選率ランキングなど）を取得します',
       parameters: {
-        type: 'OBJECT' as const,
+        type: SchemaType.OBJECT,
         properties: {
           limit: {
-            type: 'NUMBER' as const,
+            type: SchemaType.NUMBER,
             description: '取得する件数（デフォルト: 5）',
           },
         },
@@ -55,10 +55,10 @@ const tools = {
       name: 'get_best_profit_events',
       description: '利益が高かったイベントのランキングを取得します',
       parameters: {
-        type: 'OBJECT' as const,
+        type: SchemaType.OBJECT,
         properties: {
           limit: {
-            type: 'NUMBER' as const,
+            type: SchemaType.NUMBER,
             description: '取得する件数（デフォルト: 5）',
           },
         },
@@ -68,10 +68,10 @@ const tools = {
       name: 'get_recent_applications',
       description: '最近応募したイベントの一覧を取得します',
       parameters: {
-        type: 'OBJECT' as const,
+        type: SchemaType.OBJECT,
         properties: {
           limit: {
-            type: 'NUMBER' as const,
+            type: SchemaType.NUMBER,
             description: '取得する件数（デフォルト: 5）',
           },
         },
