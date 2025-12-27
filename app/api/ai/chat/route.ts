@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { chatWithGemini, ChatMessage } from '@/lib/vertexai';
-import { query } from '@/lib/db';
+import { pool } from '@/lib/db';
 
 /**
  * トークン使用量をチェック
@@ -11,11 +11,12 @@ async function checkTokenLimit(userId: string): Promise<{ allowed: boolean; rema
   const today = new Date().toISOString().split('T')[0];
 
   try {
-    const usage = await query(
+    const [rows] = await pool.query(
       'SELECT tokens_used, daily_limit FROM ai_token_usage WHERE user_id = ? AND date = ?',
       [userId, today]
     );
 
+    const usage = rows as any[];
     if (usage.length === 0) {
       // 今日初めての使用
       return { allowed: true, remaining: 10000 };
@@ -41,7 +42,7 @@ async function recordTokenUsage(userId: string, tokensUsed: number) {
   const today = new Date().toISOString().split('T')[0];
 
   try {
-    await query(
+    await pool.query(
       `INSERT INTO ai_token_usage (user_id, date, tokens_used, daily_limit)
        VALUES (?, ?, ?, 10000)
        ON DUPLICATE KEY UPDATE tokens_used = tokens_used + ?`,
@@ -57,7 +58,7 @@ async function recordTokenUsage(userId: string, tokensUsed: number) {
  */
 async function getConversationHistory(userId: string, limit: number = 50): Promise<ChatMessage[]> {
   try {
-    const messages = await query(
+    const [rows] = await pool.query(
       `SELECT role, message as content FROM ai_conversations
        WHERE user_id = ?
        ORDER BY created_at DESC
@@ -65,6 +66,7 @@ async function getConversationHistory(userId: string, limit: number = 50): Promi
       [userId, limit]
     );
 
+    const messages = rows as any[];
     return messages.reverse(); // 古い順に並び替え
   } catch (error) {
     console.error('Conversation history error:', error);
@@ -77,7 +79,7 @@ async function getConversationHistory(userId: string, limit: number = 50): Promi
  */
 async function saveConversation(userId: string, role: 'user' | 'assistant', message: string, tokensUsed: number = 0) {
   try {
-    await query(
+    await pool.query(
       'INSERT INTO ai_conversations (user_id, role, message, tokens_used) VALUES (?, ?, ?, ?)',
       [userId, role, message, tokensUsed]
     );
@@ -139,7 +141,7 @@ async function getUserStats(userId: string, period: string) {
  */
 async function getSiteStats(userId: string, limit: number) {
   try {
-    const sites = await query(
+    const [rows] = await pool.query(
       `SELECT
         site,
         COUNT(*) as applications,
@@ -153,7 +155,7 @@ async function getSiteStats(userId: string, limit: number) {
       [userId, limit]
     );
 
-    return sites;
+    return rows;
   } catch (error) {
     console.error('Get site stats error:', error);
     return { error: 'サイト別統計の取得に失敗しました' };
@@ -165,7 +167,7 @@ async function getSiteStats(userId: string, limit: number) {
  */
 async function getBestProfitEvents(userId: string, limit: number) {
   try {
-    const events = await query(
+    const [rows] = await pool.query(
       `SELECT
         r.title,
         r.site,
@@ -178,7 +180,7 @@ async function getBestProfitEvents(userId: string, limit: number) {
       [userId, limit]
     );
 
-    return events;
+    return rows;
   } catch (error) {
     console.error('Get best profit events error:', error);
     return { error: '利益ランキングの取得に失敗しました' };
@@ -190,7 +192,7 @@ async function getBestProfitEvents(userId: string, limit: number) {
  */
 async function getRecentApplications(userId: string, limit: number) {
   try {
-    const applications = await query(
+    const [rows] = await pool.query(
       `SELECT title, site, applied_at, result_status
        FROM raffle_user_records
        WHERE user_id = ?
@@ -199,7 +201,7 @@ async function getRecentApplications(userId: string, limit: number) {
       [userId, limit]
     );
 
-    return applications;
+    return rows;
   } catch (error) {
     console.error('Get recent applications error:', error);
     return { error: '最近の応募の取得に失敗しました' };
