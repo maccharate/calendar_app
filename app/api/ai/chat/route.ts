@@ -371,3 +371,32 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
+/**
+ * DELETE /api/ai/chat - 会話履歴を削除
+ */
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'ログインが必要です' }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+
+    // 会話履歴を削除
+    await pool.query(
+      'DELETE FROM ai_conversations WHERE user_id = ?',
+      [userId]
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Delete chat history error:', error);
+    return NextResponse.json(
+      { error: 'エラーが発生しました' },
+      { status: 500 }
+    );
+  }
+}

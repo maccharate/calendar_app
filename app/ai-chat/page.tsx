@@ -96,8 +96,21 @@ export default function AIChatPage() {
   const clearHistory = async () => {
     if (!confirm("会話履歴をクリアしますか？")) return;
 
-    setMessages([]);
-    // TODO: APIでサーバー側の履歴もクリア
+    try {
+      const res = await fetch("/api/ai/chat", {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setMessages([]);
+        alert("履歴をクリアしました");
+      } else {
+        alert("履歴のクリアに失敗しました");
+      }
+    } catch (error) {
+      console.error("Clear history error:", error);
+      alert("履歴のクリアに失敗しました");
+    }
   };
 
   const acceptWarning = () => {
@@ -254,8 +267,7 @@ export default function AIChatPage() {
           </div>
 
           {/* フッター */}
-          <div className="flex justify-between items-center text-sm text-gray-500">
-            <p>Powered by Google Gemini 3.0 Pro Preview</p>
+          <div className="flex justify-end items-center text-sm">
             <button
               onClick={clearHistory}
               className="text-red-400 hover:text-red-300 transition-colors"
