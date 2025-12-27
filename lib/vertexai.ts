@@ -110,10 +110,15 @@ export async function chatWithGemini(options: ChatOptions) {
     });
 
     // 会話履歴を構築（最新メッセージ以外）
-    const history = messages.slice(0, -1).map((msg) => ({
+    let history = messages.slice(0, -1).map((msg) => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }],
     }));
+
+    // 履歴の最初が'model'ロールの場合はスキップ（Gemini APIでは'user'から始まる必要がある）
+    if (history.length > 0 && history[0].role === 'model') {
+      history = history.slice(1);
+    }
 
     // チャットセッション開始
     const chat = generativeModel.startChat({
