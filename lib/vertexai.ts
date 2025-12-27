@@ -147,7 +147,9 @@ export async function chatWithGemini(options: ChatOptions) {
       const functionResponse = await chat.sendMessage([{
         functionResponse: {
           name: functionName,
-          response: functionResult,
+          response: {
+            content: JSON.stringify(functionResult),
+          },
         },
       }]);
 

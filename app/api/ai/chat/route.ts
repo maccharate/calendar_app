@@ -117,18 +117,26 @@ async function handleFunctionCall(userId: string, functionName: string, args: an
  */
 async function getUserStats(userId: string, period: string) {
   try {
-    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/stats`);
-    if (!res.ok) throw new Error('Failed to fetch stats');
+    const [rows] = await pool.query(
+      `SELECT
+        COUNT(*) as totalApplications,
+        SUM(CASE WHEN result_status = 'won' THEN 1 ELSE 0 END) as wonEvents,
+        SUM(CASE WHEN result_status = 'lost' THEN 1 ELSE 0 END) as lostEvents,
+        ROUND(SUM(CASE WHEN result_status = 'won' THEN 1 ELSE 0 END) * 100.0 /
+          NULLIF(SUM(CASE WHEN result_status IN ('won', 'lost') THEN 1 ELSE 0 END), 0), 1) as eventWinRate
+       FROM raffle_status
+       WHERE user_id = ? AND result_status IN ('won', 'lost')`,
+      [userId]
+    );
 
-    const data = await res.json();
-    const stats = data.userStats;
+    const stats = (rows as any[])[0];
 
     return {
       period,
-      totalApplications: stats.totalApplications,
-      wonEvents: stats.wonEvents,
-      lostEvents: stats.lostEvents,
-      eventWinRate: stats.eventWinRate.toFixed(1) + '%',
+      totalApplications: stats.totalApplications || 0,
+      wonEvents: stats.wonEvents || 0,
+      lostEvents: stats.lostEvents || 0,
+      eventWinRate: (stats.eventWinRate || 0) + '%',
     };
   } catch (error) {
     console.error('Get user stats error:', error);
