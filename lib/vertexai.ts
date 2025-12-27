@@ -144,14 +144,12 @@ export async function chatWithGemini(options: ChatOptions) {
       const functionResult = await onFunctionCall(functionName, functionArgs);
 
       // 関数の結果をGeminiに返す
-      const functionResponse = await chat.sendMessage({
-        parts: [{
-          functionResponse: {
-            name: functionName,
-            response: functionResult,
-          },
-        }],
-      });
+      const functionResponse = await chat.sendMessage([{
+        functionResponse: {
+          name: functionName,
+          response: functionResult,
+        },
+      }]);
 
       return {
         content: functionResponse.response.text() || '',
