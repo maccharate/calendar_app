@@ -51,7 +51,7 @@ async function checkTokenLimit(userId: string): Promise<{ allowed: boolean; rema
     const usage = rows as any[];
     if (usage.length === 0) {
       // 今日初めての使用
-      return { allowed: true, remaining: 50000 };
+      return { allowed: true, remaining: 80000 };
     }
 
     const { tokens_used, daily_limit } = usage[0];
@@ -63,7 +63,7 @@ async function checkTokenLimit(userId: string): Promise<{ allowed: boolean; rema
     };
   } catch (error) {
     console.error('Token limit check error:', error);
-    return { allowed: true, remaining: 50000 }; // エラー時は許可
+    return { allowed: true, remaining: 80000 }; // エラー時は許可
   }
 }
 
@@ -76,8 +76,8 @@ async function recordTokenUsage(userId: string, tokensUsed: number) {
   try {
     await pool.query(
       `INSERT INTO ai_token_usage (user_id, date, tokens_used, daily_limit)
-       VALUES (?, ?, ?, 50000)
-       ON DUPLICATE KEY UPDATE tokens_used = tokens_used + ?, daily_limit = 50000`,
+       VALUES (?, ?, ?, 80000)
+       ON DUPLICATE KEY UPDATE tokens_used = tokens_used + ?, daily_limit = 80000`,
       [userId, today, tokensUsed, tokensUsed]
     );
   } catch (error) {
@@ -353,7 +353,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       history,
       remaining,
-      dailyLimit: 50000,
+      dailyLimit: 80000,
     });
   } catch (error) {
     console.error('Get chat history error:', error);
