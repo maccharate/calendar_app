@@ -3,8 +3,11 @@ import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 // Vertex AI初期化（新しいSDK）
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_CLOUD_API_KEY || '');
 
-// Gemini 3.0 Pro Preview モデル
-const model = 'gemini-3-pro-preview';
+// モデル名マッピング
+const MODEL_MAP = {
+  flash: 'gemini-3-flash-preview',
+  pro: 'gemini-3-pro-preview',
+};
 
 // システムプロンプト
 const SYSTEM_PROMPT = `あなたはChimpan Calendarのアシスタントです。
@@ -88,6 +91,7 @@ export interface ChatMessage {
 export interface ChatOptions {
   messages: ChatMessage[];
   userId: string;
+  model?: 'flash' | 'pro';
   onFunctionCall?: (functionName: string, args: any) => Promise<any>;
 }
 
@@ -95,11 +99,12 @@ export interface ChatOptions {
  * Geminiとチャット
  */
 export async function chatWithGemini(options: ChatOptions) {
-  const { messages, userId, onFunctionCall } = options;
+  const { messages, userId, model = 'pro', onFunctionCall } = options;
 
   try {
+    const modelName = MODEL_MAP[model];
     const generativeModel = genAI.getGenerativeModel({
-      model: model,
+      model: modelName,
       systemInstruction: SYSTEM_PROMPT,
       tools: [tools as any],
       generationConfig: {
