@@ -213,7 +213,7 @@ export default function AIChatPage() {
 
           {/* フッター */}
           <div className="flex justify-between items-center text-sm text-gray-500">
-            <p>Powered by Google Gemini 1.5 Flash</p>
+            <p>Powered by Google Gemini 3.0 Flash Preview</p>
             <button
               onClick={clearHistory}
               className="text-red-400 hover:text-red-300 transition-colors"
