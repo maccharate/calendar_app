@@ -13,8 +13,8 @@ export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [remaining, setRemaining] = useState(50000);
-  const [dailyLimit, setDailyLimit] = useState(50000);
+  const [remaining, setRemaining] = useState(80000);
+  const [dailyLimit, setDailyLimit] = useState(80000);
   const [selectedModel, setSelectedModel] = useState<'flash' | 'pro'>('pro');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
