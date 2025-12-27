@@ -1,13 +1,10 @@
-import { VertexAI } from '@google-cloud/vertexai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Vertex AI初期化
-const vertexAI = new VertexAI({
-  project: process.env.VERTEX_AI_PROJECT_ID || '',
-  location: process.env.VERTEX_AI_LOCATION || 'us-central1',
-});
+// Vertex AI初期化（新しいSDK）
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_CLOUD_API_KEY || '');
 
-// Gemini 1.5 Flashモデル
-const model = 'gemini-1.5-flash-002';
+// Gemini 3.0 Flash Preview モデル
+const model = 'gemini-3-flash-preview';
 
 // システムプロンプト
 const SYSTEM_PROMPT = `あなたはChimpan Calendarのアシスタントです。
@@ -24,66 +21,64 @@ const SYSTEM_PROMPT = `あなたはChimpan Calendarのアシスタントです�
 日本語で回答してください。`;
 
 // Function Declarations（統計データ取得用）
-const tools = [
-  {
-    functionDeclarations: [
-      {
-        name: 'get_user_stats',
-        description: 'ユーザーの統計情報（総応募数、当選数、当選率など）を取得します',
-        parameters: {
-          type: 'object',
-          properties: {
-            period: {
-              type: 'string',
-              description: '期間を指定（this_month, last_month, all_time）',
-              enum: ['this_month', 'last_month', 'all_time'],
-            },
+const tools = {
+  functionDeclarations: [
+    {
+      name: 'get_user_stats',
+      description: 'ユーザーの統計情報（総応募数、当選数、当選率など）を取得します',
+      parameters: {
+        type: 'OBJECT' as const,
+        properties: {
+          period: {
+            type: 'STRING' as const,
+            description: '期間を指定（this_month, last_month, all_time）',
+            enum: ['this_month', 'last_month', 'all_time'],
           },
-          required: ['period'],
         },
+        required: ['period'],
       },
-      {
-        name: 'get_site_stats',
-        description: 'サイト別の統計情報（当選率ランキングなど）を取得します',
-        parameters: {
-          type: 'object',
-          properties: {
-            limit: {
-              type: 'number',
-              description: '取得する件数（デフォルト: 5）',
-            },
+    },
+    {
+      name: 'get_site_stats',
+      description: 'サイト別の統計情報（当選率ランキングなど）を取得します',
+      parameters: {
+        type: 'OBJECT' as const,
+        properties: {
+          limit: {
+            type: 'NUMBER' as const,
+            description: '取得する件数（デフォルト: 5）',
           },
         },
       },
-      {
-        name: 'get_best_profit_events',
-        description: '利益が高かったイベントのランキングを取得します',
-        parameters: {
-          type: 'object',
-          properties: {
-            limit: {
-              type: 'number',
-              description: '取得する件数（デフォルト: 5）',
-            },
+    },
+    {
+      name: 'get_best_profit_events',
+      description: '利益が高かったイベントのランキングを取得します',
+      parameters: {
+        type: 'OBJECT' as const,
+        properties: {
+          limit: {
+            type: 'NUMBER' as const,
+            description: '取得する件数（デフォルト: 5）',
           },
         },
       },
-      {
-        name: 'get_recent_applications',
-        description: '最近応募したイベントの一覧を取得します',
-        parameters: {
-          type: 'object',
-          properties: {
-            limit: {
-              type: 'number',
-              description: '取得する件数（デフォルト: 5）',
-            },
+    },
+    {
+      name: 'get_recent_applications',
+      description: '最近応募したイベントの一覧を取得します',
+      parameters: {
+        type: 'OBJECT' as const,
+        properties: {
+          limit: {
+            type: 'NUMBER' as const,
+            description: '取得する件数（デフォルト: 5）',
           },
         },
       },
-    ],
-  },
-];
+    },
+  ],
+};
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -103,35 +98,38 @@ export async function chatWithGemini(options: ChatOptions) {
   const { messages, userId, onFunctionCall } = options;
 
   try {
-    const generativeModel = vertexAI.getGenerativeModel({
+    const generativeModel = genAI.getGenerativeModel({
       model: model,
-      systemInstruction: {
-        parts: [{ text: SYSTEM_PROMPT }],
+      systemInstruction: SYSTEM_PROMPT,
+      tools: [tools],
+      generationConfig: {
+        temperature: 1,
+        topP: 0.95,
+        maxOutputTokens: 8192,
       },
     });
 
     // 会話履歴を構築
-    const contents = messages.map((msg) => ({
+    const history = messages.slice(0, -1).map((msg) => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }],
     }));
 
-    // Function Callingを有効にして送信
+    // チャットセッション開始
     const chat = generativeModel.startChat({
-      tools: tools,
+      history: history,
     });
 
-    const result = await chat.sendMessage(contents[contents.length - 1].parts[0].text);
+    // 最新のメッセージを送信
+    const lastMessage = messages[messages.length - 1].content;
+    const result = await chat.sendMessage(lastMessage);
     const response = result.response;
 
     // Function Callがあるかチェック
-    const functionCalls = response.candidates?.[0]?.content?.parts?.filter(
-      (part: any) => part.functionCall
-    );
+    const candidate = response.candidates?.[0];
+    const functionCall = candidate?.content?.parts?.find((part: any) => part.functionCall)?.functionCall;
 
-    if (functionCalls && functionCalls.length > 0 && onFunctionCall) {
-      // Function Callを実行
-      const functionCall = functionCalls[0].functionCall;
+    if (functionCall && onFunctionCall) {
       const functionName = functionCall.name;
       const functionArgs = functionCall.args;
 
@@ -151,15 +149,15 @@ export async function chatWithGemini(options: ChatOptions) {
       ]);
 
       return {
-        content: functionResponse.response.candidates?.[0]?.content?.parts?.[0]?.text || '',
-        tokensUsed: estimateTokens(messages, functionResponse.response.candidates?.[0]?.content?.parts?.[0]?.text || ''),
+        content: functionResponse.response.text() || '',
+        tokensUsed: estimateTokens(messages, functionResponse.response.text() || ''),
       };
     }
 
     // 通常のレスポンス
     return {
-      content: response.candidates?.[0]?.content?.parts?.[0]?.text || '',
-      tokensUsed: estimateTokens(messages, response.candidates?.[0]?.content?.parts?.[0]?.text || ''),
+      content: response.text() || '',
+      tokensUsed: estimateTokens(messages, response.text() || ''),
     };
   } catch (error) {
     console.error('Vertex AI Error:', error);
