@@ -101,7 +101,7 @@ export async function chatWithGemini(options: ChatOptions) {
     const generativeModel = genAI.getGenerativeModel({
       model: model,
       systemInstruction: SYSTEM_PROMPT,
-      tools: [tools as any],
+      // tools: [tools as any], // 一旦無効化
       generationConfig: {
         temperature: 1,
         topP: 0.95,
