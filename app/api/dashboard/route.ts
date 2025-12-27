@@ -123,13 +123,13 @@ export async function GET(request: NextRequest) {
     // 最近の取引（期間に関わらず最新5件）
     const [recentRows] = await pool.query(
       `SELECT
-        rs.record_id as id,
-        COALESCE(r.sneaker, '商品名なし') as title,
+        rs.id,
+        COALESCE(ce.title, rs.product_name, '商品名なし') as title,
         COALESCE(rs.profit, 0) as profit,
         rs.sale_date,
         COALESCE(rs.platform, 'その他') as platform
        FROM raffle_status rs
-       LEFT JOIN reminder r ON rs.raffle_id = r.id
+       LEFT JOIN calendar_events ce ON rs.raffle_id = ce.id
        WHERE rs.user_id = ?
        AND rs.result_status IN ('won', 'partial', 'purchased')
        AND rs.sale_price IS NOT NULL
