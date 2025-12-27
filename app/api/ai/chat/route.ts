@@ -77,7 +77,7 @@ async function recordTokenUsage(userId: string, tokensUsed: number) {
     await pool.query(
       `INSERT INTO ai_token_usage (user_id, date, tokens_used, daily_limit)
        VALUES (?, ?, ?, 50000)
-       ON DUPLICATE KEY UPDATE tokens_used = tokens_used + ?`,
+       ON DUPLICATE KEY UPDATE tokens_used = tokens_used + ?, daily_limit = 50000`,
       [userId, today, tokensUsed, tokensUsed]
     );
   } catch (error) {
