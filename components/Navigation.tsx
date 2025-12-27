@@ -63,6 +63,7 @@ export default function Navigation() {
     { name: "統計", path: "/stats", badge: 0 },
     { name: "履歴", path: "/history", badge: 0 },
     { name: "プレゼント", path: "/giveaway", badge: unenteredGiveawayCount },
+    { name: "AIチャット", path: "/ai-chat", badge: 0 },
     { name: "設定", path: "/settings", badge: 0 },
     { name: "ヘルプ", path: "/help", badge: 0 },
   ];
