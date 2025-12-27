@@ -5,9 +5,53 @@ import { useState } from "react";
 
 export default function HelpPage() {
   const [openSection, setOpenSection] = useState<string | null>("calendar");
+  const [feedbackCategory, setFeedbackCategory] = useState("feature");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
 
   const toggleSection = (section: string) => {
     setOpenSection(openSection === section ? null : section);
+  };
+
+  const handleSubmitFeedback = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!feedbackMessage.trim()) {
+      alert("メッセージを入力してください");
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitStatus("idle");
+
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          category: feedbackCategory,
+          message: feedbackMessage,
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "送信に失敗しました");
+      }
+
+      setSubmitStatus("success");
+      setFeedbackMessage("");
+      setTimeout(() => setSubmitStatus("idle"), 5000);
+    } catch (error: any) {
+      console.error("Feedback error:", error);
+      setSubmitStatus("error");
+      alert(error.message || "送信に失敗しました");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const sections = [
@@ -213,28 +257,99 @@ export default function HelpPage() {
     },
     {
       id: "request",
-      title: "機能リクエスト",
+      title: "フィードバック",
       content: (
         <div className="space-y-4">
-          <p className="text-sm">新機能の提案や改善要望を匿名で送信できます。</p>
+          <p className="text-sm">機能リクエスト、バグ報告、改善提案などをお送りください。</p>
 
-          <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-            <h4 className="font-semibold text-base mb-3">リクエストを送信する</h4>
-            <p className="text-sm text-gray-400 mb-4">
-              以下のフォームから、機能追加や改善のアイデアを送信してください。<br />
-              匿名での送信が可能です。
-            </p>
-            <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLSf_YOUR_FORM_ID/viewform"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-6 py-3 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/50 rounded-lg transition-colors font-semibold text-sm"
+          <form onSubmit={handleSubmitFeedback} className="bg-gray-800/50 rounded-lg p-6 border border-gray-700 space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-3">
+                カテゴリ
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFeedbackCategory("feature")}
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                    feedbackCategory === "feature"
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  機能リクエスト
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFeedbackCategory("bug")}
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                    feedbackCategory === "bug"
+                      ? "bg-red-600 text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  バグ報告
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFeedbackCategory("improvement")}
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                    feedbackCategory === "improvement"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  改善提案
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFeedbackCategory("other")}
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                    feedbackCategory === "other"
+                      ? "bg-purple-600 text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  その他
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
+                メッセージ
+              </label>
+              <textarea
+                value={feedbackMessage}
+                onChange={(e) => setFeedbackMessage(e.target.value)}
+                className="w-full bg-gray-900/70 border-2 border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner h-32 resize-none"
+                placeholder="できるだけ具体的に記述してください..."
+                maxLength={2000}
+                disabled={submitting}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {feedbackMessage.length}/2000文字
+              </p>
+            </div>
+
+            {submitStatus === "success" && (
+              <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3">
+                <p className="text-sm text-green-400">
+                  送信しました！ご協力ありがとうございます。
+                </p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting || !feedbackMessage.trim()}
+              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed rounded-xl font-bold transition-all shadow-lg text-white"
             >
-              リクエストフォームを開く
-            </a>
-          </div>
+              {submitting ? "送信中..." : "送信する"}
+            </button>
+          </form>
 
-          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mt-4">
+          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
             <p className="text-sm text-blue-200">
               <strong>お願い:</strong> できるだけ具体的に記述していただけると、実装の参考になります。
             </p>
