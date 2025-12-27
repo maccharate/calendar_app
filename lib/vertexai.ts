@@ -4,7 +4,7 @@ import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_CLOUD_API_KEY || '');
 
 // Gemini 1.5 Flash モデル
-const model = 'gemini-1.5-flash';
+const model = 'gemini-1.5-flash-latest';
 
 // システムプロンプト
 const SYSTEM_PROMPT = `あなたはChimpan Calendarのアシスタントです。
