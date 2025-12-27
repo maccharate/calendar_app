@@ -143,13 +143,14 @@ async function getSiteStats(userId: string, limit: number) {
   try {
     const [rows] = await pool.query(
       `SELECT
-        site,
+        ce.site,
         COUNT(*) as applications,
-        SUM(CASE WHEN result_status = 'won' THEN 1 ELSE 0 END) as won,
-        ROUND(SUM(CASE WHEN result_status = 'won' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) as win_rate
-       FROM raffle_user_records
-       WHERE user_id = ? AND result_status IN ('won', 'lost')
-       GROUP BY site
+        SUM(CASE WHEN rs.result_status = 'won' THEN 1 ELSE 0 END) as won,
+        ROUND(SUM(CASE WHEN rs.result_status = 'won' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) as win_rate
+       FROM raffle_status rs
+       JOIN calendar_events ce ON rs.raffle_id = ce.id
+       WHERE rs.user_id = ? AND rs.result_status IN ('won', 'lost')
+       GROUP BY ce.site
        ORDER BY win_rate DESC
        LIMIT ?`,
       [userId, limit]
@@ -169,13 +170,13 @@ async function getBestProfitEvents(userId: string, limit: number) {
   try {
     const [rows] = await pool.query(
       `SELECT
-        r.title,
-        r.site,
-        rd.profit
-       FROM raffle_user_records r
-       JOIN raffle_details rd ON r.record_id = rd.record_id
-       WHERE r.user_id = ? AND rd.profit IS NOT NULL AND rd.profit > 0
-       ORDER BY rd.profit DESC
+        ce.title,
+        ce.site,
+        rs.profit
+       FROM raffle_status rs
+       JOIN calendar_events ce ON rs.raffle_id = ce.id
+       WHERE rs.user_id = ? AND rs.profit IS NOT NULL AND rs.profit > 0
+       ORDER BY rs.profit DESC
        LIMIT ?`,
       [userId, limit]
     );
@@ -193,10 +194,15 @@ async function getBestProfitEvents(userId: string, limit: number) {
 async function getRecentApplications(userId: string, limit: number) {
   try {
     const [rows] = await pool.query(
-      `SELECT title, site, applied_at, result_status
-       FROM raffle_user_records
-       WHERE user_id = ?
-       ORDER BY applied_at DESC
+      `SELECT
+        ce.title,
+        ce.site,
+        rs.applied_at,
+        rs.result_status
+       FROM raffle_status rs
+       JOIN calendar_events ce ON rs.raffle_id = ce.id
+       WHERE rs.user_id = ?
+       ORDER BY rs.applied_at DESC
        LIMIT ?`,
       [userId, limit]
     );
