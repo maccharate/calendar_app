@@ -1,5 +1,5 @@
 // Service Worker for PWA
-const CACHE_NAME = 'chimpan-calendar-v5';
+const CACHE_NAME = 'chimpan-calendar-v6';
 const urlsToCache = [
   '/calendar',
   '/dashboard',
