@@ -3,6 +3,38 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { chatWithGemini, ChatMessage } from '@/lib/vertexai';
 import { pool } from '@/lib/db';
+import fs from 'fs/promises';
+import path from 'path';
+
+/**
+ * アプリに関する質問かどうかを判定
+ */
+function isAppRelatedQuestion(message: string): boolean {
+  const keywords = [
+    'アプリ', '使い方', '機能', '通知', '設定',
+    'プッシュ', 'PWA', 'インストール', 'ヘルプ',
+    'どうやって', 'できる', 'できない', 'わからない',
+    'ページ', 'カレンダー', 'ダッシュボード', '履歴',
+    'プレゼント', 'このアプリ', '何ができる',
+    'やり方', '方法', '手順', 'ログイン', '認証'
+  ];
+
+  return keywords.some(keyword => message.includes(keyword));
+}
+
+/**
+ * アプリガイドを読み込む
+ */
+async function loadAppGuide(): Promise<string> {
+  try {
+    const guidePath = path.join(process.cwd(), 'docs', 'app-guide.md');
+    const guideContent = await fs.readFile(guidePath, 'utf-8');
+    return guideContent;
+  } catch (error) {
+    console.error('Failed to load app guide:', error);
+    return '';
+  }
+}
 
 /**
  * トークン使用量をチェック
@@ -19,7 +51,7 @@ async function checkTokenLimit(userId: string): Promise<{ allowed: boolean; rema
     const usage = rows as any[];
     if (usage.length === 0) {
       // 今日初めての使用
-      return { allowed: true, remaining: 10000 };
+      return { allowed: true, remaining: 50000 };
     }
 
     const { tokens_used, daily_limit } = usage[0];
@@ -31,7 +63,7 @@ async function checkTokenLimit(userId: string): Promise<{ allowed: boolean; rema
     };
   } catch (error) {
     console.error('Token limit check error:', error);
-    return { allowed: true, remaining: 10000 }; // エラー時は許可
+    return { allowed: true, remaining: 50000 }; // エラー時は許可
   }
 }
 
@@ -44,7 +76,7 @@ async function recordTokenUsage(userId: string, tokensUsed: number) {
   try {
     await pool.query(
       `INSERT INTO ai_token_usage (user_id, date, tokens_used, daily_limit)
-       VALUES (?, ?, ?, 10000)
+       VALUES (?, ?, ?, 50000)
        ON DUPLICATE KEY UPDATE tokens_used = tokens_used + ?`,
       [userId, today, tokensUsed, tokensUsed]
     );
@@ -252,8 +284,18 @@ export async function POST(req: NextRequest) {
     // 会話履歴を取得
     const history = await getConversationHistory(userId, 50);
 
+    // アプリ関連の質問かチェックし、必要ならガイドを読み込む
+    let enhancedMessage = message;
+    if (isAppRelatedQuestion(message)) {
+      const appGuide = await loadAppGuide();
+      if (appGuide) {
+        enhancedMessage = `# アプリガイド（参考情報）\n\n${appGuide}\n\n---\n\n# ユーザーの質問\n\n${message}`;
+        console.log('App-related question detected, loading app guide');
+      }
+    }
+
     // ユーザーメッセージを追加
-    const messages: ChatMessage[] = [...history, { role: 'user', content: message }];
+    const messages: ChatMessage[] = [...history, { role: 'user', content: enhancedMessage }];
 
     // AIとチャット
     const aiResponse = await chatWithGemini({
@@ -308,7 +350,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       history,
       remaining,
-      dailyLimit: 10000,
+      dailyLimit: 50000,
     });
   } catch (error) {
     console.error('Get chat history error:', error);
