@@ -2,9 +2,6 @@
 module.exports = {
   // output: 'standalone', // Commented out: causes issues with "next start"
 
-  // Disable telemetry to prevent external data collection
-  analyticsId: '',
-
   images: {
     // 開発中の外部画像を素早く表示するため、最適化を無効化（本番では見直す）
     unoptimized: true,
@@ -26,10 +23,5 @@ module.exports = {
         pathname: '/**',
       },
     ],
-  },
-
-  // Experimental features - disable AI-related features
-  experimental: {
-    // Disable any experimental AI features
   },
 };
