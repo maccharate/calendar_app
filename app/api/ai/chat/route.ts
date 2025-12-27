@@ -266,7 +266,7 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = session.user.id;
-    const { message } = await req.json();
+    const { message, model = 'pro' } = await req.json();
 
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return NextResponse.json({ error: 'メッセージを入力してください' }, { status: 400 });
@@ -301,6 +301,7 @@ export async function POST(req: NextRequest) {
     const aiResponse = await chatWithGemini({
       messages,
       userId,
+      model: model as 'flash' | 'pro',
       onFunctionCall: (functionName, args) => handleFunctionCall(userId, functionName, args),
     });
 
@@ -308,8 +309,10 @@ export async function POST(req: NextRequest) {
     await saveConversation(userId, 'user', message, 0);
     await saveConversation(userId, 'assistant', aiResponse.content, aiResponse.tokensUsed);
 
-    // トークン使用量を記録
-    await recordTokenUsage(userId, aiResponse.tokensUsed);
+    // トークン使用量を記録（重み付け適用: Flash=1x, Pro=2x）
+    const tokenMultiplier = model === 'flash' ? 1.0 : 2.0;
+    const weightedTokens = Math.ceil(aiResponse.tokensUsed * tokenMultiplier);
+    await recordTokenUsage(userId, weightedTokens);
 
     // 残りトークン数を再計算
     const updatedLimit = await checkTokenLimit(userId);

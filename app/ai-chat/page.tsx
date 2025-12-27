@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Navigation from "@/components/Navigation";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 interface Message {
   role: "user" | "assistant";
@@ -14,6 +15,7 @@ export default function AIChatPage() {
   const [loading, setLoading] = useState(false);
   const [remaining, setRemaining] = useState(50000);
   const [dailyLimit, setDailyLimit] = useState(50000);
+  const [selectedModel, setSelectedModel] = useState<'flash' | 'pro'>('pro');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // 会話履歴を読み込み
@@ -57,7 +59,7 @@ export default function AIChatPage() {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ message: userMessage, model: selectedModel }),
       });
 
       const data = await res.json();
@@ -120,6 +122,26 @@ export default function AIChatPage() {
             </div>
           </div>
 
+          {/* モデル選択 */}
+          <div className="mb-6 bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-300">AIモデル</span>
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value as 'flash' | 'pro')}
+                className="bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="flash">Gemini 3.0 Flash (軽量・高速)</option>
+                <option value="pro">Gemini 3.0 Pro (高性能)</option>
+              </select>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {selectedModel === 'flash'
+                ? '1トークン = 1クレジット（軽量モデル）'
+                : '1トークン = 2クレジット（高性能モデル、Flashの2倍消費）'}
+            </p>
+          </div>
+
           {/* チャットエリア */}
           <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl border border-gray-700/50 mb-6 h-[600px] flex flex-col">
             {/* メッセージ一覧 */}
@@ -168,7 +190,13 @@ export default function AIChatPage() {
                         : "bg-gray-700/50 text-gray-100"
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    {msg.role === "user" ? (
+                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    ) : (
+                      <div className="text-sm">
+                        <MarkdownRenderer content={msg.content} />
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
