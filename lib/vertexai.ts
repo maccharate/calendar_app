@@ -3,8 +3,8 @@ import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 // Vertex AI初期化（新しいSDK）
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_CLOUD_API_KEY || '');
 
-// Gemini 3.0 Flash Preview モデル
-const model = 'gemini-3-flash-preview';
+// Gemini 1.5 Flash モデル
+const model = 'gemini-1.5-flash';
 
 // システムプロンプト
 const SYSTEM_PROMPT = `あなたはChimpan Calendarのアシスタントです。
@@ -109,7 +109,7 @@ export async function chatWithGemini(options: ChatOptions) {
       },
     });
 
-    // 会話履歴を構築
+    // 会話履歴を構築（最新メッセージ以外）
     const history = messages.slice(0, -1).map((msg) => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }],
@@ -117,7 +117,7 @@ export async function chatWithGemini(options: ChatOptions) {
 
     // チャットセッション開始
     const chat = generativeModel.startChat({
-      history: history,
+      history: history.length > 0 ? history : undefined,
     });
 
     // 最新のメッセージを送信
