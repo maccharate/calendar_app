@@ -12,8 +12,8 @@ export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [remaining, setRemaining] = useState(10000);
-  const [dailyLimit, setDailyLimit] = useState(10000);
+  const [remaining, setRemaining] = useState(50000);
+  const [dailyLimit, setDailyLimit] = useState(50000);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // 会話履歴を読み込み
@@ -213,7 +213,7 @@ export default function AIChatPage() {
 
           {/* フッター */}
           <div className="flex justify-between items-center text-sm text-gray-500">
-            <p>Powered by Google Gemini 3.0 Flash Preview</p>
+            <p>Powered by Google Gemini 3.0 Pro Preview</p>
             <button
               onClick={clearHistory}
               className="text-red-400 hover:text-red-300 transition-colors"
