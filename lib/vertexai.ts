@@ -3,8 +3,8 @@ import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 // Vertex AI初期化（新しいSDK）
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_CLOUD_API_KEY || '');
 
-// Gemini 3.0 Flash Preview モデル
-const model = 'gemini-3-flash-preview';
+// Gemini 1.5 Flash モデル
+const model = 'gemini-1.5-flash';
 
 // システムプロンプト
 const SYSTEM_PROMPT = `あなたはChimpan Calendarのアシスタントです。
