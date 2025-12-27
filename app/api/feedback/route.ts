@@ -29,8 +29,10 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    // レート制限チェック（IPアドレスまたはユーザーIDで識別）
-    const identifier = session?.user?.id || req.ip || "anonymous";
+    // レート制限チェック（ユーザーIDまたはIPアドレスで識別）
+    const forwarded = req.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0] : req.headers.get('x-real-ip') || 'unknown';
+    const identifier = session?.user?.id || ip;
     if (!checkRateLimit(identifier)) {
       return NextResponse.json(
         { error: "送信制限に達しました。1分後に再度お試しください。" },
