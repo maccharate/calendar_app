@@ -9,7 +9,7 @@
  */
 const mysql = require('mysql2/promise');
 const webpush = require('web-push');
-require('dotenv').config({ path: '.env.local' });
+require('dotenv').config({ path: __dirname + '/../.env' });
 
 // VAPID設定
 webpush.setVapidDetails(                // ← ここだけ修正！
