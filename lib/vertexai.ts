@@ -109,7 +109,7 @@ export async function chatWithGemini(options: ChatOptions) {
       },
     });
 
-    // 会話履歴を構築
+    // 会話履歴を構築（最新メッセージ以外）
     const history = messages.slice(0, -1).map((msg) => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }],
@@ -117,7 +117,7 @@ export async function chatWithGemini(options: ChatOptions) {
 
     // チャットセッション開始
     const chat = generativeModel.startChat({
-      history: history,
+      history: history.length > 0 ? history : undefined,
     });
 
     // 最新のメッセージを送信
