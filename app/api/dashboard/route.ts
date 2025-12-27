@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
     const [recentRows] = await pool.query(
       `SELECT
         rs.record_id as id,
-        COALESCE(r.sneaker, rs.product_name, '商品名なし') as title,
+        COALESCE(r.sneaker, '商品名なし') as title,
         COALESCE(rs.profit, 0) as profit,
         rs.sale_date,
         COALESCE(rs.platform, 'その他') as platform
@@ -159,8 +159,11 @@ export async function GET(request: NextRequest) {
       profitByPlatform,
       recentTransactions,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("[API Error] /api/dashboard:", error);
-    return NextResponse.json({ error: "Failed to fetch dashboard data" }, { status: 500 });
+    return NextResponse.json({
+      error: "Failed to fetch dashboard data",
+      details: error.message
+    }, { status: 500 });
   }
 }
