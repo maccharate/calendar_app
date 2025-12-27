@@ -145,10 +145,12 @@ export async function chatWithGemini(options: ChatOptions) {
 
       // 関数の結果をGeminiに返す
       const functionResponse = await chat.sendMessage({
-        functionResponse: {
-          name: functionName,
-          response: functionResult,
-        },
+        parts: [{
+          functionResponse: {
+            name: functionName,
+            response: functionResult,
+          },
+        }],
       });
 
       return {
