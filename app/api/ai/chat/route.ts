@@ -37,10 +37,18 @@ async function loadAppGuide(): Promise<string> {
 }
 
 /**
+ * JST（日本時間）で今日の日付を取得
+ */
+function getJSTDate(): string {
+  const jstDate = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+  return jstDate.toISOString().split('T')[0];
+}
+
+/**
  * トークン使用量をチェック
  */
 async function checkTokenLimit(userId: string): Promise<{ allowed: boolean; remaining: number }> {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getJSTDate();
 
   try {
     const [rows] = await pool.query(
@@ -71,7 +79,7 @@ async function checkTokenLimit(userId: string): Promise<{ allowed: boolean; rema
  * トークン使用量を記録
  */
 async function recordTokenUsage(userId: string, tokensUsed: number) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getJSTDate();
 
   try {
     await pool.query(
